@@ -60,3 +60,25 @@ fastlane/report.xml
 fastlane/Preview.html
 fastlane/screenshots/**/*.png
 fastlane/test_output
+
+# Xcode
+.DS_Store
+*.xcworkspace/
+*.xcuserdata/
+*.xcuserstate
+*.lock
+*.plist
+*.xcconfig
+# Swift Package Manager
+/.build/
+# CocoaPods
+Pods/
+# Carthage
+Carthage/
+# fastlane
+fastlane/report.xml
+fastlane/Preview.html
+fastlane/screenshots/**/*.png
+# General
+DerivedData/
+build/
