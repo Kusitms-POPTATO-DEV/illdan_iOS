@@ -6,16 +6,22 @@
 //
 
 import SwiftUI
+import KakaoSDKCommon
+import KakaoSDKAuth
 
 @main
 struct Poptato_iOSApp: App {
+    init() {
+        KakaoSDK.initSDK(appKey: Secrets.kakaoAppKey)
+    }
+    
     @State private var finishSplash = false
     
     var body: some Scene {
         WindowGroup {
             ZStack {
                 if finishSplash {
-//                    SplashView()
+                    MainView()
                 }
                 else {
                     SplashView()

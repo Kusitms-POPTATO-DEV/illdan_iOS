@@ -8,8 +8,31 @@
 import SwiftUI
 
 struct MainView: View {
+    @State private var isLogined = false
+    
     var body: some View {
-        Text(/*@START_MENU_TOKEN@*/"Hello, World!"/*@END_MENU_TOKEN@*/)
+        if isLogined {
+            TabView {
+//                HomeView()
+//                    .tabItem {
+//                        Label("Home", systemImage: "house")
+//                    }
+//
+//                SettingsView()
+//                    .tabItem {
+//                        Label("Settings", systemImage: "gearshape")
+//                    }
+//
+//                ProfileView()
+//                    .tabItem {
+//                        Label("Profile", systemImage: "person")
+//                    }
+            }
+        } else {
+            KaKaoLoginView(
+                onSuccessLogin: { isLogined = true }
+            )
+        }
     }
 }
 
