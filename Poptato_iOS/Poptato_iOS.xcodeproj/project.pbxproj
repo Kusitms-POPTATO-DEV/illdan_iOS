@@ -6,6 +6,12 @@
 	objectVersion = 77;
 	objects = {
 
+/* Begin PBXBuildFile section */
+		E2C6E85D2CC8D09C000D43C0 /* KakaoSDKAuth in Frameworks */ = {isa = PBXBuildFile; productRef = E2C6E85C2CC8D09C000D43C0 /* KakaoSDKAuth */; };
+		E2C6E85F2CC8D09C000D43C0 /* KakaoSDKCommon in Frameworks */ = {isa = PBXBuildFile; productRef = E2C6E85E2CC8D09C000D43C0 /* KakaoSDKCommon */; };
+		E2C6E8612CC8D09C000D43C0 /* KakaoSDKUser in Frameworks */ = {isa = PBXBuildFile; productRef = E2C6E8602CC8D09C000D43C0 /* KakaoSDKUser */; };
+/* End PBXBuildFile section */
+
 /* Begin PBXContainerItemProxy section */
 		E220716C2CC63C1D00AC6694 /* PBXContainerItemProxy */ = {
 			isa = PBXContainerItemProxy;
@@ -52,6 +58,9 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				E2C6E85F2CC8D09C000D43C0 /* KakaoSDKCommon in Frameworks */,
+				E2C6E85D2CC8D09C000D43C0 /* KakaoSDKAuth in Frameworks */,
+				E2C6E8612CC8D09C000D43C0 /* KakaoSDKUser in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -112,6 +121,9 @@
 			);
 			name = Poptato_iOS;
 			packageProductDependencies = (
+				E2C6E85C2CC8D09C000D43C0 /* KakaoSDKAuth */,
+				E2C6E85E2CC8D09C000D43C0 /* KakaoSDKCommon */,
+				E2C6E8602CC8D09C000D43C0 /* KakaoSDKUser */,
 			);
 			productName = Poptato_iOS;
 			productReference = E220715B2CC63C1C00AC6694 /* Poptato_iOS.app */;
@@ -195,6 +207,9 @@
 			);
 			mainGroup = E22071522CC63C1C00AC6694;
 			minimizedProjectReferenceProxies = 1;
+			packageReferences = (
+				E2C6E85B2CC8D09C000D43C0 /* XCRemoteSwiftPackageReference "kakao-ios-sdk" */,
+			);
 			preferredProjectObjectVersion = 77;
 			productRefGroup = E220715C2CC63C1C00AC6694 /* Products */;
 			projectDirPath = "";
@@ -399,6 +414,7 @@
 				DEVELOPMENT_TEAM = Y2Q4TFA96S;
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_FILE = "Poptato-iOS-Info.plist";
 				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
 				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
 				INFOPLIST_KEY_UILaunchScreen_Generation = YES;
@@ -428,6 +444,7 @@
 				DEVELOPMENT_TEAM = Y2Q4TFA96S;
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_FILE = "Poptato-iOS-Info.plist";
 				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
 				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
 				INFOPLIST_KEY_UILaunchScreen_Generation = YES;
@@ -554,6 +571,35 @@
 			defaultConfigurationName = Release;
 		};
 /* End XCConfigurationList section */
+
+/* Begin XCRemoteSwiftPackageReference section */
+		E2C6E85B2CC8D09C000D43C0 /* XCRemoteSwiftPackageReference "kakao-ios-sdk" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/kakao/kakao-ios-sdk";
+			requirement = {
+				branch = master;
+				kind = branch;
+			};
+		};
+/* End XCRemoteSwiftPackageReference section */
+
+/* Begin XCSwiftPackageProductDependency section */
+		E2C6E85C2CC8D09C000D43C0 /* KakaoSDKAuth */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = E2C6E85B2CC8D09C000D43C0 /* XCRemoteSwiftPackageReference "kakao-ios-sdk" */;
+			productName = KakaoSDKAuth;
+		};
+		E2C6E85E2CC8D09C000D43C0 /* KakaoSDKCommon */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = E2C6E85B2CC8D09C000D43C0 /* XCRemoteSwiftPackageReference "kakao-ios-sdk" */;
+			productName = KakaoSDKCommon;
+		};
+		E2C6E8602CC8D09C000D43C0 /* KakaoSDKUser */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = E2C6E85B2CC8D09C000D43C0 /* XCRemoteSwiftPackageReference "kakao-ios-sdk" */;
+			productName = KakaoSDKUser;
+		};
+/* End XCSwiftPackageProductDependency section */
 	};
 	rootObject = E22071532CC63C1C00AC6694 /* Project object */;
 }
