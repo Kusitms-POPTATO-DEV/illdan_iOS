@@ -10,7 +10,6 @@ import Combine
 
 struct BacklogView: View {
     @State private var backlogList: Array<Int> = []
-    @State private var newBacklogInput: String = ""
     @FocusState private var isTextFieldFocused: Bool
     
     var body: some View {
