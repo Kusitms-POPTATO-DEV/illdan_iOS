@@ -10,28 +10,36 @@ import SwiftUI
 struct MainView: View {
     @State private var isLogined = false
     
+    init() {
+            let appearance = UITabBarAppearance()
+            appearance.configureWithOpaqueBackground()
+            appearance.backgroundColor = UIColor(Color.gray100)
+        
+            appearance.stackedLayoutAppearance.normal.iconColor = UIColor(Color.gray90)
+            appearance.stackedLayoutAppearance.normal.titleTextAttributes = [.foregroundColor: UIColor(Color.gray80)]
+            
+            appearance.stackedLayoutAppearance.selected.iconColor = UIColor(Color.primary60)
+            appearance.stackedLayoutAppearance.selected.titleTextAttributes = [.foregroundColor: UIColor(Color.primary60)]
+
+            UITabBar.appearance().standardAppearance = appearance
+            UITabBar.appearance().scrollEdgeAppearance = appearance
+        }
+    
     var body: some View {
-        if isLogined {
-            TabView {
-//                HomeView()
-//                    .tabItem {
-//                        Label("Home", systemImage: "house")
-//                    }
-//
-//                SettingsView()
-//                    .tabItem {
-//                        Label("Settings", systemImage: "gearshape")
-//                    }
-//
-//                ProfileView()
-//                    .tabItem {
-//                        Label("Profile", systemImage: "person")
-//                    }
+        ZStack {
+            if isLogined {
+                TabView {
+                    BacklogView()
+                        .tabItem {
+                            Label("할 일", image: "ic_backlog_selected")
+                                .font(PoptatoTypo.xsMedium)
+                        }
+                }
+            } else {
+                KaKaoLoginView(
+                    onSuccessLogin: { isLogined = true }
+                )
             }
-        } else {
-            KaKaoLoginView(
-                onSuccessLogin: { isLogined = true }
-            )
         }
     }
 }

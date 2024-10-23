@@ -35,6 +35,7 @@ struct KaKaoLoginView: View {
                             }
                             if let oauthToken = oauthToken{
                                 onSuccessLogin()
+                                print("kakao success: \(oauthToken)")
                             }
                         }
                     } else {
@@ -44,7 +45,7 @@ struct KaKaoLoginView: View {
                             }
                             if let oauthToken = oauthToken{
                                 onSuccessLogin()
-                                print("kakao success")
+                                print("kakao success: \(oauthToken)")
                             }
                         }
                     }
