@@ -8,8 +8,30 @@
 import SwiftUI
 
 struct TopBar: View {
+    var titleText: String = "할 일"
+    var subText: String = "8"
+    
     var body: some View {
-        Text(/*@START_MENU_TOKEN@*/"Hello, World!"/*@END_MENU_TOKEN@*/)
+        ZStack {
+            Color.gray100
+                .ignoresSafeArea(.all)
+            
+            HStack {
+                Text(titleText)
+                    .font(PoptatoTypo.xxxLSemiBold)
+                    .foregroundColor(.gray00)
+                
+                Spacer().frame(width: 8)
+                
+                Text(subText)
+                    .font(PoptatoTypo.xLSemiBold)
+                    .foregroundColor(.primary60)
+                
+                Spacer()
+            }
+            .padding(.horizontal, 16)
+        }
+        .frame(width: .infinity, height: 56)
     }
 }
 
