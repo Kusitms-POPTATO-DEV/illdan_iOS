@@ -82,3 +82,6 @@ fastlane/screenshots/**/*.png
 # General
 DerivedData/
 build/
+
+Poptato_iOS/Poptato_iOS/Secrets.swift
+Secrets.swift
