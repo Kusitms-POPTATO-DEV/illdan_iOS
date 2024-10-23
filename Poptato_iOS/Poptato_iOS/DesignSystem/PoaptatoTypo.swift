@@ -7,33 +7,41 @@
 import SwiftUI
 
 struct PoptatoTypo {
-    static let fontFamily = "Pretendard"
+    static let pretendardBlack = "Pretendard-Black"
+    static let pretendardBold = "Pretendard-Bold"
+    static let pretendardExtraBold = "Pretendart-ExtraBold"
+    static let pretendardExtraLight = "Pretendard-ExtraLight"
+    static let pretendardLight = "Pretendard-Light"
+    static let pretendardMedium = "Pretendard-Medium"
+    static let pretendardRegular = "Pretendard-Regular"
+    static let pretendardSemiBold = "Pretendard-SemiBold"
+    static let pretendardThin = "Pretendard-Thin"
 
-    static let xxxLSemiBold: Font = .custom(fontFamily, size: 24).weight(.semibold)
-    static let xxxLMedium: Font = .custom(fontFamily, size: 24).weight(.medium)
-    static let xxxLRegular: Font = .custom(fontFamily, size: 24).weight(.regular)
+    static let xxxLSemiBold: Font = .custom(pretendardSemiBold, size: 24).weight(.semibold)
+    static let xxxLMedium: Font = .custom(pretendardMedium, size: 24).weight(.medium)
+    static let xxxLRegular: Font = .custom(pretendardRegular, size: 24).weight(.regular)
 
-    static let xxLSemiBold: Font = .custom(fontFamily, size: 22).weight(.semibold)
-    static let xxLMedium: Font = .custom(fontFamily, size: 22).weight(.medium)
-    static let xxLRegular: Font = .custom(fontFamily, size: 22).weight(.regular)
+    static let xxLSemiBold: Font = .custom(pretendardSemiBold, size: 22).weight(.semibold)
+    static let xxLMedium: Font = .custom(pretendardMedium, size: 22).weight(.medium)
+    static let xxLRegular: Font = .custom(pretendardRegular, size: 22).weight(.regular)
 
-    static let xLSemiBold: Font = .custom(fontFamily, size: 20).weight(.semibold)
-    static let xLMedium: Font = .custom(fontFamily, size: 20).weight(.medium)
-    static let xLRegular: Font = .custom(fontFamily, size: 20).weight(.regular)
+    static let xLSemiBold: Font = .custom(pretendardSemiBold, size: 20).weight(.semibold)
+    static let xLMedium: Font = .custom(pretendardMedium, size: 20).weight(.medium)
+    static let xLRegular: Font = .custom(pretendardRegular, size: 20).weight(.regular)
 
-    static let lgSemiBold: Font = .custom(fontFamily, size: 18).weight(.semibold)
-    static let lgMedium: Font = .custom(fontFamily, size: 18).weight(.medium)
-    static let lgRegular: Font = .custom(fontFamily, size: 18).weight(.regular)
+    static let lgSemiBold: Font = .custom(pretendardSemiBold, size: 18).weight(.semibold)
+    static let lgMedium: Font = .custom(pretendardMedium, size: 18).weight(.medium)
+    static let lgRegular: Font = .custom(pretendardRegular, size: 18).weight(.regular)
 
-    static let mdSemiBold: Font = .custom(fontFamily, size: 16).weight(.semibold)
-    static let mdMedium: Font = .custom(fontFamily, size: 16).weight(.medium)
-    static let mdRegular: Font = .custom(fontFamily, size: 16).weight(.regular)
+    static let mdSemiBold: Font = .custom(pretendardSemiBold, size: 16).weight(.semibold)
+    static let mdMedium: Font = .custom(pretendardMedium, size: 16).weight(.medium)
+    static let mdRegular: Font = .custom(pretendardRegular, size: 16).weight(.regular)
 
-    static let smSemiBold: Font = .custom(fontFamily, size: 14).weight(.semibold)
-    static let smMedium: Font = .custom(fontFamily, size: 14).weight(.medium)
-    static let smRegular: Font = .custom(fontFamily, size: 14).weight(.regular)
+    static let smSemiBold: Font = .custom(pretendardSemiBold, size: 14).weight(.semibold)
+    static let smMedium: Font = .custom(pretendardMedium, size: 14).weight(.medium)
+    static let smRegular: Font = .custom(pretendardRegular, size: 14).weight(.regular)
 
-    static let xsSemiBold: Font = .custom(fontFamily, size: 12).weight(.semibold)
-    static let xsMedium: Font = .custom(fontFamily, size: 12).weight(.medium)
-    static let xsRegular: Font = .custom(fontFamily, size: 12).weight(.regular)
+    static let xsSemiBold: Font = .custom(pretendardSemiBold, size: 12).weight(.semibold)
+    static let xsMedium: Font = .custom(pretendardMedium, size: 12).weight(.medium)
+    static let xsRegular: Font = .custom(pretendardRegular, size: 12).weight(.regular)
 }
