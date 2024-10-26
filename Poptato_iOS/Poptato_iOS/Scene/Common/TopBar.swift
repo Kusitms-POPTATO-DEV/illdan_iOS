@@ -31,7 +31,8 @@ struct TopBar: View {
             }
             .padding(.horizontal, 16)
         }
-        .frame(width: .infinity, height: 56)
+        .frame(maxWidth: .infinity)
+        .frame(height: 56)
     }
 }
 

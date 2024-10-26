@@ -11,20 +11,20 @@ struct MainView: View {
     @State private var isLogined = false
     
     init() {
-            let appearance = UITabBarAppearance()
-            appearance.configureWithOpaqueBackground()
-            appearance.backgroundColor = UIColor(Color.gray100)
-        
-            appearance.stackedLayoutAppearance.normal.iconColor = UIColor(Color.gray90)
-            appearance.stackedLayoutAppearance.normal.titleTextAttributes = [.foregroundColor: UIColor(Color.gray80)]
-            
-            appearance.stackedLayoutAppearance.selected.iconColor = UIColor(Color.primary60)
-            appearance.stackedLayoutAppearance.selected.titleTextAttributes = [.foregroundColor: UIColor(Color.primary60)]
-
-            UITabBar.appearance().standardAppearance = appearance
-            UITabBar.appearance().scrollEdgeAppearance = appearance
-        }
+        let appearance = UITabBarAppearance()
+        appearance.configureWithOpaqueBackground()
+        appearance.backgroundColor = UIColor(Color.gray100)
     
+        appearance.stackedLayoutAppearance.normal.iconColor = UIColor(Color.gray90)
+        appearance.stackedLayoutAppearance.normal.titleTextAttributes = [.foregroundColor: UIColor(Color.gray80)]
+        
+        appearance.stackedLayoutAppearance.selected.iconColor = UIColor(Color.primary60)
+        appearance.stackedLayoutAppearance.selected.titleTextAttributes = [.foregroundColor: UIColor(Color.primary60)]
+
+        UITabBar.appearance().standardAppearance = appearance
+        UITabBar.appearance().scrollEdgeAppearance = appearance
+    }
+
     var body: some View {
         ZStack {
             if isLogined {
