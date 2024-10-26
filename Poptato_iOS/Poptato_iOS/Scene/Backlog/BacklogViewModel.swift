@@ -9,16 +9,26 @@ import SwiftUI
 import Combine
 
 class BacklogViewModel: ObservableObject {
+    private let backlogRepository: BacklogRepository
     @Published var backlogList: Array<TodoItemModel> = []
     
-    func createBacklog(_ item: String) {
-        let newItem = TodoItemModel(
-            todoId: Int.random(in: 1...100000000),
-            content: item,
-            isBookmark: false,
-            dDay: nil,
-            deadline: nil
-        )
-        backlogList.append(newItem)
+    init(backlogRepository: BacklogRepository = BacklogRepositoryImpl()) {
+        self.backlogRepository = backlogRepository
+    }
+    
+    func createBacklog(_ item: String) async {
+        do {
+            let response = try await backlogRepository.createBacklog(request: CreateBacklogRequest(content: item))
+            DispatchQueue.main.async {
+                self.backlogList.insert(
+                    TodoItemModel(todoId: response.todoId, content: item, isBookmark: false, dDay: nil, deadline: nil),
+                    at: 0
+                )
+            }
+        } catch {
+            DispatchQueue.main.async {
+                print("Login error: \(error)")
+            }
+        }
     }
 }

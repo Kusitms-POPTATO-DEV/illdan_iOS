@@ -26,7 +26,9 @@ struct BacklogView: View {
                 CreateBacklogTextField(
                     isFocused: $isTextFieldFocused,
                     createBacklog: { task in
-                        viewModel.createBacklog(task)
+                        Task {
+                            await viewModel.createBacklog(task)
+                        }
                     }
                 )
                 
