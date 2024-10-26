@@ -9,6 +9,8 @@ import SwiftUI
 
 struct MainView: View {
     @State private var isLogined = false
+    @State private var isBottomSheetVisible = false
+    @State private var selectedTodoItem: TodoItemModel? = nil
     
     init() {
         let appearance = UITabBarAppearance()
@@ -29,15 +31,29 @@ struct MainView: View {
         ZStack {
             if isLogined {
                 TabView {
-                    BacklogView()
-                        .tabItem {
-                            Label("할 일", image: "ic_backlog_selected")
-                                .font(PoptatoTypo.xsMedium)
+                    BacklogView(
+                        onItemSelcted: { item in
+                            selectedTodoItem = item
+                        },
+                        showBottomSheet: {
+                            isBottomSheetVisible = true
                         }
+                    )
+                    .tabItem {
+                        Label("할 일", image: "ic_backlog_selected")
+                            .font(PoptatoTypo.xsMedium)
+                    }
                 }
             } else {
                 KaKaoLoginView(
                     onSuccessLogin: { isLogined = true }
+                )
+            }
+            
+            if isBottomSheetVisible, let todoItem = selectedTodoItem {
+                BottomSheetView(
+                    isVisible: $isBottomSheetVisible,
+                    todoItem: todoItem
                 )
             }
         }

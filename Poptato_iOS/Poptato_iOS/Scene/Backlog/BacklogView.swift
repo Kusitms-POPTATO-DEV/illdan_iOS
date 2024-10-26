@@ -11,6 +11,8 @@ import Combine
 struct BacklogView: View {
     @StateObject private var viewModel = BacklogViewModel()
     @FocusState private var isTextFieldFocused: Bool
+    var onItemSelcted: (TodoItemModel) -> Void
+    var showBottomSheet: () -> Void
     
     var body: some View {
         ZStack {
@@ -42,7 +44,11 @@ struct BacklogView: View {
                         .foregroundColor(.gray80)
                         .multilineTextAlignment(.center)
                 } else {
-                    BacklogListView(backlogList: viewModel.backlogList)
+                    BacklogListView(
+                        backlogList: viewModel.backlogList,
+                        onItemSelcted: onItemSelcted,
+                        showBottomSheet: showBottomSheet
+                    )
                 }
                 
                 Spacer()
@@ -56,12 +62,18 @@ struct BacklogView: View {
 
 struct BacklogListView: View {
     var backlogList: [TodoItemModel]
+    var onItemSelcted: (TodoItemModel) -> Void
+    var showBottomSheet: () -> Void
     
     var body: some View {
         ScrollView {
             LazyVStack {
                 ForEach(backlogList.indices, id: \.self) { index in
-                    BacklogItemView(item: backlogList[index])
+                    BacklogItemView(
+                        item: backlogList[index],
+                        onItemSelcted: onItemSelcted,
+                        showBottomSheet: showBottomSheet
+                    )
                 }
             }
         }
@@ -72,6 +84,8 @@ struct BacklogListView: View {
 
 struct BacklogItemView: View {
     var item: TodoItemModel
+    var onItemSelcted: (TodoItemModel) -> Void
+    var showBottomSheet: () -> Void
     
     var body: some View {
         VStack {
@@ -81,6 +95,14 @@ struct BacklogItemView: View {
                     .foregroundColor(.gray00)
                 
                 Spacer()
+                
+                Image("ic_dot")
+                    .resizable()
+                    .frame(width: 20, height: 20)
+                    .onTapGesture {
+                        onItemSelcted(item)
+                        showBottomSheet()
+                    }
             }
         }
         .frame(maxWidth: .infinity)
@@ -147,5 +169,8 @@ struct CreateBacklogTextField: View {
 }
 
 #Preview {
-    BacklogView()
+    BacklogView(
+        onItemSelcted: {item in},
+        showBottomSheet: {}
+    )
 }
