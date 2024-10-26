@@ -23,6 +23,9 @@ final class KaKaoLoginViewModel: ObservableObject {
             DispatchQueue.main.async {
                 self.isLoginSuccess = true
                 print("Login successful: \(response)")
+                
+                KeychainManager.shared.saveToken(response.accessToken, for: "accessToken")
+                KeychainManager.shared.saveToken(response.refreshToken, for: "refreshToken")
             }
         } catch {
             DispatchQueue.main.async {
