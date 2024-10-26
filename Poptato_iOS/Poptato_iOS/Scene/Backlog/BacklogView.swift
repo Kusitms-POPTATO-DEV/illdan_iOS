@@ -9,7 +9,7 @@ import SwiftUI
 import Combine
 
 struct BacklogView: View {
-    @StateObject private var viewModel = BacklogViewModel()
+    @EnvironmentObject var viewModel: BacklogViewModel
     @FocusState private var isTextFieldFocused: Bool
     var onItemSelcted: (TodoItemModel) -> Void
     var showBottomSheet: () -> Void

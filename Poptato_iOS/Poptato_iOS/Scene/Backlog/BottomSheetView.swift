@@ -10,6 +10,7 @@ import SwiftUI
 struct BottomSheetView: View {
     @Binding var isVisible: Bool
     var todoItem: TodoItemModel
+    var deleteTodo: () -> Void
     
     var body: some View {
         VStack {
@@ -51,10 +52,11 @@ struct BottomSheetView: View {
                     
                     Button(
                         action: {
-                            
+                            deleteTodo()
+                            isVisible = false
                         }
                     ) {
-                        Text("수정")
+                        Text("삭제")
                             .frame(maxWidth: .infinity)
                             .frame(height: 40)
                             .foregroundColor(.danger40)
@@ -130,6 +132,7 @@ struct RoundedCorner: Shape {
             bookmark: false,
             dDay: nil,
             deadline: nil
-        )
+        ),
+        deleteTodo: {}
     )
 }

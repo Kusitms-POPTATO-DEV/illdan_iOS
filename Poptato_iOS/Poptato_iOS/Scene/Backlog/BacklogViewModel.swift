@@ -55,4 +55,17 @@ class BacklogViewModel: ObservableObject {
             }
         }
     }
+    
+    func deleteBacklog(todoId: Int) async {
+        do {
+            try await backlogRepository.deleteBacklog(todoId: todoId)
+            DispatchQueue.main.async {
+                self.backlogList.removeAll { $0.todoId == todoId }
+            }
+        } catch {
+            DispatchQueue.main.async {
+                print("Error delete backlog: \(error)")
+            }
+        }
+    }
 }
