@@ -7,4 +7,5 @@
 
 protocol BacklogRepository {
     func createBacklog(request: CreateBacklogRequest) async throws -> TodoIdModel
+    func getBacklogList(page: Int, size: Int) async throws -> BacklogListResponse
 }
