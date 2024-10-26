@@ -15,6 +15,7 @@ enum Router: URLRequestConvertible {
     
     // backlog
     case createBacklog(createBacklogRequest: CreateBacklogRequest)
+    case getBacklogList(page: Int, size: Int)
     
     var accessToken: String? {
         KeychainManager.shared.readToken(for: "accessToken")
@@ -55,6 +56,21 @@ enum Router: URLRequestConvertible {
                 request.addValue("Bearer \(accessToken)", forHTTPHeaderField: "Authorization")
             }
             request.httpBody = try JSONEncoder().encode(createBacklogRequest)
+        case .getBacklogList(let page, let size):
+            var components = URLComponents(url: url.appendingPathComponent("/backlogs"), resolvingAgainstBaseURL: false)
+            components?.queryItems = [
+                URLQueryItem(name: "page", value: "\(page)"),
+                URLQueryItem(name: "size", value: "\(size)")
+            ]
+            guard let endpoint = components?.url else {
+                throw URLError(.badURL)
+            }
+            request = URLRequest(url: endpoint)
+            request.httpMethod = "GET"
+            request.addValue("application/json", forHTTPHeaderField: "Content-Type")
+            if let accessToken = accessToken {
+                request.addValue("Bearer \(accessToken)", forHTTPHeaderField: "Authorization")
+            }
         }
     
         return request
