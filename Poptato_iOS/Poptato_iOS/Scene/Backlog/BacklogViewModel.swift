@@ -14,6 +14,9 @@ class BacklogViewModel: ObservableObject {
     
     init(backlogRepository: BacklogRepository = BacklogRepositoryImpl()) {
         self.backlogRepository = backlogRepository
+        Task {
+            await fetchBacklogList()
+        }
     }
     
     func createBacklog(_ item: String) async {
@@ -21,13 +24,34 @@ class BacklogViewModel: ObservableObject {
             let response = try await backlogRepository.createBacklog(request: CreateBacklogRequest(content: item))
             DispatchQueue.main.async {
                 self.backlogList.insert(
-                    TodoItemModel(todoId: response.todoId, content: item, isBookmark: false, dDay: nil, deadline: nil),
+                    TodoItemModel(todoId: response.todoId, content: item, bookmark: false, dDay: nil, deadline: nil),
                     at: 0
                 )
             }
         } catch {
             DispatchQueue.main.async {
                 print("Login error: \(error)")
+            }
+        }
+    }
+    
+    private func fetchBacklogList() async {
+        do {
+            let response = try await backlogRepository.getBacklogList(page: 0, size: 100)
+            DispatchQueue.main.async {
+                self.backlogList = response.backlogs.map { item in
+                    TodoItemModel(
+                        todoId: item.todoId,
+                        content: item.content,
+                        bookmark: item.bookmark,
+                        dDay: item.dDay,
+                        deadline: item.deadline
+                    )
+                }
+            }
+        } catch {
+            DispatchQueue.main.async {
+                print("Error fetching backlog list: \(error)")
             }
         }
     }

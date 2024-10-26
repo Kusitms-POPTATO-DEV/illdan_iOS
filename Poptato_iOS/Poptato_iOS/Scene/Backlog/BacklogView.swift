@@ -42,7 +42,7 @@ struct BacklogView: View {
                         .foregroundColor(.gray80)
                         .multilineTextAlignment(.center)
                 } else {
-                    BacklogListView(backlogList: $viewModel.backlogList)
+                    BacklogListView(backlogList: viewModel.backlogList)
                 }
                 
                 Spacer()
@@ -51,6 +51,42 @@ struct BacklogView: View {
         .onTapGesture {
             isTextFieldFocused = false
         }
+    }
+}
+
+struct BacklogListView: View {
+    var backlogList: [TodoItemModel]
+    
+    var body: some View {
+        ScrollView {
+            LazyVStack {
+                ForEach(backlogList.indices, id: \.self) { index in
+                    BacklogItemView(item: backlogList[index])
+                }
+            }
+        }
+        .frame(maxWidth: .infinity)
+        .padding(.horizontal, 16)
+    }
+}
+
+struct BacklogItemView: View {
+    var item: TodoItemModel
+    
+    var body: some View {
+        VStack {
+            HStack{
+                Text(item.content)
+                    .font(PoptatoTypo.mdRegular)
+                    .foregroundColor(.gray00)
+                
+                Spacer()
+            }
+        }
+        .frame(maxWidth: .infinity)
+        .padding()
+        .background(RoundedRectangle(cornerRadius: 8))
+        .foregroundColor(.gray95)
     }
 }
 
@@ -107,42 +143,6 @@ struct CreateBacklogTextField: View {
                 .padding(.trailing, 16)
             }
         }
-    }
-}
-
-struct BacklogListView: View {
-    @Binding var backlogList: Array<TodoItemModel>
-    
-    var body: some View {
-        ScrollView {
-            LazyVStack {
-                ForEach(backlogList.indices, id: \.self) { index in
-                    BacklogItemView(item: $backlogList[index])
-                }
-            }
-        }
-        .frame(maxWidth: .infinity)
-        .padding(.horizontal, 16)
-    }
-}
-
-struct BacklogItemView: View {
-    @Binding var item: TodoItemModel
-    
-    var body: some View {
-        VStack {
-            HStack{
-                Text(item.content)
-                    .font(PoptatoTypo.mdRegular)
-                    .foregroundColor(.gray00)
-                
-                Spacer()
-            }
-        }
-        .frame(maxWidth: .infinity)
-        .padding()
-        .background(RoundedRectangle(cornerRadius: 8))
-        .foregroundColor(.gray95)
     }
 }
 
