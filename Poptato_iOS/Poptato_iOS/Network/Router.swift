@@ -9,8 +9,12 @@ import Foundation
 import Alamofire
 
 enum Router: URLRequestConvertible {
+    // auth
     case kakaoLogin(loginRequest: KaKaoLoginRequest)
     case reissueToken(reissueRequest: TokenModel)
+    
+    // backlog
+    case createBacklog(createBacklogRequest: CreateBacklogRequest)
     
     var accessToken: String? {
         KeychainManager.shared.readToken(for: "accessToken")
@@ -24,6 +28,7 @@ enum Router: URLRequestConvertible {
         var request: URLRequest
         
         switch self {
+        // auth
         case .kakaoLogin(let loginRequest):
             let endPoint = url.appendingPathComponent("/auth/login")
             request = URLRequest(url: endPoint)
@@ -39,6 +44,17 @@ enum Router: URLRequestConvertible {
                 request.addValue("Bearer \(accessToken)", forHTTPHeaderField: "Authorization")
             }
             request.httpBody = try JSONEncoder().encode(reissueRequest)
+            
+        // backlog
+        case .createBacklog(let createBacklogRequest):
+            let endpoint = url.appendingPathComponent("/backlog")
+            request = URLRequest(url: endpoint)
+            request.httpMethod = "POST"
+            request.addValue("application/json", forHTTPHeaderField: "Content-Type")
+            if let accessToken = accessToken {
+                request.addValue("Bearer \(accessToken)", forHTTPHeaderField: "Authorization")
+            }
+            request.httpBody = try JSONEncoder().encode(createBacklogRequest)
         }
     
         return request
