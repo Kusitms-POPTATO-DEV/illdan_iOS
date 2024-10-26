@@ -9,7 +9,7 @@ import SwiftUI
 import Combine
 
 struct BacklogView: View {
-    @State private var backlogList: Array<Int> = []
+    @StateObject private var viewModel = BacklogViewModel()
     @FocusState private var isTextFieldFocused: Bool
     
     var body: some View {
@@ -20,18 +20,27 @@ struct BacklogView: View {
             VStack {
                 TopBar(
                     titleText: "할 일",
-                    subText: String(backlogList.count)
+                    subText: String(viewModel.backlogList.count)
                 )
                 
-                CreateBacklogTextField(isFocused: $isTextFieldFocused)
+                CreateBacklogTextField(
+                    isFocused: $isTextFieldFocused,
+                    createBacklog: { task in
+                        viewModel.createBacklog(task)
+                    }
+                )
                 
-                if backlogList.isEmpty {
+                Spacer().frame(height: 16)
+                
+                if viewModel.backlogList.isEmpty {
                     Spacer()
                     
                     Text("일단, 할 일을\n모두 추가해 보세요.")
                         .font(PoptatoTypo.lgMedium)
                         .foregroundColor(.gray80)
                         .multilineTextAlignment(.center)
+                } else {
+                    BacklogListView(backlogList: $viewModel.backlogList)
                 }
                 
                 Spacer()
@@ -99,6 +108,41 @@ struct CreateBacklogTextField: View {
     }
 }
 
+struct BacklogListView: View {
+    @Binding var backlogList: Array<TodoItemModel>
+    
+    var body: some View {
+        ScrollView {
+            LazyVStack {
+                ForEach(backlogList.indices, id: \.self) { index in
+                    BacklogItemView(item: $backlogList[index])
+                }
+            }
+        }
+        .frame(maxWidth: .infinity)
+        .padding(.horizontal, 16)
+    }
+}
+
+struct BacklogItemView: View {
+    @Binding var item: TodoItemModel
+    
+    var body: some View {
+        VStack {
+            HStack{
+                Text(item.content)
+                    .font(PoptatoTypo.mdRegular)
+                    .foregroundColor(.gray00)
+                
+                Spacer()
+            }
+        }
+        .frame(maxWidth: .infinity)
+        .padding()
+        .background(RoundedRectangle(cornerRadius: 8))
+        .foregroundColor(.gray95)
+    }
+}
 
 #Preview {
     BacklogView()
