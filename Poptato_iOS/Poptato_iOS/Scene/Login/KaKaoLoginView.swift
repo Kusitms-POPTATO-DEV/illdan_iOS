@@ -11,6 +11,7 @@ import KakaoSDKAuth
 import KakaoSDKUser
 
 struct KaKaoLoginView: View {
+    @StateObject private var viewModel = KaKaoLoginViewModel()
     var onSuccessLogin: () -> Void
     
     var body: some View {
@@ -34,7 +35,11 @@ struct KaKaoLoginView: View {
                                 print(error)
                             }
                             if let oauthToken = oauthToken{
-                                onSuccessLogin()
+                                Task {
+                                    await viewModel.kakaoLogin(token: oauthToken.accessToken)
+                                    onSuccessLogin()
+                                }
+                                print("kakao success: \(oauthToken)")
                             }
                         }
                     } else {
@@ -43,8 +48,11 @@ struct KaKaoLoginView: View {
                                 print(error)
                             }
                             if let oauthToken = oauthToken{
-                                onSuccessLogin()
-                                print("kakao success")
+                                Task {
+                                    await viewModel.kakaoLogin(token: oauthToken.accessToken)
+                                    onSuccessLogin()
+                                }
+                                print("kakao success: \(oauthToken)")
                             }
                         }
                     }
