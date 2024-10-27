@@ -8,6 +8,7 @@
 import SwiftUI
 
 struct MainView: View {
+    @State private var selectedTab: Int = 1
     @State private var isLogined = false
     @State private var isBottomSheetVisible = false
     @State private var selectedTodoItem: TodoItemModel? = nil
@@ -31,7 +32,15 @@ struct MainView: View {
     var body: some View {
         ZStack {
             if isLogined {
-                TabView {
+                TabView(selection: $selectedTab) {
+                    TodayView(
+                        goToBacklog: { selectedTab = 1 }
+                    )
+                    .tabItem {
+                        Label("오늘", image: selectedTab == 0 ? "ic_today_selected" : "ic_today_unselected")
+                            .font(PoptatoTypo.xsMedium)
+                    }
+                    .tag(0)
                     BacklogView(
                         onItemSelcted: { item in
                             selectedTodoItem = item
@@ -41,11 +50,12 @@ struct MainView: View {
                         }
                     )
                     .tabItem {
-                        Label("할 일", image: "ic_backlog_selected")
+                        Label("할 일", image: selectedTab == 1 ? "ic_backlog_selected" : "ic_backlog_unselected")
                             .font(PoptatoTypo.xsMedium)
                     }
+                    .environmentObject(backlogViewModel)
+                    .tag(1)
                 }
-                .environmentObject(backlogViewModel)
             } else {
                 KaKaoLoginView(
                     onSuccessLogin: { isLogined = true }

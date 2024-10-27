@@ -1,0 +1,12 @@
+{
+  "images" : [
+    {
+      "filename" : "ic_today_msg_bubble.pdf",
+      "idiom" : "universal"
+    }
+  ],
+  "info" : {
+    "author" : "xcode",
+    "version" : 1
+  }
+}

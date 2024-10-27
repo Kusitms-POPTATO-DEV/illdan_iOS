@@ -23,9 +23,13 @@ struct TopBar: View {
                 
                 Spacer().frame(width: 8)
                 
-                Text(subText)
-                    .font(PoptatoTypo.xLSemiBold)
-                    .foregroundColor(.primary60)
+                if (!subText.isEmpty) {
+                    Text(subText)
+                        .font(PoptatoTypo.xLSemiBold)
+                        .foregroundColor(.primary60)
+                } else {
+                    Image("ic_today_msg_bubble")
+                }
                 
                 Spacer()
             }
