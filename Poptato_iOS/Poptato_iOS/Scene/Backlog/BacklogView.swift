@@ -118,6 +118,7 @@ struct BacklogItemView: View {
                         isActive = false
                         activeItemId = nil
                     }
+                    .font(PoptatoTypo.mdRegular)
                     .foregroundColor(.gray00)
             } else {
                 HStack{
