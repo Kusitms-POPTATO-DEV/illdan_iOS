@@ -11,7 +11,7 @@ struct MainView: View {
     @State private var isLogined = false
     @State private var isBottomSheetVisible = false
     @State private var selectedTodoItem: TodoItemModel? = nil
-    @StateObject private var viewModel = BacklogViewModel()
+    @StateObject private var backlogViewModel = BacklogViewModel()
     
     init() {
         let appearance = UITabBarAppearance()
@@ -45,7 +45,7 @@ struct MainView: View {
                             .font(PoptatoTypo.xsMedium)
                     }
                 }
-                .environmentObject(viewModel)
+                .environmentObject(backlogViewModel)
             } else {
                 KaKaoLoginView(
                     onSuccessLogin: { isLogined = true }
@@ -58,8 +58,11 @@ struct MainView: View {
                     todoItem: todoItem,
                     deleteTodo: {
                         Task {
-                            await viewModel.deleteBacklog(todoId: todoItem.todoId)
+                            await backlogViewModel.deleteBacklog(todoId: todoItem.todoId)
                         }
+                    },
+                    editTodo: {
+                        backlogViewModel.activeItemId = todoItem.todoId
                     }
                 )
             }

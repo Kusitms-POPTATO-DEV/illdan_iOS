@@ -11,6 +11,7 @@ struct BottomSheetView: View {
     @Binding var isVisible: Bool
     var todoItem: TodoItemModel
     var deleteTodo: () -> Void
+    var editTodo: () -> Void
     
     var body: some View {
         VStack {
@@ -39,7 +40,8 @@ struct BottomSheetView: View {
                 HStack {
                     Button(
                         action: {
-                            
+                            editTodo()
+                            isVisible = false
                         }
                     ) {
                         Text("수정")
@@ -133,6 +135,7 @@ struct RoundedCorner: Shape {
             dDay: nil,
             deadline: nil
         ),
-        deleteTodo: {}
+        deleteTodo: {},
+        editTodo: {}
     )
 }
