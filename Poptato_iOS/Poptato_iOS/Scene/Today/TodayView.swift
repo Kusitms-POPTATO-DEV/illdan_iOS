@@ -33,6 +33,11 @@ struct TodayView: View {
                 }
             }
         }
+        .onAppear {
+            Task {
+                await viewModel.getTodayList()
+            }
+        }
     }
 }
 

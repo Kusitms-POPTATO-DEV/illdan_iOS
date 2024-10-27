@@ -18,9 +18,6 @@ final class TodayViewModel: ObservableObject {
         let formatter = DateFormatter()
         formatter.dateFormat = "MM.dd"
         currentDate = formatter.string(from: Date())
-        Task {
-            await getTodayList()
-        }
     }
     
     func getTodayList() async {
