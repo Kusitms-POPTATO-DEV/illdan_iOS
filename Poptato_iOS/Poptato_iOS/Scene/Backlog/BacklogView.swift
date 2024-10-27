@@ -9,8 +9,10 @@ import SwiftUI
 import Combine
 
 struct BacklogView: View {
-    @StateObject private var viewModel = BacklogViewModel()
+    @EnvironmentObject var viewModel: BacklogViewModel
     @FocusState private var isTextFieldFocused: Bool
+    var onItemSelcted: (TodoItemModel) -> Void
+    var showBottomSheet: () -> Void
     
     var body: some View {
         ZStack {
@@ -42,7 +44,17 @@ struct BacklogView: View {
                         .foregroundColor(.gray80)
                         .multilineTextAlignment(.center)
                 } else {
-                    BacklogListView(backlogList: viewModel.backlogList)
+                    BacklogListView(
+                        backlogList: $viewModel.backlogList,
+                        onItemSelcted: onItemSelcted,
+                        showBottomSheet: showBottomSheet,
+                        editBacklog: { id, content in
+                            Task {
+                                await viewModel.editBacklog(todoId: id, content: content)
+                            }
+                        },
+                        activeItemId: $viewModel.activeItemId
+                    )
                 }
                 
                 Spacer()
@@ -55,13 +67,23 @@ struct BacklogView: View {
 }
 
 struct BacklogListView: View {
-    var backlogList: [TodoItemModel]
+    @Binding var backlogList: [TodoItemModel]
+    var onItemSelcted: (TodoItemModel) -> Void
+    var showBottomSheet: () -> Void
+    var editBacklog: (Int, String) -> Void
+    @Binding var activeItemId: Int?
     
     var body: some View {
         ScrollView {
             LazyVStack {
                 ForEach(backlogList.indices, id: \.self) { index in
-                    BacklogItemView(item: backlogList[index])
+                    BacklogItemView(
+                        item: $backlogList[index],
+                        onItemSelcted: onItemSelcted,
+                        showBottomSheet: showBottomSheet,
+                        editBacklog: editBacklog,
+                        activeItemId: $activeItemId
+                    )
                 }
             }
         }
@@ -71,16 +93,48 @@ struct BacklogListView: View {
 }
 
 struct BacklogItemView: View {
-    var item: TodoItemModel
+    @Binding var item: TodoItemModel
+    var onItemSelcted: (TodoItemModel) -> Void
+    var showBottomSheet: () -> Void
+    var editBacklog: (Int, String) -> Void
+    @Binding var activeItemId: Int?
+    @FocusState var isActive: Bool
+    @State var content = ""
     
     var body: some View {
         VStack {
-            HStack{
-                Text(item.content)
-                    .font(PoptatoTypo.mdRegular)
+            if activeItemId == item.todoId {
+                TextField("", text: $content)
+                    .focused($isActive)
+                    .onAppear {
+                        isActive = true
+                        content = item.content
+                    }
+                    .onSubmit {
+                        if !content.isEmpty, let activeItemId {
+                            item.content = content
+                            editBacklog(activeItemId, content)
+                        }
+                        isActive = false
+                        activeItemId = nil
+                    }
                     .foregroundColor(.gray00)
-                
-                Spacer()
+            } else {
+                HStack{
+                    Text(item.content)
+                        .font(PoptatoTypo.mdRegular)
+                        .foregroundColor(.gray00)
+                    
+                    Spacer()
+                    
+                    Image("ic_dot")
+                        .resizable()
+                        .frame(width: 20, height: 20)
+                        .onTapGesture {
+                            onItemSelcted(item)
+                            showBottomSheet()
+                        }
+                }
             }
         }
         .frame(maxWidth: .infinity)
@@ -147,5 +201,8 @@ struct CreateBacklogTextField: View {
 }
 
 #Preview {
-    BacklogView()
+    BacklogView(
+        onItemSelcted: {item in},
+        showBottomSheet: {}
+    )
 }

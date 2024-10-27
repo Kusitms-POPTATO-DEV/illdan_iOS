@@ -10,7 +10,7 @@ import SwiftUI
 
 struct TodoItemModel: Codable {
     let todoId: Int
-    let content: String
+    var content: String
     let bookmark: Bool
     let dDay: Int?
     let deadline: String?

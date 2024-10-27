@@ -8,4 +8,6 @@
 protocol BacklogRepository {
     func createBacklog(request: CreateBacklogRequest) async throws -> TodoIdModel
     func getBacklogList(page: Int, size: Int) async throws -> BacklogListResponse
+    func deleteBacklog(todoId: Int) async throws -> Void
+    func editBacklog(todoId: Int, content: String) async throws -> Void
 }

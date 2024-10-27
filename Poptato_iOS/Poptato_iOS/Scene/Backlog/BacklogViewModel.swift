@@ -11,6 +11,7 @@ import Combine
 class BacklogViewModel: ObservableObject {
     private let backlogRepository: BacklogRepository
     @Published var backlogList: Array<TodoItemModel> = []
+    @Published var activeItemId: Int? = nil
     
     init(backlogRepository: BacklogRepository = BacklogRepositoryImpl()) {
         self.backlogRepository = backlogRepository
@@ -52,6 +53,29 @@ class BacklogViewModel: ObservableObject {
         } catch {
             DispatchQueue.main.async {
                 print("Error fetching backlog list: \(error)")
+            }
+        }
+    }
+    
+    func deleteBacklog(todoId: Int) async {
+        do {
+            try await backlogRepository.deleteBacklog(todoId: todoId)
+            DispatchQueue.main.async {
+                self.backlogList.removeAll { $0.todoId == todoId }
+            }
+        } catch {
+            DispatchQueue.main.async {
+                print("Error delete backlog: \(error)")
+            }
+        }
+    }
+    
+    func editBacklog(todoId: Int, content: String) async {
+        do {
+            try await backlogRepository.editBacklog(todoId: todoId, content: content)
+        } catch {
+            DispatchQueue.main.async {
+                print("Error edit backlog: \(error)")
             }
         }
     }

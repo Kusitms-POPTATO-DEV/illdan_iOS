@@ -16,6 +16,8 @@ enum Router: URLRequestConvertible {
     // backlog
     case createBacklog(createBacklogRequest: CreateBacklogRequest)
     case getBacklogList(page: Int, size: Int)
+    case deleteBacklog(todoId: Int)
+    case editBacklog(todoId: Int, content: String)
     
     var accessToken: String? {
         KeychainManager.shared.readToken(for: "accessToken")
@@ -71,6 +73,22 @@ enum Router: URLRequestConvertible {
             if let accessToken = accessToken {
                 request.addValue("Bearer \(accessToken)", forHTTPHeaderField: "Authorization")
             }
+        case .deleteBacklog(let todoId):
+            let endpoint = url.appendingPathComponent("/todo/\(todoId)")
+            request = URLRequest(url: endpoint)
+            request.httpMethod = "DELETE"
+            if let accessToken = accessToken {
+                request.addValue("Bearer \(accessToken)", forHTTPHeaderField: "Authorization")
+            }
+        case .editBacklog(let todoId, let content):
+            let endpoint = url.appendingPathComponent("/todo/\(todoId)/content")
+            request = URLRequest(url: endpoint)
+            request.httpMethod = "PATCH"
+            request.addValue("application/json", forHTTPHeaderField: "Content-Type")
+            if let accessToken = accessToken {
+                request.addValue("Bearer \(accessToken)", forHTTPHeaderField: "Authorization")
+            }
+            request.httpBody = try JSONEncoder().encode(TodoContentModel(content: content))
         }
     
         return request
