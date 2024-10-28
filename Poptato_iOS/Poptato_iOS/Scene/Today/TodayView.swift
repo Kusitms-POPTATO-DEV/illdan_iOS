@@ -8,8 +8,9 @@
 import SwiftUI
 
 struct TodayView: View {
-    @ObservedObject private var viewModel = TodayViewModel()
+    @EnvironmentObject var viewModel: TodayViewModel
     var goToBacklog: () -> Void
+    @State private var isViewActive = false
     
     var body: some View {
         ZStack {
@@ -22,26 +23,32 @@ struct TodayView: View {
                     subText: ""
                 )
                 
-                if viewModel.todayList.isEmpty {
-                    EmptyTodayView(
-                        goToBacklog: goToBacklog
-                    )
-                } else {
-                    TodayListView(
-                        todayList: $viewModel.todayList,
-                        swipeToday: { id in
-                            Task {
-                                await viewModel.swipeToday(todoId: id)
+                if isViewActive {
+                    if viewModel.todayList.isEmpty {
+                        EmptyTodayView(
+                            goToBacklog: goToBacklog
+                        )
+                    } else {
+                        TodayListView(
+                            todayList: $viewModel.todayList,
+                            swipeToday: { id in
+                                Task {
+                                    await viewModel.swipeToday(todoId: id)
+                                }
                             }
-                        }
-                    )
+                        )
+                    }
                 }
             }
         }
         .onAppear {
             Task {
+                isViewActive = true
                 await viewModel.getTodayList()
             }
+        }
+        .onDisappear {
+            isViewActive = false
         }
     }
 }
