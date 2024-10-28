@@ -53,6 +53,11 @@ struct BacklogView: View {
                                 await viewModel.editBacklog(todoId: id, content: content)
                             }
                         },
+                        swipeBacklog: { id in
+                            Task {
+                                await viewModel.swipeBacklog(todoId: id)
+                            }
+                        },
                         activeItemId: $viewModel.activeItemId
                     )
                 }
@@ -63,6 +68,11 @@ struct BacklogView: View {
         .onTapGesture {
             isTextFieldFocused = false
         }
+        .onAppear {
+            Task {
+                await viewModel.fetchBacklogList()
+            }
+        }
     }
 }
 
@@ -71,6 +81,7 @@ struct BacklogListView: View {
     var onItemSelcted: (TodoItemModel) -> Void
     var showBottomSheet: () -> Void
     var editBacklog: (Int, String) -> Void
+    var swipeBacklog: (Int) -> Void
     @Binding var activeItemId: Int?
     
     var body: some View {
@@ -79,9 +90,11 @@ struct BacklogListView: View {
                 ForEach(backlogList.indices, id: \.self) { index in
                     BacklogItemView(
                         item: $backlogList[index],
+                        backlogList: $backlogList,
                         onItemSelcted: onItemSelcted,
                         showBottomSheet: showBottomSheet,
                         editBacklog: editBacklog,
+                        swipeBacklog: swipeBacklog,
                         activeItemId: $activeItemId
                     )
                 }
@@ -94,12 +107,15 @@ struct BacklogListView: View {
 
 struct BacklogItemView: View {
     @Binding var item: TodoItemModel
+    @Binding var backlogList: [TodoItemModel]
     var onItemSelcted: (TodoItemModel) -> Void
     var showBottomSheet: () -> Void
     var editBacklog: (Int, String) -> Void
+    var swipeBacklog: (Int) -> Void
     @Binding var activeItemId: Int?
     @FocusState var isActive: Bool
     @State var content = ""
+    @State private var offset: CGFloat = 0
     
     var body: some View {
         VStack {
@@ -142,6 +158,33 @@ struct BacklogItemView: View {
         .padding()
         .background(RoundedRectangle(cornerRadius: 8))
         .foregroundColor(.gray95)
+        .offset(x: offset)
+        .gesture(
+            DragGesture()
+                .onChanged { gesture in
+                    if gesture.translation.width < 0 {
+                        self.offset = gesture.translation.width
+                    }
+                }
+                .onEnded { _ in
+                    if abs(offset) > 100 {
+                        swipeBacklog(item.todoId)
+                        withAnimation {
+                            self.offset = -UIScreen.main.bounds.width
+                        }
+                        DispatchQueue.main.asyncAfter(deadline: .now() + 0.3) {
+                            if let index = backlogList.firstIndex(where: { $0.todoId == item.todoId }) {
+                                backlogList.remove(at: index)
+                            }
+                            offset = 0
+                        }
+                    } else {
+                        withAnimation {
+                            offset = 0
+                        }
+                    }
+                }
+        )
     }
 }
 
