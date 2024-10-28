@@ -35,6 +35,11 @@ struct TodayView: View {
                                 Task {
                                     await viewModel.swipeToday(todoId: id)
                                 }
+                            },
+                            updateTodoCompletion: { id in
+                                Task {
+                                    await viewModel.updateTodoCompletion(todoId: id)
+                                }
                             }
                         )
                     }
@@ -56,6 +61,7 @@ struct TodayView: View {
 struct TodayListView: View {
     @Binding var todayList: Array<TodayItemModel>
     var swipeToday: (Int) -> Void
+    var updateTodoCompletion: (Int) -> Void
     
     var body: some View {
         ScrollView {
@@ -64,7 +70,8 @@ struct TodayListView: View {
                     TodayItemView(
                         item: $todayList[index],
                         todayList: $todayList,
-                        swipeToday: swipeToday
+                        swipeToday: swipeToday,
+                        updateTodoCompletion: updateTodoCompletion
                     )
                 }
             }
@@ -76,30 +83,30 @@ struct TodayListView: View {
 
 struct TodayItemView: View {
     @Binding var item: TodayItemModel
-    @Binding var todayList: Array<TodayItemModel>
+    @Binding var todayList: [TodayItemModel]
     var swipeToday: (Int) -> Void
+    var updateTodoCompletion: (Int) -> Void
     @State private var offset: CGFloat = 0
-    
+
     var body: some View {
         VStack {
-            HStack{
+            HStack {
                 Image(item.todayStatus == "COMPLETED" ? "ic_checked" : "ic_unchecked")
                     .resizable()
                     .frame(width: 20, height: 20)
                     .onTapGesture {
-                        switch item.todayStatus {
-                        case "COMPLETED":
-                            item.todayStatus = "INCOMPLETE"
-                        case "INCOMPLETE":
-                            item.todayStatus = "COMPLETED"
-                        default: break
+                        updateTodoCompletion(item.todoId)
+                        if item.todayStatus == "INCOMPLETE" {
+                            moveItemToCompleted()
+                        } else {
+                            moveItemToIncomplete()
                         }
                     }
-                
+
                 Text(item.content)
                     .font(PoptatoTypo.mdRegular)
                     .foregroundColor(.gray00)
-                
+
                 Spacer()
             }
         }
@@ -111,29 +118,54 @@ struct TodayItemView: View {
         .simultaneousGesture(
             DragGesture(minimumDistance: 20)
                 .onChanged { gesture in
-                    if gesture.translation.width > 0 {
+                    if item.todayStatus != "COMPLETED" && gesture.translation.width > 0 {
                         self.offset = gesture.translation.width
                     }
                 }
                 .onEnded { _ in
-                    if abs(offset) > 100 {
-                        swipeToday(item.todoId)
-                        withAnimation {
-                            self.offset = UIScreen.main.bounds.width
-                        }
-                        DispatchQueue.main.asyncAfter(deadline: .now() + 0.3) {
-                            if let index = todayList.firstIndex(where: { $0.todoId == item.todoId }) {
-                                todayList.remove(at: index)
+                    if item.todayStatus != "COMPLETED" {
+                        if abs(offset) > 100 {
+                            swipeToday(item.todoId)
+                            offset = UIScreen.main.bounds.width
+                            DispatchQueue.main.asyncAfter(deadline: .now() + 0.3) {
+                                if let index = todayList.firstIndex(where: { $0.todoId == item.todoId }) {
+                                    todayList.remove(at: index)
+                                }
+                                offset = 0
                             }
+                        } else {
                             offset = 0
                         }
                     } else {
-                        withAnimation {
-                            offset = 0
-                        }
+                        offset = 0
                     }
                 }
         )
+    }
+
+    private func moveItemToCompleted() {
+        if let index = todayList.firstIndex(where: { $0.todoId == item.todoId }) {
+            var updatedItem = item
+            updatedItem.todayStatus = "COMPLETED"
+            
+            todayList.remove(at: index)
+            todayList.append(updatedItem)
+        }
+    }
+
+    private func moveItemToIncomplete() {
+        if let index = todayList.firstIndex(where: { $0.todoId == item.todoId }) {
+            var updatedItem = item
+            updatedItem.todayStatus = "INCOMPLETE"
+            
+            todayList.remove(at: index)
+            
+            if let lastIncompleteIndex = todayList.lastIndex(where: { $0.todayStatus == "INCOMPLETE" }) {
+                todayList.insert(updatedItem, at: lastIncompleteIndex + 1)
+            } else {
+                todayList.insert(updatedItem, at: 0)
+            }
+        }
     }
 }
 
