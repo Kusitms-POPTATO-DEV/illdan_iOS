@@ -12,15 +12,17 @@ final class TodayViewModel: ObservableObject {
     @Published var todayList: Array<TodayItemModel> = []
     @Published var currentDate: String = ""
     private let todayRepository: TodayRepository
+    private let todoRepository: TodoRepository
     
-    init(todayRepository: TodayRepository = TodayRepositoryImpl()) {
+    init(
+        todayRepository: TodayRepository = TodayRepositoryImpl(),
+        todoRepository: TodoRepository = TodoRepositoryImpl()
+    ) {
         self.todayRepository = todayRepository
+        self.todoRepository = todoRepository
         let formatter = DateFormatter()
         formatter.dateFormat = "MM.dd"
         currentDate = formatter.string(from: Date())
-        Task {
-            await getTodayList()
-        }
     }
     
     func getTodayList() async {
@@ -41,6 +43,16 @@ final class TodayViewModel: ObservableObject {
         } catch {
             DispatchQueue.main.async {
                 print("Error getTodayList \(error)")
+            }
+        }
+    }
+    
+    func swipeToday(todoId: Int) async {
+        do {
+            try await todoRepository.swipeTodo(request: TodoIdModel(todoId: todoId))
+        } catch {
+            DispatchQueue.main.async {
+                print("Error swipe today: \(error)")
             }
         }
     }

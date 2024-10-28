@@ -29,33 +29,45 @@ struct KaKaoLoginView: View {
                 Spacer()
 
                 Button(action: {
-                    if (UserApi.isKakaoTalkLoginAvailable()) {
-                        UserApi.shared.loginWithKakaoTalk {(oauthToken, error) in
-                            if let error = error {
-                                print(error)
-                            }
-                            if let oauthToken = oauthToken{
-                                Task {
-                                    await viewModel.kakaoLogin(token: oauthToken.accessToken)
-                                    onSuccessLogin()
-                                }
-                                print("kakao success: \(oauthToken)")
-                            }
+                    UserApi.shared.loginWithKakaoAccount {(oauthToken, error) in
+                        if let error = error {
+                            print(error)
                         }
-                    } else {
-                        UserApi.shared.loginWithKakaoAccount {(oauthToken, error) in
-                            if let error = error {
-                                print(error)
+                        if let oauthToken = oauthToken{
+                            Task {
+                                await viewModel.kakaoLogin(token: oauthToken.accessToken)
+                                onSuccessLogin()
                             }
-                            if let oauthToken = oauthToken{
-                                Task {
-                                    await viewModel.kakaoLogin(token: oauthToken.accessToken)
-                                    onSuccessLogin()
-                                }
-                                print("kakao success: \(oauthToken)")
-                            }
+                            print("kakao success: \(oauthToken)")
                         }
                     }
+//                    if (UserApi.isKakaoTalkLoginAvailable()) {
+//                        UserApi.shared.loginWithKakaoTalk {(oauthToken, error) in
+//                            if let error = error {
+//                                print(error)
+//                            }
+//                            if let oauthToken = oauthToken{
+//                                Task {
+//                                    await viewModel.kakaoLogin(token: oauthToken.accessToken)
+//                                    onSuccessLogin()
+//                                }
+//                                print("kakao success: \(oauthToken)")
+//                            }
+//                        }
+//                    } else {
+//                        UserApi.shared.loginWithKakaoAccount {(oauthToken, error) in
+//                            if let error = error {
+//                                print(error)
+//                            }
+//                            if let oauthToken = oauthToken{
+//                                Task {
+//                                    await viewModel.kakaoLogin(token: oauthToken.accessToken)
+//                                    onSuccessLogin()
+//                                }
+//                                print("kakao success: \(oauthToken)")
+//                            }
+//                        }
+//                    }
                 }) {
                     HStack {
                         Image("ic_kakao")

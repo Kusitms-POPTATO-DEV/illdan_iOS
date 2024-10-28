@@ -13,6 +13,7 @@ struct MainView: View {
     @State private var isBottomSheetVisible = false
     @State private var selectedTodoItem: TodoItemModel? = nil
     @StateObject private var backlogViewModel = BacklogViewModel()
+    @StateObject private var todayViewModel = TodayViewModel()
     
     init() {
         let appearance = UITabBarAppearance()
@@ -40,7 +41,9 @@ struct MainView: View {
                         Label("오늘", image: selectedTab == 0 ? "ic_today_selected" : "ic_today_unselected")
                             .font(PoptatoTypo.xsMedium)
                     }
+                    .environmentObject(todayViewModel)
                     .tag(0)
+                    
                     BacklogView(
                         onItemSelcted: { item in
                             selectedTodoItem = item

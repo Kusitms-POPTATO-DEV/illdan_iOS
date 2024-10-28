@@ -8,8 +8,9 @@
 import SwiftUI
 
 struct TodayView: View {
-    @ObservedObject private var viewModel = TodayViewModel()
+    @EnvironmentObject var viewModel: TodayViewModel
     var goToBacklog: () -> Void
+    @State private var isViewActive = false
     
     var body: some View {
         ZStack {
@@ -22,29 +23,48 @@ struct TodayView: View {
                     subText: ""
                 )
                 
-                if viewModel.todayList.isEmpty {
-                    EmptyTodayView(
-                        goToBacklog: goToBacklog
-                    )
-                } else {
-                    TodayListView(
-                        todayList: $viewModel.todayList
-                    )
+                if isViewActive {
+                    if viewModel.todayList.isEmpty {
+                        EmptyTodayView(
+                            goToBacklog: goToBacklog
+                        )
+                    } else {
+                        TodayListView(
+                            todayList: $viewModel.todayList,
+                            swipeToday: { id in
+                                Task {
+                                    await viewModel.swipeToday(todoId: id)
+                                }
+                            }
+                        )
+                    }
                 }
             }
+        }
+        .onAppear {
+            Task {
+                isViewActive = true
+                await viewModel.getTodayList()
+            }
+        }
+        .onDisappear {
+            isViewActive = false
         }
     }
 }
 
 struct TodayListView: View {
     @Binding var todayList: Array<TodayItemModel>
+    var swipeToday: (Int) -> Void
     
     var body: some View {
         ScrollView {
             LazyVStack {
                 ForEach(todayList.indices, id: \.self) { index in
                     TodayItemView(
-                        item: $todayList[index]
+                        item: $todayList[index],
+                        todayList: $todayList,
+                        swipeToday: swipeToday
                     )
                 }
             }
@@ -56,6 +76,9 @@ struct TodayListView: View {
 
 struct TodayItemView: View {
     @Binding var item: TodayItemModel
+    @Binding var todayList: Array<TodayItemModel>
+    var swipeToday: (Int) -> Void
+    @State private var offset: CGFloat = 0
     
     var body: some View {
         VStack {
@@ -84,6 +107,33 @@ struct TodayItemView: View {
         .padding()
         .background(RoundedRectangle(cornerRadius: 8))
         .foregroundColor(.gray95)
+        .offset(x: offset)
+        .gesture(
+            DragGesture()
+                .onChanged { gesture in
+                    if gesture.translation.width > 0 {
+                        self.offset = gesture.translation.width
+                    }
+                }
+                .onEnded { _ in
+                    if abs(offset) > 100 {
+                        swipeToday(item.todoId)
+                        withAnimation {
+                            self.offset = UIScreen.main.bounds.width
+                        }
+                        DispatchQueue.main.asyncAfter(deadline: .now() + 0.3) {
+                            if let index = todayList.firstIndex(where: { $0.todoId == item.todoId }) {
+                                todayList.remove(at: index)
+                            }
+                            offset = 0
+                        }
+                    } else {
+                        withAnimation {
+                            offset = 0
+                        }
+                    }
+                }
+        )
     }
 }
 

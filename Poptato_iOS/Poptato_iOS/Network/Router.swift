@@ -22,6 +22,9 @@ enum Router: URLRequestConvertible {
     // today
     case getTodayList(page: Int, size: Int)
     
+    // todo
+    case swipeTodo(swipeRequest: TodoIdModel)
+    
     var accessToken: String? {
         KeychainManager.shared.readToken(for: "accessToken")
     }
@@ -109,6 +112,17 @@ enum Router: URLRequestConvertible {
             if let accessToken = accessToken {
                 request.addValue("Bearer \(accessToken)", forHTTPHeaderField: "Authorization")
             }
+            
+        // todo
+        case .swipeTodo(let swipeRequest):
+            let endpoint = url.appendingPathComponent("/swipe")
+            request = URLRequest(url: endpoint)
+            request.httpMethod = "PATCH"
+            request.addValue("application/json", forHTTPHeaderField: "Content-Type")
+            if let accessToken = accessToken {
+                request.addValue("Bearer \(accessToken)", forHTTPHeaderField: "Authorization")
+            }
+            request.httpBody = try JSONEncoder().encode(swipeRequest)
         }
     
         return request
