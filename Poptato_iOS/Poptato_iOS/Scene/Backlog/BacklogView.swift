@@ -159,8 +159,8 @@ struct BacklogItemView: View {
         .background(RoundedRectangle(cornerRadius: 8))
         .foregroundColor(.gray95)
         .offset(x: offset)
-        .gesture(
-            DragGesture()
+        .simultaneousGesture(
+            DragGesture(minimumDistance: 20)
                 .onChanged { gesture in
                     if gesture.translation.width < 0 {
                         self.offset = gesture.translation.width
@@ -169,9 +169,7 @@ struct BacklogItemView: View {
                 .onEnded { _ in
                     if abs(offset) > 100 {
                         swipeBacklog(item.todoId)
-                        withAnimation {
-                            self.offset = -UIScreen.main.bounds.width
-                        }
+                        offset = -UIScreen.main.bounds.width
                         DispatchQueue.main.asyncAfter(deadline: .now() + 0.3) {
                             if let index = backlogList.firstIndex(where: { $0.todoId == item.todoId }) {
                                 backlogList.remove(at: index)

@@ -9,4 +9,8 @@ final class TodoRepositoryImpl: TodoRepository {
     func swipeTodo(request: TodoIdModel) async throws {
         try await NetworkManager.shared.request(api: .swipeTodo(swipeRequest: request))
     }
+    
+    func updateTodoCompletion(todoId: Int) async throws {
+        try await NetworkManager.shared.request(api: .updateTodoCompletion(todoId: todoId))
+    }
 }
