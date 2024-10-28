@@ -11,6 +11,7 @@ import Foundation
 final class TodayViewModel: ObservableObject {
     @Published var todayList: Array<TodayItemModel> = []
     @Published var currentDate: String = ""
+    private var snapshotList: [TodayItemModel] = []
     private let todayRepository: TodayRepository
     private let todoRepository: TodoRepository
     
@@ -39,6 +40,7 @@ final class TodayViewModel: ObservableObject {
                         deadline: item.deadline
                     )
                 }
+                self.snapshotList = self.todayList
             }
         } catch {
             DispatchQueue.main.async {
@@ -48,11 +50,33 @@ final class TodayViewModel: ObservableObject {
     }
     
     func swipeToday(todoId: Int) async {
+        await MainActor.run {
+            self.snapshotList = self.todayList
+        }
+        
         do {
             try await todoRepository.swipeTodo(request: TodoIdModel(todoId: todoId))
+            await MainActor.run {
+                self.snapshotList = self.todayList
+            }
+        } catch {
+            await MainActor.run {
+                print("Error swipe today: \(error)")
+                self.todayList = self.snapshotList
+            }
+        }
+    }
+    
+    func updateTodoCompletion(todoId: Int) async {
+        let previousSnapshot = todayList
+        
+        do {
+            try await todoRepository.updateTodoCompletion(todoId: todoId)
+            snapshotList = todayList
         } catch {
             DispatchQueue.main.async {
-                print("Error swipe today: \(error)")
+                print("Error update todocompletion: \(error)")
+                self.todayList = previousSnapshot
             }
         }
     }
