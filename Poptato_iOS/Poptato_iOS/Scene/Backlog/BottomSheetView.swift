@@ -132,7 +132,7 @@ struct RoundedCorner: Shape {
             todoId: 1,
             content: "테스트테스트테스트테스트테스트테스트테스트테스트",
             bookmark: false,
-            dDay: nil,
+            dday: nil,
             deadline: nil
         ),
         deleteTodo: {},

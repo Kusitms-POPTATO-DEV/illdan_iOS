@@ -12,6 +12,6 @@ struct TodoItemModel: Codable {
     let todoId: Int
     var content: String
     let bookmark: Bool
-    let dDay: Int?
+    let dday: Int?
     let deadline: String?
 }

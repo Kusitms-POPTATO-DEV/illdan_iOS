@@ -131,14 +131,18 @@ struct BacklogItemView: View {
                     }
                 }
                 
-                if let dDay = item.dDay {
+                if let dDay = item.dday {
                     if dDay == 0 {
                         Text("D-day")
+                            .font(PoptatoTypo.xsSemiBold)
+                            .foregroundColor(.gray70)
                     } else {
                         Text("D-\(dDay)")
+                            .font(PoptatoTypo.xsSemiBold)
+                            .foregroundColor(.gray70)
                     }
                 }
-                Spacer()
+                if (item.bookmark || item.dday != nil) { Spacer() }
             }
             
             if activeItemId == item.todoId {
