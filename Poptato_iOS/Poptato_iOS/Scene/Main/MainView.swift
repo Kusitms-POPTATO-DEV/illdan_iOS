@@ -49,7 +49,9 @@ struct MainView: View {
                             selectedTodoItem = item
                         },
                         showBottomSheet: {
-                            isBottomSheetVisible = true
+                            withAnimation {
+                                isBottomSheetVisible = true
+                            }
                         }
                     )
                     .tabItem {
@@ -63,6 +65,18 @@ struct MainView: View {
                 KaKaoLoginView(
                     onSuccessLogin: { isLogined = true }
                 )
+            }
+            
+            if isBottomSheetVisible {
+                Color.black.opacity(0.6)
+                    .edgesIgnoringSafeArea(.all)
+                    .transition(.opacity)
+                    .animation(nil, value: isBottomSheetVisible)
+                    .onTapGesture {
+                        withAnimation {
+                            isBottomSheetVisible = false
+                        }
+                    }
             }
             
             if isBottomSheetVisible, let todoItem = selectedTodoItem {
@@ -84,6 +98,8 @@ struct MainView: View {
                         }
                     }
                 )
+                .transition(.move(edge: .bottom))
+                .zIndex(1)
             }
         }
     }

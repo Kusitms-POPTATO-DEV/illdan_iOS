@@ -41,7 +41,9 @@ struct BottomSheetView: View {
                     Button(
                         action: {
                             editTodo()
-                            isVisible = false
+                            withAnimation {
+                                isVisible = false
+                            }
                         }
                     ) {
                         Text("수정")
@@ -55,7 +57,9 @@ struct BottomSheetView: View {
                     Button(
                         action: {
                             deleteTodo()
-                            isVisible = false
+                            withAnimation {
+                                isVisible = false
+                            }
                         }
                     ) {
                         Text("삭제")
@@ -104,11 +108,6 @@ struct BottomSheetView: View {
             .background(Color(UIColor.gray100))
             .clipShape(RoundedCorner(radius: 16, corners: [.topLeft, .topRight]))
         }
-        .background(Color(UIColor.gray100).opacity(0.6)
-            .onTapGesture {
-                isVisible = false
-            }
-        )
     }
 }
 
