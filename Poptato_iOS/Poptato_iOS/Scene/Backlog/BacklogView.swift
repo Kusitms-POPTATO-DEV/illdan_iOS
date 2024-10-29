@@ -119,6 +119,28 @@ struct BacklogItemView: View {
     
     var body: some View {
         VStack {
+            HStack(spacing: 6) {
+                if (item.bookmark) {
+                    HStack(spacing: 2) {
+                        Image("ic_star_filled")
+                            .resizable()
+                            .frame(width: 12, height: 12)
+                        Text("중요")
+                            .font(PoptatoTypo.xsSemiBold)
+                            .foregroundColor(.primary60)
+                    }
+                }
+                
+                if let dDay = item.dDay {
+                    if dDay == 0 {
+                        Text("D-day")
+                    } else {
+                        Text("D-\(dDay)")
+                    }
+                }
+                Spacer()
+            }
+            
             if activeItemId == item.todoId {
                 TextField("", text: $content)
                     .focused($isActive)
