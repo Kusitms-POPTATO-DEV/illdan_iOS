@@ -25,6 +25,7 @@ enum Router: URLRequestConvertible {
     // todo
     case swipeTodo(swipeRequest: TodoIdModel)
     case updateTodoCompletion(todoId: Int)
+    case updateBookmark(todoId: Int)
     
     var accessToken: String? {
         KeychainManager.shared.readToken(for: "accessToken")
@@ -126,6 +127,14 @@ enum Router: URLRequestConvertible {
             request.httpBody = try JSONEncoder().encode(swipeRequest)
         case .updateTodoCompletion(let todoId):
             let endpoint = url.appendingPathComponent("/todo/\(todoId)/achieve")
+            request = URLRequest(url: endpoint)
+            request.httpMethod = "PATCH"
+            request.addValue("application/json", forHTTPHeaderField: "Content-Type")
+            if let accessToken = accessToken {
+                request.addValue("Bearer \(accessToken)", forHTTPHeaderField: "Authorization")
+            }
+        case .updateBookmark(let todoId):
+            let endpoint = url.appendingPathComponent("/todo/\(todoId)/bookmark")
             request = URLRequest(url: endpoint)
             request.httpMethod = "PATCH"
             request.addValue("application/json", forHTTPHeaderField: "Content-Type")

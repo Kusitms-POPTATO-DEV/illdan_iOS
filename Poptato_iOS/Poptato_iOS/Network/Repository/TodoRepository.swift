@@ -8,4 +8,5 @@
 protocol TodoRepository {
     func swipeTodo(request: TodoIdModel) async throws -> Void
     func updateTodoCompletion(todoId: Int) async throws -> Void
+    func updateBookmark(todoId: Int) async throws -> Void
 }
