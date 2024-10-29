@@ -90,6 +90,32 @@ struct TodayItemView: View {
 
     var body: some View {
         VStack {
+            HStack(spacing: 6) {
+                if (item.bookmark) {
+                    HStack(spacing: 2) {
+                        Image("ic_star_filled")
+                            .resizable()
+                            .frame(width: 12, height: 12)
+                        Text("중요")
+                            .font(PoptatoTypo.xsSemiBold)
+                            .foregroundColor(.primary60)
+                    }
+                }
+                
+                if let dDay = item.dday {
+                    if dDay == 0 {
+                        Text("D-day")
+                            .font(PoptatoTypo.xsSemiBold)
+                            .foregroundColor(.gray70)
+                    } else {
+                        Text("D-\(dDay)")
+                            .font(PoptatoTypo.xsSemiBold)
+                            .foregroundColor(.gray70)
+                    }
+                }
+                if (item.bookmark || item.dday != nil) { Spacer() }
+            }
+            
             HStack {
                 Image(item.todayStatus == "COMPLETED" ? "ic_checked" : "ic_unchecked")
                     .resizable()
