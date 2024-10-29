@@ -94,4 +94,20 @@ class BacklogViewModel: ObservableObject {
             }
         }
     }
+    
+    func updateBookmark(todoId: Int) async {
+        do {
+            try await todoRepository.updateBookmark(todoId: todoId)
+            
+            await MainActor.run {
+                if let index = backlogList.firstIndex(where: { $0.todoId == todoId }) {
+                    backlogList[index].bookmark.toggle()
+                }
+            }
+        } catch {
+            DispatchQueue.main.async {
+                print("Error updateBookmark: \(error)")
+            }
+        }
+    }
 }

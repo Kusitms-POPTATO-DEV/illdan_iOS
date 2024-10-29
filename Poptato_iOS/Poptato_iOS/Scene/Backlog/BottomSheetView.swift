@@ -9,9 +9,10 @@ import SwiftUI
 
 struct BottomSheetView: View {
     @Binding var isVisible: Bool
-    var todoItem: TodoItemModel
+    @Binding var todoItem: TodoItemModel?
     var deleteTodo: () -> Void
     var editTodo: () -> Void
+    var updateBookmark: () -> Void
     
     var body: some View {
         VStack {
@@ -19,19 +20,18 @@ struct BottomSheetView: View {
 
             VStack {
                 HStack {
-                    Text(todoItem.content)
-                        .font(PoptatoTypo.xLMedium)
-                        .foregroundColor(.gray00)
-                        .lineLimit(1)
-                    Spacer()
-                    if todoItem.bookmark {
-                        Image("ic_star_filled")
+                    if let todo = todoItem {
+                        Text(todo.content)
+                            .font(PoptatoTypo.xLMedium)
+                            .foregroundColor(.gray00)
+                            .lineLimit(1)
+                        Spacer()
+                        Image(todo.bookmark ? "ic_star_filled" : "ic_star_empty")
                             .resizable()
                             .frame(width: 20, height: 20)
-                    } else {
-                        Image("ic_star_empty")
-                            .resizable()
-                            .frame(width: 20, height: 20)
+                            .onTapGesture {
+                                updateBookmark()
+                            }
                     }
                 }
                 .padding(.horizontal, 24)
@@ -75,23 +75,25 @@ struct BottomSheetView: View {
                 Divider()
                     .background(Color(.gray95))
                 
-                HStack {
-                    if todoItem.deadline == nil {
-                        Image("ic_plus")
-                    } else {
-                        Image("ic_minus")
+                if let todo = todoItem {
+                    HStack {
+                        if todo.deadline == nil {
+                            Image("ic_plus")
+                        } else {
+                            Image("ic_minus")
+                        }
+                        
+                        Text("마감기한")
+                            .font(PoptatoTypo.mdMedium)
+                            .foregroundColor(.gray40)
+                        
+                        Spacer()
                     }
-                    
-                    Text("마감기한")
-                        .font(PoptatoTypo.mdMedium)
-                        .foregroundColor(.gray40)
-                    
-                    Spacer()
+                    .frame(maxWidth: .infinity)
+                    .padding(.horizontal, 24)
+                    .padding(.vertical, 12)
                 }
-                .frame(maxWidth: .infinity)
-                .padding(.horizontal, 24)
-                .padding(.vertical, 12)
-                
+
                 Divider()
                     .background(Color(.gray95))
                 
@@ -122,20 +124,4 @@ struct RoundedCorner: Shape {
         )
         return Path(path.cgPath)
     }
-}
-
-#Preview {
-    
-    BottomSheetView(
-        isVisible: .constant(true),
-        todoItem: TodoItemModel(
-            todoId: 1,
-            content: "테스트테스트테스트테스트테스트테스트테스트테스트",
-            bookmark: false,
-            dday: nil,
-            deadline: nil
-        ),
-        deleteTodo: {},
-        editTodo: {}
-    )
 }

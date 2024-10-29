@@ -68,7 +68,7 @@ struct MainView: View {
             if isBottomSheetVisible, let todoItem = selectedTodoItem {
                 BottomSheetView(
                     isVisible: $isBottomSheetVisible,
-                    todoItem: todoItem,
+                    todoItem: $selectedTodoItem,
                     deleteTodo: {
                         Task {
                             await backlogViewModel.deleteBacklog(todoId: todoItem.todoId)
@@ -76,6 +76,12 @@ struct MainView: View {
                     },
                     editTodo: {
                         backlogViewModel.activeItemId = todoItem.todoId
+                    },
+                    updateBookmark: {
+                        selectedTodoItem?.bookmark.toggle()
+                        Task {
+                            await backlogViewModel.updateBookmark(todoId: todoItem.todoId)
+                        }
                     }
                 )
             }
