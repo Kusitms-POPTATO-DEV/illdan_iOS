@@ -30,7 +30,7 @@ class BacklogViewModel: ObservableObject {
             let response = try await backlogRepository.createBacklog(request: CreateBacklogRequest(content: item))
             DispatchQueue.main.async {
                 self.backlogList.insert(
-                    TodoItemModel(todoId: response.todoId, content: item, bookmark: false, dDay: nil, deadline: nil),
+                    TodoItemModel(todoId: response.todoId, content: item, bookmark: false, dday: nil, deadline: nil),
                     at: 0
                 )
             }
@@ -50,7 +50,7 @@ class BacklogViewModel: ObservableObject {
                         todoId: item.todoId,
                         content: item.content,
                         bookmark: item.bookmark,
-                        dDay: item.dDay,
+                        dday: item.dday,
                         deadline: item.deadline
                     )
                 }
@@ -91,6 +91,22 @@ class BacklogViewModel: ObservableObject {
         } catch {
             DispatchQueue.main.async {
                 print("Error swipe backlog: \(error)")
+            }
+        }
+    }
+    
+    func updateBookmark(todoId: Int) async {
+        do {
+            try await todoRepository.updateBookmark(todoId: todoId)
+            
+            await MainActor.run {
+                if let index = backlogList.firstIndex(where: { $0.todoId == todoId }) {
+                    backlogList[index].bookmark.toggle()
+                }
+            }
+        } catch {
+            DispatchQueue.main.async {
+                print("Error updateBookmark: \(error)")
             }
         }
     }

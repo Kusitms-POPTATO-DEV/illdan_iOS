@@ -49,7 +49,9 @@ struct MainView: View {
                             selectedTodoItem = item
                         },
                         showBottomSheet: {
-                            isBottomSheetVisible = true
+                            withAnimation {
+                                isBottomSheetVisible = true
+                            }
                         }
                     )
                     .tabItem {
@@ -65,10 +67,22 @@ struct MainView: View {
                 )
             }
             
+            if isBottomSheetVisible {
+                Color.black.opacity(0.6)
+                    .edgesIgnoringSafeArea(.all)
+                    .transition(.opacity)
+                    .animation(nil, value: isBottomSheetVisible)
+                    .onTapGesture {
+                        withAnimation {
+                            isBottomSheetVisible = false
+                        }
+                    }
+            }
+            
             if isBottomSheetVisible, let todoItem = selectedTodoItem {
                 BottomSheetView(
                     isVisible: $isBottomSheetVisible,
-                    todoItem: todoItem,
+                    todoItem: $selectedTodoItem,
                     deleteTodo: {
                         Task {
                             await backlogViewModel.deleteBacklog(todoId: todoItem.todoId)
@@ -76,8 +90,16 @@ struct MainView: View {
                     },
                     editTodo: {
                         backlogViewModel.activeItemId = todoItem.todoId
+                    },
+                    updateBookmark: {
+                        selectedTodoItem?.bookmark.toggle()
+                        Task {
+                            await backlogViewModel.updateBookmark(todoId: todoItem.todoId)
+                        }
                     }
                 )
+                .transition(.move(edge: .bottom))
+                .zIndex(1)
             }
         }
     }

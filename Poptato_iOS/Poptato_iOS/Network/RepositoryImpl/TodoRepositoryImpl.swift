@@ -13,4 +13,8 @@ final class TodoRepositoryImpl: TodoRepository {
     func updateTodoCompletion(todoId: Int) async throws {
         try await NetworkManager.shared.request(api: .updateTodoCompletion(todoId: todoId))
     }
+    
+    func updateBookmark(todoId: Int) async throws {
+        try await NetworkManager.shared.request(api: .updateBookmark(todoId: todoId))
+    }
 }
