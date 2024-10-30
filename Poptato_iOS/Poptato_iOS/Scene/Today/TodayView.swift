@@ -66,9 +66,16 @@ struct TodayListView: View {
     var body: some View {
         ScrollView {
             LazyVStack {
-                ForEach(todayList.indices, id: \.self) { index in
+                ForEach(todayList, id: \.todoId) { item in
                     TodayItemView(
-                        item: $todayList[index],
+                        item: Binding(
+                            get: { item },
+                            set: { updatedItem in
+                                if let index = todayList.firstIndex(where: { $0.todoId == updatedItem.todoId }) {
+                                    todayList[index] = updatedItem
+                                }
+                            }
+                        ),
                         todayList: $todayList,
                         swipeToday: swipeToday,
                         updateTodoCompletion: updateTodoCompletion
