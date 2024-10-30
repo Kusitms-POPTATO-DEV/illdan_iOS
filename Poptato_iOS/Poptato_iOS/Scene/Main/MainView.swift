@@ -11,7 +11,6 @@ struct MainView: View {
     @State private var selectedTab: Int = 1
     @State private var isLogined = false
     @State private var isBottomSheetVisible = false
-    @State private var selectedTodoItem: TodoItemModel? = nil
     @StateObject private var backlogViewModel = BacklogViewModel()
     @StateObject private var todayViewModel = TodayViewModel()
     
@@ -46,7 +45,7 @@ struct MainView: View {
                     
                     BacklogView(
                         onItemSelcted: { item in
-                            selectedTodoItem = item
+                            backlogViewModel.updateSelectedItem(item: item)
                         },
                         showBottomSheet: {
                             withAnimation {
@@ -79,10 +78,10 @@ struct MainView: View {
                     }
             }
             
-            if isBottomSheetVisible, let todoItem = selectedTodoItem {
+            if isBottomSheetVisible, let todoItem = backlogViewModel.selectedTodoItem {
                 BottomSheetView(
                     isVisible: $isBottomSheetVisible,
-                    todoItem: $selectedTodoItem,
+                    todoItem: $backlogViewModel.selectedTodoItem,
                     deleteTodo: {
                         Task {
                             await backlogViewModel.deleteBacklog(todoId: todoItem.todoId)
@@ -92,9 +91,16 @@ struct MainView: View {
                         backlogViewModel.activeItemId = todoItem.todoId
                     },
                     updateBookmark: {
-                        selectedTodoItem?.bookmark.toggle()
                         Task {
                             await backlogViewModel.updateBookmark(todoId: todoItem.todoId)
+                        }
+                    },
+                    updateDeadline: { deadline in
+                        Task {
+                            await backlogViewModel.updateDeadline(
+                                todoId: todoItem.todoId,
+                                deadline: deadline
+                            )
                         }
                     }
                 )

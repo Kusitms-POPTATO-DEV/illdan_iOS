@@ -13,6 +13,7 @@ class BacklogViewModel: ObservableObject {
     private let todoRepository: TodoRepository
     @Published var backlogList: Array<TodoItemModel> = []
     @Published var activeItemId: Int? = nil
+    @Published var selectedTodoItem: TodoItemModel? = nil
     
     init(
         backlogRepository: BacklogRepository = BacklogRepositoryImpl(),
@@ -96,6 +97,8 @@ class BacklogViewModel: ObservableObject {
     }
     
     func updateBookmark(todoId: Int) async {
+        await MainActor.run { selectedTodoItem?.bookmark.toggle() }
+        
         do {
             try await todoRepository.updateBookmark(todoId: todoId)
             
@@ -109,5 +112,42 @@ class BacklogViewModel: ObservableObject {
                 print("Error updateBookmark: \(error)")
             }
         }
+    }
+    
+    func updateDeadline(todoId: Int, deadline: String?) async {
+        let dateFormatter = DateFormatter()
+        dateFormatter.dateFormat = "yyyy-MM-dd"
+        
+        await MainActor.run { selectedTodoItem?.deadline = deadline }
+        
+        do {
+            try await backlogRepository.updateDeadline(todoId: todoId, request: UpdateDeadlineRequest(deadline: deadline))
+            await MainActor.run {
+                if let index = backlogList.firstIndex(where: { $0.todoId == todoId }) {
+                    backlogList[index].deadline = deadline
+                    
+                    if let deadline = deadline,
+                        let deadlineDate = dateFormatter.date(from: deadline) {
+                        let currentDate = Date()
+                        let calendar = Calendar.current
+                        
+                        let components = calendar.dateComponents([.day], from: currentDate, to: deadlineDate)
+                        if let daysDifference = components.day {
+                            backlogList[index].dday = daysDifference
+                            selectedTodoItem?.dday = daysDifference
+                        }
+                    } else {
+                        backlogList[index].dday = nil
+                        selectedTodoItem?.dday = nil
+                    }
+                }
+            }
+        } catch {
+            print("Error updating deadline: \(error)")
+        }
+    }
+    
+    func updateSelectedItem(item: TodoItemModel?) {
+        selectedTodoItem = item
     }
 }

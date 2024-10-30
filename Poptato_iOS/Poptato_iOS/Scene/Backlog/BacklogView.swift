@@ -118,70 +118,79 @@ struct BacklogItemView: View {
     @State private var offset: CGFloat = 0
     
     var body: some View {
-        VStack {
-            HStack(spacing: 6) {
-                if (item.bookmark) {
-                    HStack(spacing: 2) {
-                        Image("ic_star_filled")
-                            .resizable()
-                            .frame(width: 12, height: 12)
-                        Text("중요")
-                            .font(PoptatoTypo.xsSemiBold)
-                            .foregroundColor(.primary60)
+        HStack {
+            VStack {
+                HStack(spacing: 6) {
+                    if (item.bookmark) {
+                        HStack(spacing: 2) {
+                            Image("ic_star_filled")
+                                .resizable()
+                                .frame(width: 12, height: 12)
+                            Text("중요")
+                                .font(PoptatoTypo.xsSemiBold)
+                                .foregroundColor(.primary60)
+                        }
                     }
+                    
+                    if let dDay = item.dday {
+                        if dDay == 0 {
+                            Text("D-day")
+                                .font(PoptatoTypo.xsSemiBold)
+                                .foregroundColor(.gray70)
+                                .frame(height: 12)
+                        } else {
+                            Text("D-\(dDay)")
+                                .font(PoptatoTypo.xsSemiBold)
+                                .foregroundColor(.gray70)
+                                .frame(height: 12)
+                        }
+                    }
+                    if (item.bookmark || item.dday != nil) { Spacer() }
                 }
                 
-                if let dDay = item.dday {
-                    if dDay == 0 {
-                        Text("D-day")
-                            .font(PoptatoTypo.xsSemiBold)
-                            .foregroundColor(.gray70)
-                    } else {
-                        Text("D-\(dDay)")
-                            .font(PoptatoTypo.xsSemiBold)
-                            .foregroundColor(.gray70)
-                    }
-                }
-                if (item.bookmark || item.dday != nil) { Spacer() }
-            }
-            
-            if activeItemId == item.todoId {
-                TextField("", text: $content)
-                    .focused($isActive)
-                    .onAppear {
-                        isActive = true
-                        content = item.content
-                    }
-                    .onSubmit {
-                        if !content.isEmpty, let activeItemId {
-                            item.content = content
-                            editBacklog(activeItemId, content)
+                if activeItemId == item.todoId {
+                    TextField("", text: $content)
+                        .focused($isActive)
+                        .onAppear {
+                            isActive = true
+                            content = item.content
                         }
-                        isActive = false
-                        activeItemId = nil
-                    }
-                    .font(PoptatoTypo.mdRegular)
-                    .foregroundColor(.gray00)
-            } else {
-                HStack{
-                    Text(item.content)
+                        .onSubmit {
+                            if !content.isEmpty, let activeItemId {
+                                item.content = content
+                                editBacklog(activeItemId, content)
+                            }
+                            isActive = false
+                            activeItemId = nil
+                        }
                         .font(PoptatoTypo.mdRegular)
                         .foregroundColor(.gray00)
-                    
-                    Spacer()
-                    
-                    Image("ic_dot")
-                        .resizable()
-                        .frame(width: 20, height: 20)
-                        .onTapGesture {
-                            onItemSelcted(item)
-                            showBottomSheet()
-                        }
+                } else {
+                    HStack{
+                        Text(item.content)
+                            .font(PoptatoTypo.mdRegular)
+                            .foregroundColor(.gray00)
+                        
+                        Spacer()
+                    }
                 }
+            }
+            
+            Spacer()
+            
+            ZStack(alignment: (item.bookmark || item.dday != nil) ? .top : .center) {
+                Image("ic_dot")
+                    .resizable()
+                    .frame(width: 20, height: 20)
+                    .onTapGesture {
+                        onItemSelcted(item)
+                        showBottomSheet()
+                    }
             }
         }
         .frame(maxWidth: .infinity)
-        .padding()
+        .padding(.horizontal, 16)
+        .padding(.vertical, 16)
         .background(RoundedRectangle(cornerRadius: 8))
         .foregroundColor(.gray95)
         .offset(x: offset)
