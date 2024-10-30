@@ -9,6 +9,7 @@ import SwiftUI
 import Combine
 
 class BacklogViewModel: ObservableObject {
+    private var tempIdCounter = -1
     private let backlogRepository: BacklogRepository
     private let todoRepository: TodoRepository
     @Published var backlogList: Array<TodoItemModel> = []
@@ -27,18 +28,26 @@ class BacklogViewModel: ObservableObject {
     }
     
     func createBacklog(_ item: String) async {
+        let temporaryId = tempIdCounter
+        tempIdCounter -= 1
+        
+        let newItem = TodoItemModel(todoId: temporaryId, content: item, bookmark: false, dday: nil, deadline: nil)
+        await MainActor.run {
+            backlogList.insert(newItem, at: 0)
+        }
+        
         do {
             let response = try await backlogRepository.createBacklog(request: CreateBacklogRequest(content: item))
-            DispatchQueue.main.async {
-                self.backlogList.insert(
-                    TodoItemModel(todoId: response.todoId, content: item, bookmark: false, dday: nil, deadline: nil),
-                    at: 0
-                )
+            await MainActor.run {
+                if let index = backlogList.firstIndex(where: { $0.todoId == temporaryId }) {
+                    backlogList[index].todoId = response.todoId
+                }
             }
         } catch {
-            DispatchQueue.main.async {
-                print("Login error: \(error)")
+            await MainActor.run {
+                backlogList.removeAll { $0.todoId == temporaryId }
             }
+            print("Login error: \(error)")
         }
     }
     

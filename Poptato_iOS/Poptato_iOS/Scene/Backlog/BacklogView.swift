@@ -12,7 +12,6 @@ struct BacklogView: View {
     @EnvironmentObject var viewModel: BacklogViewModel
     @FocusState private var isTextFieldFocused: Bool
     var onItemSelcted: (TodoItemModel) -> Void
-    var showBottomSheet: () -> Void
     
     var body: some View {
         ZStack {
@@ -47,7 +46,6 @@ struct BacklogView: View {
                     BacklogListView(
                         backlogList: $viewModel.backlogList,
                         onItemSelcted: onItemSelcted,
-                        showBottomSheet: showBottomSheet,
                         editBacklog: { id, content in
                             Task {
                                 await viewModel.editBacklog(todoId: id, content: content)
@@ -79,7 +77,6 @@ struct BacklogView: View {
 struct BacklogListView: View {
     @Binding var backlogList: [TodoItemModel]
     var onItemSelcted: (TodoItemModel) -> Void
-    var showBottomSheet: () -> Void
     var editBacklog: (Int, String) -> Void
     var swipeBacklog: (Int) -> Void
     @Binding var activeItemId: Int?
@@ -87,12 +84,18 @@ struct BacklogListView: View {
     var body: some View {
         ScrollView {
             LazyVStack {
-                ForEach(backlogList.indices, id: \.self) { index in
+                ForEach(backlogList, id: \.todoId) { item in
                     BacklogItemView(
-                        item: $backlogList[index],
+                        item: Binding(
+                            get: { item },
+                            set: { newItem in
+                                if let index = backlogList.firstIndex(where: { $0.todoId == newItem.todoId }) {
+                                    backlogList[index] = newItem
+                                }
+                            }
+                        ),
                         backlogList: $backlogList,
                         onItemSelcted: onItemSelcted,
-                        showBottomSheet: showBottomSheet,
                         editBacklog: editBacklog,
                         swipeBacklog: swipeBacklog,
                         activeItemId: $activeItemId
@@ -109,7 +112,6 @@ struct BacklogItemView: View {
     @Binding var item: TodoItemModel
     @Binding var backlogList: [TodoItemModel]
     var onItemSelcted: (TodoItemModel) -> Void
-    var showBottomSheet: () -> Void
     var editBacklog: (Int, String) -> Void
     var swipeBacklog: (Int) -> Void
     @Binding var activeItemId: Int?
@@ -184,7 +186,6 @@ struct BacklogItemView: View {
                     .frame(width: 20, height: 20)
                     .onTapGesture {
                         onItemSelcted(item)
-                        showBottomSheet()
                     }
             }
         }
@@ -242,14 +243,19 @@ struct CreateBacklogTextField: View {
                     .padding(.leading, 16)
                 }
 
-                TextField("", text: $taskInput)
+                TextField("", text: $taskInput, axis: .vertical)
                     .focused($isFocused)
-                    .onSubmit {
-                        if !taskInput.isEmpty {
-                            createBacklog(taskInput)
-                            taskInput = ""
+                    .onChange(of: taskInput) {
+                        guard let newValueLastChar = taskInput.last else { return }
+                        
+                        if newValueLastChar == "\n" {
+                            taskInput.removeLast()
+                            if !taskInput.isEmpty {
+                                createBacklog(taskInput)
+                                taskInput = "" 
+                            }
+                            isFocused = true
                         }
-                        isFocused = true
                     }
                     .foregroundColor(.white)
                     .padding(.vertical, 16)
@@ -279,7 +285,6 @@ struct CreateBacklogTextField: View {
 
 #Preview {
     BacklogView(
-        onItemSelcted: {item in},
-        showBottomSheet: {}
+        onItemSelcted: {item in}
     )
 }
