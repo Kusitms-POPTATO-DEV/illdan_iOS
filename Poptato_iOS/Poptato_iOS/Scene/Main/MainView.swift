@@ -45,10 +45,8 @@ struct MainView: View {
                     
                     BacklogView(
                         onItemSelcted: { item in
-                            backlogViewModel.updateSelectedItem(item: item)
-                        },
-                        showBottomSheet: {
-                            withAnimation {
+                            withTransaction(Transaction(animation: .easeInOut)) {
+                                backlogViewModel.updateSelectedItem(item: item)
                                 isBottomSheetVisible = true
                             }
                         }
@@ -74,6 +72,7 @@ struct MainView: View {
                     .onTapGesture {
                         withAnimation {
                             isBottomSheetVisible = false
+                            backlogViewModel.updateSelectedItem(item: nil)
                         }
                     }
             }
