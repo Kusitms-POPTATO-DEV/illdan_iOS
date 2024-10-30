@@ -208,7 +208,9 @@ struct DateBottomSheet: View {
                     
                     Button(
                         action: {
-                            let deadline = "\(String(selectedYear))-\(selectedMonth)-\(selectedDay)"
+                            let formattedMonth = String(format: "%02d", selectedMonth)
+                            let formattedDay = String(format: "%02d", selectedDay)  
+                            let deadline = "\(String(selectedYear))-\(formattedMonth)-\(formattedDay)"
                             updateDeadline(deadline)
                             onDissmiss()
                         }
