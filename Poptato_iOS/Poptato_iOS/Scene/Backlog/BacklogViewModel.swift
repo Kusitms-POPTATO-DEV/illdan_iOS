@@ -9,10 +9,12 @@ import SwiftUI
 import Combine
 
 class BacklogViewModel: ObservableObject {
+    private var tempIdCounter = -1
     private let backlogRepository: BacklogRepository
     private let todoRepository: TodoRepository
     @Published var backlogList: Array<TodoItemModel> = []
     @Published var activeItemId: Int? = nil
+    @Published var selectedTodoItem: TodoItemModel? = nil
     
     init(
         backlogRepository: BacklogRepository = BacklogRepositoryImpl(),
@@ -26,18 +28,26 @@ class BacklogViewModel: ObservableObject {
     }
     
     func createBacklog(_ item: String) async {
+        let temporaryId = tempIdCounter
+        tempIdCounter -= 1
+        
+        let newItem = TodoItemModel(todoId: temporaryId, content: item, bookmark: false, dday: nil, deadline: nil)
+        await MainActor.run {
+            backlogList.insert(newItem, at: 0)
+        }
+        
         do {
             let response = try await backlogRepository.createBacklog(request: CreateBacklogRequest(content: item))
-            DispatchQueue.main.async {
-                self.backlogList.insert(
-                    TodoItemModel(todoId: response.todoId, content: item, bookmark: false, dday: nil, deadline: nil),
-                    at: 0
-                )
+            await MainActor.run {
+                if let index = backlogList.firstIndex(where: { $0.todoId == temporaryId }) {
+                    backlogList[index].todoId = response.todoId
+                }
             }
         } catch {
-            DispatchQueue.main.async {
-                print("Login error: \(error)")
+            await MainActor.run {
+                backlogList.removeAll { $0.todoId == temporaryId }
             }
+            print("Login error: \(error)")
         }
     }
     
@@ -96,6 +106,8 @@ class BacklogViewModel: ObservableObject {
     }
     
     func updateBookmark(todoId: Int) async {
+        await MainActor.run { selectedTodoItem?.bookmark.toggle() }
+        
         do {
             try await todoRepository.updateBookmark(todoId: todoId)
             
@@ -109,5 +121,42 @@ class BacklogViewModel: ObservableObject {
                 print("Error updateBookmark: \(error)")
             }
         }
+    }
+    
+    func updateDeadline(todoId: Int, deadline: String?) async {
+        let dateFormatter = DateFormatter()
+        dateFormatter.dateFormat = "yyyy-MM-dd"
+        
+        await MainActor.run { selectedTodoItem?.deadline = deadline }
+        
+        do {
+            try await backlogRepository.updateDeadline(todoId: todoId, request: UpdateDeadlineRequest(deadline: deadline))
+            await MainActor.run {
+                if let index = backlogList.firstIndex(where: { $0.todoId == todoId }) {
+                    backlogList[index].deadline = deadline
+                    
+                    if let deadline = deadline,
+                        let deadlineDate = dateFormatter.date(from: deadline) {
+                        let currentDate = Date()
+                        let calendar = Calendar.current
+                        
+                        let components = calendar.dateComponents([.day], from: currentDate, to: deadlineDate)
+                        if let daysDifference = components.day {
+                            backlogList[index].dday = daysDifference
+                            selectedTodoItem?.dday = daysDifference
+                        }
+                    } else {
+                        backlogList[index].dday = nil
+                        selectedTodoItem?.dday = nil
+                    }
+                }
+            }
+        } catch {
+            print("Error updating deadline: \(error)")
+        }
+    }
+    
+    func updateSelectedItem(item: TodoItemModel?) {
+        selectedTodoItem = item
     }
 }

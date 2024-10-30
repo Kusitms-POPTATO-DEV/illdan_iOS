@@ -9,7 +9,7 @@ import Foundation
 import SwiftUI
 
 struct TodoItemModel: Codable {
-    let todoId: Int
+    var todoId: Int
     var content: String
     var bookmark: Bool
     var dday: Int?

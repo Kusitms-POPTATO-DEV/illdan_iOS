@@ -66,9 +66,16 @@ struct TodayListView: View {
     var body: some View {
         ScrollView {
             LazyVStack {
-                ForEach(todayList.indices, id: \.self) { index in
+                ForEach(todayList, id: \.todoId) { item in
                     TodayItemView(
-                        item: $todayList[index],
+                        item: Binding(
+                            get: { item },
+                            set: { updatedItem in
+                                if let index = todayList.firstIndex(where: { $0.todoId == updatedItem.todoId }) {
+                                    todayList[index] = updatedItem
+                                }
+                            }
+                        ),
                         todayList: $todayList,
                         swipeToday: swipeToday,
                         updateTodoCompletion: updateTodoCompletion
@@ -90,6 +97,32 @@ struct TodayItemView: View {
 
     var body: some View {
         VStack {
+            HStack(spacing: 6) {
+                if (item.bookmark) {
+                    HStack(spacing: 2) {
+                        Image("ic_star_filled")
+                            .resizable()
+                            .frame(width: 12, height: 12)
+                        Text("중요")
+                            .font(PoptatoTypo.xsSemiBold)
+                            .foregroundColor(.primary60)
+                    }
+                }
+                
+                if let dDay = item.dday {
+                    if dDay == 0 {
+                        Text("D-day")
+                            .font(PoptatoTypo.xsSemiBold)
+                            .foregroundColor(.gray70)
+                    } else {
+                        Text("D-\(dDay)")
+                            .font(PoptatoTypo.xsSemiBold)
+                            .foregroundColor(.gray70)
+                    }
+                }
+                if (item.bookmark || item.dday != nil) { Spacer() }
+            }
+            
             HStack {
                 Image(item.todayStatus == "COMPLETED" ? "ic_checked" : "ic_unchecked")
                     .resizable()

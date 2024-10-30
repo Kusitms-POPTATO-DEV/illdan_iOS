@@ -36,7 +36,7 @@ final class TodayViewModel: ObservableObject {
                         content: item.content,
                         todayStatus: item.todayStatus,
                         bookmark: item.bookmark,
-                        dDay: item.dDay,
+                        dday: item.dday,
                         deadline: item.deadline
                     )
                 }

@@ -12,7 +12,6 @@ struct BacklogView: View {
     @EnvironmentObject var viewModel: BacklogViewModel
     @FocusState private var isTextFieldFocused: Bool
     var onItemSelcted: (TodoItemModel) -> Void
-    var showBottomSheet: () -> Void
     
     var body: some View {
         ZStack {
@@ -47,7 +46,6 @@ struct BacklogView: View {
                     BacklogListView(
                         backlogList: $viewModel.backlogList,
                         onItemSelcted: onItemSelcted,
-                        showBottomSheet: showBottomSheet,
                         editBacklog: { id, content in
                             Task {
                                 await viewModel.editBacklog(todoId: id, content: content)
@@ -79,7 +77,6 @@ struct BacklogView: View {
 struct BacklogListView: View {
     @Binding var backlogList: [TodoItemModel]
     var onItemSelcted: (TodoItemModel) -> Void
-    var showBottomSheet: () -> Void
     var editBacklog: (Int, String) -> Void
     var swipeBacklog: (Int) -> Void
     @Binding var activeItemId: Int?
@@ -87,12 +84,18 @@ struct BacklogListView: View {
     var body: some View {
         ScrollView {
             LazyVStack {
-                ForEach(backlogList.indices, id: \.self) { index in
+                ForEach(backlogList, id: \.todoId) { item in
                     BacklogItemView(
-                        item: $backlogList[index],
+                        item: Binding(
+                            get: { item },
+                            set: { newItem in
+                                if let index = backlogList.firstIndex(where: { $0.todoId == newItem.todoId }) {
+                                    backlogList[index] = newItem
+                                }
+                            }
+                        ),
                         backlogList: $backlogList,
                         onItemSelcted: onItemSelcted,
-                        showBottomSheet: showBottomSheet,
                         editBacklog: editBacklog,
                         swipeBacklog: swipeBacklog,
                         activeItemId: $activeItemId
@@ -109,7 +112,6 @@ struct BacklogItemView: View {
     @Binding var item: TodoItemModel
     @Binding var backlogList: [TodoItemModel]
     var onItemSelcted: (TodoItemModel) -> Void
-    var showBottomSheet: () -> Void
     var editBacklog: (Int, String) -> Void
     var swipeBacklog: (Int) -> Void
     @Binding var activeItemId: Int?
@@ -118,70 +120,78 @@ struct BacklogItemView: View {
     @State private var offset: CGFloat = 0
     
     var body: some View {
-        VStack {
-            HStack(spacing: 6) {
-                if (item.bookmark) {
-                    HStack(spacing: 2) {
-                        Image("ic_star_filled")
-                            .resizable()
-                            .frame(width: 12, height: 12)
-                        Text("중요")
-                            .font(PoptatoTypo.xsSemiBold)
-                            .foregroundColor(.primary60)
+        HStack {
+            VStack {
+                HStack(spacing: 6) {
+                    if (item.bookmark) {
+                        HStack(spacing: 2) {
+                            Image("ic_star_filled")
+                                .resizable()
+                                .frame(width: 12, height: 12)
+                            Text("중요")
+                                .font(PoptatoTypo.xsSemiBold)
+                                .foregroundColor(.primary60)
+                        }
                     }
+                    
+                    if let dDay = item.dday {
+                        if dDay == 0 {
+                            Text("D-day")
+                                .font(PoptatoTypo.xsSemiBold)
+                                .foregroundColor(.gray70)
+                                .frame(height: 12)
+                        } else {
+                            Text("D-\(dDay)")
+                                .font(PoptatoTypo.xsSemiBold)
+                                .foregroundColor(.gray70)
+                                .frame(height: 12)
+                        }
+                    }
+                    if (item.bookmark || item.dday != nil) { Spacer() }
                 }
                 
-                if let dDay = item.dday {
-                    if dDay == 0 {
-                        Text("D-day")
-                            .font(PoptatoTypo.xsSemiBold)
-                            .foregroundColor(.gray70)
-                    } else {
-                        Text("D-\(dDay)")
-                            .font(PoptatoTypo.xsSemiBold)
-                            .foregroundColor(.gray70)
-                    }
-                }
-                if (item.bookmark || item.dday != nil) { Spacer() }
-            }
-            
-            if activeItemId == item.todoId {
-                TextField("", text: $content)
-                    .focused($isActive)
-                    .onAppear {
-                        isActive = true
-                        content = item.content
-                    }
-                    .onSubmit {
-                        if !content.isEmpty, let activeItemId {
-                            item.content = content
-                            editBacklog(activeItemId, content)
+                if activeItemId == item.todoId {
+                    TextField("", text: $content)
+                        .focused($isActive)
+                        .onAppear {
+                            isActive = true
+                            content = item.content
                         }
-                        isActive = false
-                        activeItemId = nil
-                    }
-                    .font(PoptatoTypo.mdRegular)
-                    .foregroundColor(.gray00)
-            } else {
-                HStack{
-                    Text(item.content)
+                        .onSubmit {
+                            if !content.isEmpty, let activeItemId {
+                                item.content = content
+                                editBacklog(activeItemId, content)
+                            }
+                            isActive = false
+                            activeItemId = nil
+                        }
                         .font(PoptatoTypo.mdRegular)
                         .foregroundColor(.gray00)
-                    
-                    Spacer()
-                    
-                    Image("ic_dot")
-                        .resizable()
-                        .frame(width: 20, height: 20)
-                        .onTapGesture {
-                            onItemSelcted(item)
-                            showBottomSheet()
-                        }
+                } else {
+                    HStack{
+                        Text(item.content)
+                            .font(PoptatoTypo.mdRegular)
+                            .foregroundColor(.gray00)
+                        
+                        Spacer()
+                    }
                 }
+            }
+            
+            Spacer()
+            
+            ZStack(alignment: (item.bookmark || item.dday != nil) ? .top : .center) {
+                Image("ic_dot")
+                    .resizable()
+                    .frame(width: 20, height: 20)
+                    .onTapGesture {
+                        onItemSelcted(item)
+                    }
             }
         }
         .frame(maxWidth: .infinity)
-        .padding()
+        .padding(.horizontal, 16)
+        .padding(.vertical, 16)
         .background(RoundedRectangle(cornerRadius: 8))
         .foregroundColor(.gray95)
         .offset(x: offset)
@@ -233,14 +243,19 @@ struct CreateBacklogTextField: View {
                     .padding(.leading, 16)
                 }
 
-                TextField("", text: $taskInput)
+                TextField("", text: $taskInput, axis: .vertical)
                     .focused($isFocused)
-                    .onSubmit {
-                        if !taskInput.isEmpty {
-                            createBacklog(taskInput)
-                            taskInput = ""
+                    .onChange(of: taskInput) {
+                        guard let newValueLastChar = taskInput.last else { return }
+                        
+                        if newValueLastChar == "\n" {
+                            taskInput.removeLast()
+                            if !taskInput.isEmpty {
+                                createBacklog(taskInput)
+                                taskInput = "" 
+                            }
+                            isFocused = true
                         }
-                        isFocused = true
                     }
                     .foregroundColor(.white)
                     .padding(.vertical, 16)
@@ -270,7 +285,6 @@ struct CreateBacklogTextField: View {
 
 #Preview {
     BacklogView(
-        onItemSelcted: {item in},
-        showBottomSheet: {}
+        onItemSelcted: {item in}
     )
 }

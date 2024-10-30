@@ -18,6 +18,7 @@ enum Router: URLRequestConvertible {
     case getBacklogList(page: Int, size: Int)
     case deleteBacklog(todoId: Int)
     case editBacklog(todoId: Int, content: String)
+    case updateDeadline(updateRequest: UpdateDeadlineRequest, todoId: Int)
     
     // today
     case getTodayList(page: Int, size: Int)
@@ -97,6 +98,15 @@ enum Router: URLRequestConvertible {
                 request.addValue("Bearer \(accessToken)", forHTTPHeaderField: "Authorization")
             }
             request.httpBody = try JSONEncoder().encode(TodoContentModel(content: content))
+        case .updateDeadline(let updateRequest, let todoId):
+            let endpoint = url.appendingPathComponent("/todo/\(todoId)/deadline")
+            request = URLRequest(url: endpoint)
+            request.httpMethod = "PATCH"
+            request.addValue("application/json", forHTTPHeaderField: "Content-Type")
+            if let accessToken = accessToken {
+                request.addValue("Bearer \(accessToken)", forHTTPHeaderField: "Authorization")
+            }
+            request.httpBody = try JSONEncoder().encode(updateRequest)
             
         // today
         case .getTodayList(let page, let size):
