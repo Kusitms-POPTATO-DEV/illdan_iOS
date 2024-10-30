@@ -10,4 +10,5 @@ protocol BacklogRepository {
     func getBacklogList(page: Int, size: Int) async throws -> BacklogListResponse
     func deleteBacklog(todoId: Int) async throws -> Void
     func editBacklog(todoId: Int, content: String) async throws -> Void
+    func updateDeadline(todoId: Int, request: UpdateDeadlineRequest) async throws -> Void
 }

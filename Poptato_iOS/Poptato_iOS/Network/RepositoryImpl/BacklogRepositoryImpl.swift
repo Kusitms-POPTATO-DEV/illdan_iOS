@@ -21,4 +21,8 @@ final class BacklogRepositoryImpl: BacklogRepository {
     func editBacklog(todoId: Int, content: String) async throws {
         try await NetworkManager.shared.request(api: .editBacklog(todoId: todoId, content: content))
     }
+    
+    func updateDeadline(todoId: Int, request: UpdateDeadlineRequest) async throws {
+        try await NetworkManager.shared.request(api: .updateDeadline(updateRequest: request, todoId: todoId))
+    }
 }
