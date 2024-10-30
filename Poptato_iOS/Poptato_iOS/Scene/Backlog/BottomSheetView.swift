@@ -161,7 +161,7 @@ struct DateBottomSheet: View {
                                 .foregroundColor(.gray00)
                         }
                     }
-                    .frame(width: 80)
+                    .frame(maxWidth: .infinity)
                     .clipped()
                     .pickerStyle(WheelPickerStyle())
                     
@@ -173,7 +173,7 @@ struct DateBottomSheet: View {
                                 .foregroundColor(.gray00)
                         }
                     }
-                    .frame(width: 70)
+                    .frame(maxWidth: .infinity)
                     .clipped()
                     .pickerStyle(WheelPickerStyle())
                     
@@ -185,11 +185,12 @@ struct DateBottomSheet: View {
                                 .foregroundColor(.gray00)
                         }
                     }
-                    .frame(width: 70)
+                    .frame(maxWidth: .infinity)
                     .clipped()
                     .pickerStyle(WheelPickerStyle())
                 }
-                .padding(.horizontal)
+                .frame(maxWidth: .infinity)
+                .padding(.horizontal, 40)
                 
                 HStack {
                     Button(
@@ -217,7 +218,7 @@ struct DateBottomSheet: View {
                             .frame(height: 40)
                             .foregroundColor(.gray100)
                             .cornerRadius(8)
-                            .background(Color(.primary60).opacity(0.1))
+                            .background(Color(.primary60))
                             .cornerRadius(8)
                     }
                     
