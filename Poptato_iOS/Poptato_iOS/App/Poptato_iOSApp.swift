@@ -15,18 +15,21 @@ struct Poptato_iOSApp: App {
         KakaoSDK.initSDK(appKey: Secrets.kakaoAppKey)
     }
     
+    @ObservedObject private var splashViewModel = SplashViewModel()
     @State private var finishSplash = false
+    @State private var isLogined = false
     
     var body: some Scene {
         WindowGroup {
             ZStack {
                 if finishSplash {
-                    MainView()
+                    MainView(isLogined: $isLogined)
                 }
                 else {
                     SplashView()
                         .onAppear(perform: {
                             DispatchQueue.main.asyncAfter(deadline: .now() + 2) {
+                                isLogined = splashViewModel.checkLogin()
                                 finishSplash = true
                             }
                         })

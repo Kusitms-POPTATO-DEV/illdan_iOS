@@ -8,13 +8,15 @@
 import SwiftUI
 
 struct MainView: View {
+    @Binding var isLogined: Bool
     @State private var selectedTab: Int = 1
-    @State private var isLogined = false
     @State private var isBottomSheetVisible = false
     @StateObject private var backlogViewModel = BacklogViewModel()
     @StateObject private var todayViewModel = TodayViewModel()
     
-    init() {
+    init(isLogined: Binding<Bool>) {
+        self._isLogined = isLogined
+        
         let appearance = UITabBarAppearance()
         appearance.configureWithOpaqueBackground()
         appearance.backgroundColor = UIColor(Color.gray100)
@@ -108,8 +110,4 @@ struct MainView: View {
             }
         }
     }
-}
-
-#Preview {
-    MainView()
 }
