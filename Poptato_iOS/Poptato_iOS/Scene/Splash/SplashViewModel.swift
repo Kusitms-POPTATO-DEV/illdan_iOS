@@ -16,10 +16,12 @@ class SplashViewModel: ObservableObject {
         refreshToken = KeychainManager.shared.readToken(for: "refreshToken")
     }
     
-    func checkLogin() -> Bool {
+    func checkLogin() async -> Bool {
         guard accessToken != nil, refreshToken != nil else {
             return false
         }
-        return true
+        let isTokenValid = await NetworkManager.shared.refreshToken()
+        
+        return isTokenValid
     }
 }

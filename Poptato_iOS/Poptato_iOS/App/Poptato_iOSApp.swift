@@ -29,8 +29,10 @@ struct Poptato_iOSApp: App {
                     SplashView()
                         .onAppear(perform: {
                             DispatchQueue.main.asyncAfter(deadline: .now() + 2) {
-                                isLogined = splashViewModel.checkLogin()
-                                finishSplash = true
+                                Task{
+                                    isLogined = await splashViewModel.checkLogin()
+                                    finishSplash = true
+                                }
                             }
                         })
                 }
