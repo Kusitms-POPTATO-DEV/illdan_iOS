@@ -42,6 +42,7 @@ struct MainView: View {
                         Label("오늘", image: selectedTab == 0 ? "ic_today_selected" : "ic_today_unselected")
                             .font(PoptatoTypo.xsMedium)
                     }
+                    
                     .environmentObject(todayViewModel)
                     .tag(0)
                     
@@ -59,6 +60,13 @@ struct MainView: View {
                     }
                     .environmentObject(backlogViewModel)
                     .tag(1)
+                    
+                    MyPageView()
+                        .tabItem {
+                            Label("마이", image: "ic_mypage")
+                                .font(PoptatoTypo.xsMedium)
+                        }
+                        .tag(2)
                 }
             } else {
                 KaKaoLoginView(
