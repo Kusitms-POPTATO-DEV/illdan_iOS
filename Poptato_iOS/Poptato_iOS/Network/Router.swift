@@ -28,6 +28,9 @@ enum Router: URLRequestConvertible {
     case updateTodoCompletion(todoId: Int)
     case updateBookmark(todoId: Int)
     
+    // mypage
+    case getUserInfo
+    
     var accessToken: String? {
         KeychainManager.shared.readToken(for: "accessToken")
     }
@@ -147,6 +150,16 @@ enum Router: URLRequestConvertible {
             let endpoint = url.appendingPathComponent("/todo/\(todoId)/bookmark")
             request = URLRequest(url: endpoint)
             request.httpMethod = "PATCH"
+            request.addValue("application/json", forHTTPHeaderField: "Content-Type")
+            if let accessToken = accessToken {
+                request.addValue("Bearer \(accessToken)", forHTTPHeaderField: "Authorization")
+            }
+            
+        // mypage
+        case .getUserInfo:
+            let endpoint = url.appendingPathComponent("/user/mypage")
+            request = URLRequest(url: endpoint)
+            request.httpMethod = "GET"
             request.addValue("application/json", forHTTPHeaderField: "Content-Type")
             if let accessToken = accessToken {
                 request.addValue("Bearer \(accessToken)", forHTTPHeaderField: "Authorization")
