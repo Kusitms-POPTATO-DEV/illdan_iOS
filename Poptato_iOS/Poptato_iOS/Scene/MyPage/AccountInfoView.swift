@@ -9,8 +9,10 @@ import SwiftUI
 
 struct AccountInfoView: View {
     @Environment(\.presentationMode) var presentationMode
+    var onClickBtnLogout: () -> Void
     var nickname: String
     var email: String
+    @State private var isLogoutDialogPresented = false
     
     var body: some View {
         ZStack {
@@ -59,7 +61,7 @@ struct AccountInfoView: View {
                 Spacer().frame(height: 16)
                 
                 Button(action: {
-                    
+                    isLogoutDialogPresented = true
                 }) {
                     ZStack(alignment: .center) {
                         Color(.danger50).opacity(0.1)
@@ -94,6 +96,23 @@ struct AccountInfoView: View {
                 Spacer()
             }
             .padding(.horizontal, 16)
+            
+            if isLogoutDialogPresented {
+                Color.gray100.opacity(0.7)
+                    .ignoresSafeArea()
+                
+                CommonDialog(
+                    content: "로그아웃 하시겠어요?",
+                    positiveButtonText: "로그아웃",
+                    negativeButtonText: "돌아가기",
+                    onClickBtnPositive: {
+                        onClickBtnLogout()
+                        isLogoutDialogPresented = false
+                    },
+                    onClickBtnNegative: { isLogoutDialogPresented = false },
+                    onDismissRequest: { isLogoutDialogPresented = false }
+                )
+            }
         }
         .navigationBarBackButtonHidden(true)
     }
@@ -118,5 +137,5 @@ struct AccountInfoItem: View {
 }
 
 #Preview {
-    AccountInfoView(nickname: "손현수", email: "email1234@email.com")
+    AccountInfoView(onClickBtnLogout: {}, nickname: "손현수", email: "email1234@email.com")
 }

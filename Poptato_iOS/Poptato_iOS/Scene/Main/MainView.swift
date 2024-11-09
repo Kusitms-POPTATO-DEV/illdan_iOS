@@ -62,7 +62,7 @@ struct MainView: View {
                     .environmentObject(backlogViewModel)
                     .tag(1)
                     
-                    MyPageView(isPolicyViewPresented: $isPolicyViewPresented)
+                    MyPageView(goToKaKaoLogin: { isLogined = false }, isPolicyViewPresented: $isPolicyViewPresented)
                         .tabItem {
                             Label("마이", image: "ic_mypage")
                                 .font(PoptatoTypo.xsMedium)

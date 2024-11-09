@@ -8,6 +8,7 @@
 import SwiftUI
 
 struct MyPageView: View {
+    var goToKaKaoLogin: () -> Void
     @ObservedObject private var viewModel = MyPageViewModel()
     @Binding var isPolicyViewPresented: Bool
     
@@ -37,7 +38,17 @@ struct MyPageView: View {
                     
                     Spacer().frame(height: 16)
                     
-                    NavigationLink(destination: AccountInfoView(nickname: viewModel.nickname, email: viewModel.email)) {
+                    NavigationLink(
+                        destination: AccountInfoView(
+                            onClickBtnLogout: {
+                                Task {
+                                    await viewModel.logout()
+                                    goToKaKaoLogin()
+                                }
+                            },
+                            nickname: viewModel.nickname,
+                            email: viewModel.email
+                        )) {
                         ZStack(alignment: .center) {
                             Color(.gray95)
                             Text("계정 정보")

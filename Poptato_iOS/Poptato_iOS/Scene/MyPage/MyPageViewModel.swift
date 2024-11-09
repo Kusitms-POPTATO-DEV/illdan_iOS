@@ -9,12 +9,14 @@ import SwiftUI
 
 class MyPageViewModel: ObservableObject {
     private var userRepository: UserRepository
+    private var authRepository: AuthRepository
     @Published var nickname: String = "손현수"
     @Published var email: String = "email1234@email.com"
     @Published var policyContent: String = ""
     
-    init(userRepository: UserRepository = UserRepositoryImpl()) {
+    init(userRepository: UserRepository = UserRepositoryImpl(), authRepository: AuthRepository = AuthRepositoryImpl()) {
         self.userRepository = userRepository
+        self.authRepository = authRepository
     }
     
     func getUserInfo() async {
@@ -37,6 +39,16 @@ class MyPageViewModel: ObservableObject {
             }
         } catch {
             print("Error getPolicy: \(error)")
+        }
+    }
+    
+    func logout() async {
+        do {
+            try await authRepository.logout()
+            KeychainManager.shared.deleteToken(for: "accessToken")
+            KeychainManager.shared.deleteToken(for: "refreshToken")
+        } catch {
+            print("Error logout: \(error)")
         }
     }
 }
