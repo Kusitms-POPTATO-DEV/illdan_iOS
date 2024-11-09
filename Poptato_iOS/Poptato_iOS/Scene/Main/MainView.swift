@@ -11,6 +11,7 @@ struct MainView: View {
     @Binding var isLogined: Bool
     @State private var selectedTab: Int = 1
     @State private var isBottomSheetVisible = false
+    @State private var isPolicyViewPresented = false
     @StateObject private var backlogViewModel = BacklogViewModel()
     @StateObject private var todayViewModel = TodayViewModel()
     
@@ -61,12 +62,16 @@ struct MainView: View {
                     .environmentObject(backlogViewModel)
                     .tag(1)
                     
-                    MyPageView()
+                    MyPageView(isPolicyViewPresented: $isPolicyViewPresented)
                         .tabItem {
                             Label("마이", image: "ic_mypage")
                                 .font(PoptatoTypo.xsMedium)
                         }
                         .tag(2)
+                }
+                
+                if isPolicyViewPresented {
+                    PolicyView(isPolicyViewPresented: $isPolicyViewPresented)
                 }
             } else {
                 KaKaoLoginView(

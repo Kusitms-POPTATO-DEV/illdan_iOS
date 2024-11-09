@@ -9,6 +9,7 @@ import SwiftUI
 
 struct MyPageView: View {
     @ObservedObject private var viewModel = MyPageViewModel()
+    @Binding var isPolicyViewPresented: Bool
     
     var body: some View {
         ZStack {
@@ -63,6 +64,9 @@ struct MyPageView: View {
                     Text("개인정보처리 방침")
                         .font(PoptatoTypo.mdMedium)
                         .foregroundColor(.gray20)
+                        .onTapGesture {
+                            isPolicyViewPresented = true
+                        }
                     Text("버전")
                         .font(PoptatoTypo.mdMedium)
                         .foregroundColor(.gray20)
@@ -81,8 +85,4 @@ struct MyPageView: View {
             }
         }
     }
-}
-
-#Preview {
-    MyPageView()
 }
