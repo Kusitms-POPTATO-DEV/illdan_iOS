@@ -9,4 +9,8 @@ class UserRepositoryImpl: UserRepository {
     func getUserInfo() async throws -> UserInfoResponse {
         try await NetworkManager.shared.request(type: UserInfoResponse.self, api: .getUserInfo)
     }
+    
+    func getPolicy() async throws -> PolicyResponse {
+        try await NetworkManager.shared.request(type: PolicyResponse.self, api: .getPolicy)
+    }
 }

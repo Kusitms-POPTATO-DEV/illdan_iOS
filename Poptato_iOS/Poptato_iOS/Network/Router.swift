@@ -30,6 +30,7 @@ enum Router: URLRequestConvertible {
     
     // mypage
     case getUserInfo
+    case getPolicy
     
     var accessToken: String? {
         KeychainManager.shared.readToken(for: "accessToken")
@@ -164,6 +165,11 @@ enum Router: URLRequestConvertible {
             if let accessToken = accessToken {
                 request.addValue("Bearer \(accessToken)", forHTTPHeaderField: "Authorization")
             }
+        case .getPolicy:
+            let endpoint = url.appendingPathComponent("/policy")
+            request = URLRequest(url: endpoint)
+            request.httpMethod = "GET"
+            request.addValue("application/json", forHTTPHeaderField: "Content-Type")
         }
     
         return request

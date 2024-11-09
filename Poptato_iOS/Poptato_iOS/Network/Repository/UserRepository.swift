@@ -7,4 +7,5 @@
 
 protocol UserRepository {
     func getUserInfo() async throws -> UserInfoResponse
+    func getPolicy() async throws -> PolicyResponse
 }
