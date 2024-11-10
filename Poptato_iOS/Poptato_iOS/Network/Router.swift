@@ -25,6 +25,9 @@ enum Router: URLRequestConvertible {
     // today
     case getTodayList(page: Int, size: Int)
     
+    // yesterday
+    case getYesterdayList(page: Int, size: Int)
+    
     // todo
     case swipeTodo(swipeRequest: TodoIdModel)
     case updateTodoCompletion(todoId: Int)
@@ -134,6 +137,23 @@ enum Router: URLRequestConvertible {
         // today
         case .getTodayList(let page, let size):
             var components = URLComponents(url: url.appendingPathComponent("/todays"), resolvingAgainstBaseURL: false)
+            components?.queryItems = [
+                URLQueryItem(name: "page", value: "\(page)"),
+                URLQueryItem(name: "size", value: "\(size)")
+            ]
+            guard let endpoint = components?.url else {
+                throw URLError(.badURL)
+            }
+            request = URLRequest(url: endpoint)
+            request.httpMethod = "GET"
+            request.addValue("application/json", forHTTPHeaderField: "Content-Type")
+            if let accessToken = accessToken {
+                request.addValue("Bearer \(accessToken)", forHTTPHeaderField: "Authorization")
+            }
+            
+        // yesterday
+        case .getYesterdayList(let page, let size):
+            var components = URLComponents(url: url.appendingPathComponent("/yesterdays"), resolvingAgainstBaseURL: false)
             components?.queryItems = [
                 URLQueryItem(name: "page", value: "\(page)"),
                 URLQueryItem(name: "size", value: "\(size)")

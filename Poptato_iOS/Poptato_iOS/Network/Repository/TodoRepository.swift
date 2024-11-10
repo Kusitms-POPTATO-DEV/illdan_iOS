@@ -10,4 +10,5 @@ protocol TodoRepository {
     func updateTodoCompletion(todoId: Int) async throws -> Void
     func updateBookmark(todoId: Int) async throws -> Void
     func dragAndDrop(type: String, todoIds: Array<Int>) async throws -> Void
+    func getYesterdayList(page: Int, size: Int) async throws -> YesterdayListResponse
 }

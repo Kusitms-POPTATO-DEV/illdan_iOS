@@ -12,6 +12,7 @@ class BacklogViewModel: ObservableObject {
     private var tempIdCounter = -1
     private let backlogRepository: BacklogRepository
     private let todoRepository: TodoRepository
+    private var yesterdayList: Array<YesterdayItemModel> = []
     @Published var backlogList: Array<TodoItemModel> = []
     @Published var activeItemId: Int? = nil
     @Published var selectedTodoItem: TodoItemModel? = nil
@@ -24,6 +25,7 @@ class BacklogViewModel: ObservableObject {
         self.todoRepository = todoRepository
         Task {
             await fetchBacklogList()
+            await getYesterdayList()
         }
     }
     
@@ -168,6 +170,17 @@ class BacklogViewModel: ObservableObject {
             try await todoRepository.dragAndDrop(type: "BACKLOG", todoIds: todoIds)
         } catch {
             print("Error dragAndDrop: \(error)")
+        }
+    }
+    
+    func getYesterdayList() async {
+        do {
+            let response = try await todoRepository.getYesterdayList(page: 0, size: 1)
+            await MainActor.run {
+                yesterdayList = response.yesterdays
+            }
+        } catch {
+            print("Error getYesterdayList: \(error)")
         }
     }
 }
