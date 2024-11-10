@@ -84,10 +84,11 @@ struct BacklogView: View {
                             .resizable()
                             .frame(width: 12, height: 12)
                     }
+                    .padding(.horizontal, 16)
                 }
                 .frame(maxWidth: .infinity)
+                .frame(height: 45)
                 .clipShape(RoundedCorner(radius: 8, corners: [.topLeft, .topRight]))
-                .padding(.horizontal, 16)
                 .padding(.vertical, 12)
             }
         }
@@ -149,6 +150,7 @@ struct BacklogListView: View {
                     ))
                 }
             }
+            Spacer().frame(height: 45)
         }
         .frame(maxWidth: .infinity)
         .padding(.horizontal, 16)
