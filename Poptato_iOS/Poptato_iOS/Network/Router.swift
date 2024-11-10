@@ -29,6 +29,7 @@ enum Router: URLRequestConvertible {
     case swipeTodo(swipeRequest: TodoIdModel)
     case updateTodoCompletion(todoId: Int)
     case updateBookmark(todoId: Int)
+    case dragAndDrop(type: String, todoIds: Array<Int>)
     
     // mypage
     case getUserInfo
@@ -173,6 +174,15 @@ enum Router: URLRequestConvertible {
             if let accessToken = accessToken {
                 request.addValue("Bearer \(accessToken)", forHTTPHeaderField: "Authorization")
             }
+        case .dragAndDrop(let type, let todoIds):
+            let endpoint = url.appendingPathComponent("/dragAndDrop")
+            request = URLRequest(url: endpoint)
+            request.httpMethod = "PATCH"
+            request.addValue("application/json", forHTTPHeaderField: "Content-Type")
+            if let accessToken = accessToken {
+                request.addValue("Bearer \(accessToken)", forHTTPHeaderField: "Authorization")
+            }
+            request.httpBody = try JSONEncoder().encode(DragAndDropRequest(type: type, todoIds: todoIds))
             
         // mypage
         case .getUserInfo:

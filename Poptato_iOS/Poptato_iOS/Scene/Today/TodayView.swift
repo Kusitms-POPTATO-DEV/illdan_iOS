@@ -40,6 +40,11 @@ struct TodayView: View {
                                 Task {
                                     await viewModel.updateTodoCompletion(todoId: id)
                                 }
+                            },
+                            onDragEnd: {
+                                Task {
+                                    await viewModel.dragAndDrop()
+                                }
                             }
                         )
                     }
@@ -59,14 +64,19 @@ struct TodayView: View {
 }
 
 struct TodayListView: View {
-    @Binding var todayList: Array<TodayItemModel>
+    @Binding var todayList: [TodayItemModel]
     var swipeToday: (Int) -> Void
     var updateTodoCompletion: (Int) -> Void
+    var onDragEnd: () -> Void
+    @State private var draggedItem: TodayItemModel?
+    @State private var draggedIndex: Int?
     
     var body: some View {
         ScrollView {
             LazyVStack {
                 ForEach(todayList, id: \.todoId) { item in
+                    let index = todayList.firstIndex(where: { $0.todoId == item.todoId }) ?? 0
+                    
                     TodayItemView(
                         item: Binding(
                             get: { item },
@@ -80,6 +90,20 @@ struct TodayListView: View {
                         swipeToday: swipeToday,
                         updateTodoCompletion: updateTodoCompletion
                     )
+                    .onDrag {
+                        self.draggedItem = item
+                        self.draggedIndex = index
+                        let provider = NSItemProvider(object: String(item.todoId) as NSString)
+                        provider.suggestedName = ""
+                        return provider
+                    }
+                    .onDrop(of: [.text], delegate: TodayDropViewDelegate(
+                        item: item,
+                        todayList: $todayList,
+                        draggedItem: $draggedItem,
+                        draggedIndex: $draggedIndex,
+                        onReorder: { onDragEnd() }
+                    ))
                 }
             }
         }

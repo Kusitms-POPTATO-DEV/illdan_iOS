@@ -56,6 +56,11 @@ struct BacklogView: View {
                                 await viewModel.swipeBacklog(todoId: id)
                             }
                         },
+                        onDragEnd: {
+                            Task {
+                                await viewModel.dragAndDrop()
+                            }
+                        },
                         activeItemId: $viewModel.activeItemId
                     )
                 }
@@ -79,12 +84,17 @@ struct BacklogListView: View {
     var onItemSelcted: (TodoItemModel) -> Void
     var editBacklog: (Int, String) -> Void
     var swipeBacklog: (Int) -> Void
+    var onDragEnd: () -> Void
     @Binding var activeItemId: Int?
+    @State private var draggedItem: TodoItemModel?
+    @State private var draggedIndex: Int?
     
     var body: some View {
         ScrollView {
             LazyVStack {
                 ForEach(backlogList, id: \.todoId) { item in
+                    let index = backlogList.firstIndex(where: { $0.todoId == item.todoId }) ?? 0
+                    
                     BacklogItemView(
                         item: Binding(
                             get: { item },
@@ -100,6 +110,20 @@ struct BacklogListView: View {
                         swipeBacklog: swipeBacklog,
                         activeItemId: $activeItemId
                     )
+                    .onDrag {
+                        self.draggedItem = item
+                        self.draggedIndex = index
+                        let provider = NSItemProvider(object: String(item.todoId) as NSString)
+                        provider.suggestedName = ""
+                        return provider
+                    }
+                    .onDrop(of: [.text], delegate: DropViewDelegate(
+                        item: item,
+                        backlogList: $backlogList,
+                        draggedItem: $draggedItem,
+                        draggedIndex: $draggedIndex,
+                        onReorder: { onDragEnd() }
+                    ))
                 }
             }
         }
