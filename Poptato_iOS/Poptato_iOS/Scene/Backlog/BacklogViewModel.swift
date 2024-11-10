@@ -12,7 +12,7 @@ class BacklogViewModel: ObservableObject {
     private var tempIdCounter = -1
     private let backlogRepository: BacklogRepository
     private let todoRepository: TodoRepository
-    private var yesterdayList: Array<YesterdayItemModel> = []
+    var isExistYesterdayTodo: Bool = false
     @Published var backlogList: Array<TodoItemModel> = []
     @Published var activeItemId: Int? = nil
     @Published var selectedTodoItem: TodoItemModel? = nil
@@ -177,7 +177,8 @@ class BacklogViewModel: ObservableObject {
         do {
             let response = try await todoRepository.getYesterdayList(page: 0, size: 1)
             await MainActor.run {
-                yesterdayList = response.yesterdays
+                if !response.yesterdays.isEmpty { isExistYesterdayTodo = true }
+                else { isExistYesterdayTodo = false }
             }
         } catch {
             print("Error getYesterdayList: \(error)")

@@ -14,7 +14,7 @@ struct BacklogView: View {
     var onItemSelcted: (TodoItemModel) -> Void
     
     var body: some View {
-        ZStack {
+        ZStack(alignment: .bottom) {
             Color.gray100
                 .ignoresSafeArea()
             
@@ -66,6 +66,29 @@ struct BacklogView: View {
                 }
                 
                 Spacer()
+            }
+            
+            if viewModel.isExistYesterdayTodo {
+                ZStack {
+                    Color.primary60.ignoresSafeArea()
+                    HStack(spacing: 0) {
+                        Text("어제 한 일 체크를 깜빡했다면?")
+                            .font(PoptatoTypo.smMedium)
+                            .foregroundColor(.gray100)
+                        Spacer()
+                        Text("확인하기")
+                            .font(PoptatoTypo.smSemiBold)
+                            .foregroundColor(.gray100)
+                        Spacer().frame(width: 4)
+                        Image("ic_arrow_right")
+                            .resizable()
+                            .frame(width: 12, height: 12)
+                    }
+                }
+                .frame(maxWidth: .infinity)
+                .clipShape(RoundedCorner(radius: 8, corners: [.topLeft, .topRight]))
+                .padding(.horizontal, 16)
+                .padding(.vertical, 12)
             }
         }
         .onTapGesture {
