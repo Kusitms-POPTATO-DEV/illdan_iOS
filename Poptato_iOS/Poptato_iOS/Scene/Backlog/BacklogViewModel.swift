@@ -136,10 +136,12 @@ class BacklogViewModel: ObservableObject {
                     backlogList[index].deadline = deadline
                     
                     if let deadline = deadline,
-                        let deadlineDate = dateFormatter.date(from: deadline) {
-                        let currentDate = Date()
-                        let calendar = Calendar.current
+                        let parsedDate = dateFormatter.date(from: deadline) {
                         
+                        let deadlineDate = Calendar.current.startOfDay(for: parsedDate)
+                        let currentDate = Calendar.current.startOfDay(for: Date())
+                        let calendar = Calendar.current
+
                         let components = calendar.dateComponents([.day], from: currentDate, to: deadlineDate)
                         if let daysDifference = components.day {
                             backlogList[index].dday = daysDifference

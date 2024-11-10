@@ -12,6 +12,8 @@ enum Router: URLRequestConvertible {
     // auth
     case kakaoLogin(loginRequest: KaKaoLoginRequest)
     case reissueToken(reissueRequest: TokenModel)
+    case logout
+    case deleteAccount
     
     // backlog
     case createBacklog(createBacklogRequest: CreateBacklogRequest)
@@ -27,6 +29,10 @@ enum Router: URLRequestConvertible {
     case swipeTodo(swipeRequest: TodoIdModel)
     case updateTodoCompletion(todoId: Int)
     case updateBookmark(todoId: Int)
+    
+    // mypage
+    case getUserInfo
+    case getPolicy
     
     var accessToken: String? {
         KeychainManager.shared.readToken(for: "accessToken")
@@ -56,6 +62,22 @@ enum Router: URLRequestConvertible {
                 request.addValue("Bearer \(accessToken)", forHTTPHeaderField: "Authorization")
             }
             request.httpBody = try JSONEncoder().encode(reissueRequest)
+        case .logout:
+            let endpoint = url.appendingPathComponent("/auth/logout")
+            request = URLRequest(url: endpoint)
+            request.httpMethod = "POST"
+            request.addValue("application/json", forHTTPHeaderField: "Content-Type")
+            if let accessToken = accessToken {
+                request.addValue("Bearer \(accessToken)", forHTTPHeaderField: "Authorization")
+            }
+        case .deleteAccount:
+            let endpoint = url.appendingPathComponent("/user")
+            request = URLRequest(url: endpoint)
+            request.httpMethod = "DELETE"
+            request.addValue("application/json", forHTTPHeaderField: "Content-Type")
+            if let accessToken = accessToken {
+                request.addValue("Bearer \(accessToken)", forHTTPHeaderField: "Authorization")
+            }
             
         // backlog
         case .createBacklog(let createBacklogRequest):
@@ -151,6 +173,21 @@ enum Router: URLRequestConvertible {
             if let accessToken = accessToken {
                 request.addValue("Bearer \(accessToken)", forHTTPHeaderField: "Authorization")
             }
+            
+        // mypage
+        case .getUserInfo:
+            let endpoint = url.appendingPathComponent("/user/mypage")
+            request = URLRequest(url: endpoint)
+            request.httpMethod = "GET"
+            request.addValue("application/json", forHTTPHeaderField: "Content-Type")
+            if let accessToken = accessToken {
+                request.addValue("Bearer \(accessToken)", forHTTPHeaderField: "Authorization")
+            }
+        case .getPolicy:
+            let endpoint = url.appendingPathComponent("/policy")
+            request = URLRequest(url: endpoint)
+            request.httpMethod = "GET"
+            request.addValue("application/json", forHTTPHeaderField: "Content-Type")
         }
     
         return request

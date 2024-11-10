@@ -13,4 +13,12 @@ final class AuthRepositoryImpl: AuthRepository {
     func refreshToken(request: TokenModel) async throws -> TokenModel {
         try await NetworkManager.shared.request(type: TokenModel.self, api: .reissueToken(reissueRequest: request))
     }
+    
+    func logout() async throws {
+        try await NetworkManager.shared.request(api: .logout)
+    }
+    
+    func deleteAccount() async throws {
+        try await NetworkManager.shared.request(api: .deleteAccount)
+    }
 }

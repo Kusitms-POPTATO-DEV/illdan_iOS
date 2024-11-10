@@ -8,13 +8,16 @@
 import SwiftUI
 
 struct MainView: View {
+    @Binding var isLogined: Bool
     @State private var selectedTab: Int = 1
-    @State private var isLogined = false
     @State private var isBottomSheetVisible = false
+    @State private var isPolicyViewPresented = false
     @StateObject private var backlogViewModel = BacklogViewModel()
     @StateObject private var todayViewModel = TodayViewModel()
     
-    init() {
+    init(isLogined: Binding<Bool>) {
+        self._isLogined = isLogined
+        
         let appearance = UITabBarAppearance()
         appearance.configureWithOpaqueBackground()
         appearance.backgroundColor = UIColor(Color.gray100)
@@ -40,6 +43,7 @@ struct MainView: View {
                         Label("오늘", image: selectedTab == 0 ? "ic_today_selected" : "ic_today_unselected")
                             .font(PoptatoTypo.xsMedium)
                     }
+                    
                     .environmentObject(todayViewModel)
                     .tag(0)
                     
@@ -57,6 +61,17 @@ struct MainView: View {
                     }
                     .environmentObject(backlogViewModel)
                     .tag(1)
+                    
+                    MyPageView(goToKaKaoLogin: { isLogined = false }, isPolicyViewPresented: $isPolicyViewPresented)
+                        .tabItem {
+                            Label("마이", image: "ic_mypage")
+                                .font(PoptatoTypo.xsMedium)
+                        }
+                        .tag(2)
+                }
+                
+                if isPolicyViewPresented {
+                    PolicyView(isPolicyViewPresented: $isPolicyViewPresented)
                 }
             } else {
                 KaKaoLoginView(
@@ -108,8 +123,4 @@ struct MainView: View {
             }
         }
     }
-}
-
-#Preview {
-    MainView()
 }

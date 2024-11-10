@@ -8,4 +8,6 @@
 protocol AuthRepository {
     func kakaoLogin(request: KaKaoLoginRequest) async throws -> KaKaoLoginResponse
     func refreshToken(request: TokenModel) async throws -> TokenModel
+    func logout() async throws -> Void
+    func deleteAccount() async throws -> Void
 }
