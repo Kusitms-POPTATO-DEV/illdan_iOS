@@ -8,6 +8,7 @@
 import SwiftUI
 
 struct CommonDialog: View {
+    var title: String = ""
     var content: String = ""
     var positiveButtonText: String = ""
     var negativeButtonText: String = ""
@@ -21,9 +22,16 @@ struct CommonDialog: View {
             
             VStack {
                 Spacer()
+                if !title.isEmpty {
+                    Text(title)
+                        .font(PoptatoTypo.lgSemiBold)
+                        .foregroundColor(.gray00)
+                    Spacer().frame(height: 16)
+                }
                 Text(content)
                     .font(PoptatoTypo.mdSemiBold)
                     .foregroundColor(.gray00)
+                    .multilineTextAlignment(.center)
                 Spacer()
                 HStack(spacing: 0) {
                     ZStack {

@@ -13,6 +13,7 @@ struct AccountInfoView: View {
     var nickname: String
     var email: String
     @State private var isLogoutDialogPresented = false
+    @State private var showAccountDeletionDialog = false
     
     var body: some View {
         ZStack {
@@ -85,7 +86,7 @@ struct AccountInfoView: View {
                 Spacer().frame(height: 32)
                 
                 Button(action: {
-                    
+                    showAccountDeletionDialog = true
                 }) {
                     Text("서비스 탈퇴하기")
                         .font(PoptatoTypo.mdMedium)
@@ -111,6 +112,18 @@ struct AccountInfoView: View {
                     },
                     onClickBtnNegative: { isLogoutDialogPresented = false },
                     onDismissRequest: { isLogoutDialogPresented = false }
+                )
+            }
+            
+            if showAccountDeletionDialog {
+                CommonDialog(
+                    title: "정말 탈퇴하시겠어요?",
+                    content: "탈퇴 시 계정에 저장된 모든 데이터가\n삭제되며, 복구되지 않아요.",
+                    positiveButtonText: "탈퇴하기",
+                    negativeButtonText: "취소",
+                    onClickBtnPositive: { showAccountDeletionDialog = false },
+                    onClickBtnNegative: { showAccountDeletionDialog = false },
+                    onDismissRequest: { showAccountDeletionDialog = false }
                 )
             }
         }
