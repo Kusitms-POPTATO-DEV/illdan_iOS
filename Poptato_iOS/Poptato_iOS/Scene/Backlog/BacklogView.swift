@@ -164,8 +164,13 @@ struct BacklogItemView: View {
                                 .font(PoptatoTypo.xsSemiBold)
                                 .foregroundColor(.gray70)
                                 .frame(height: 12)
-                        } else {
+                        } else if dDay > 0 {
                             Text("D-\(dDay)")
+                                .font(PoptatoTypo.xsSemiBold)
+                                .foregroundColor(.gray70)
+                                .frame(height: 12)
+                        } else {
+                            Text("D+\(abs(dDay))")
                                 .font(PoptatoTypo.xsSemiBold)
                                 .foregroundColor(.gray70)
                                 .frame(height: 12)
