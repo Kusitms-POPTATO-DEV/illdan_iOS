@@ -10,6 +10,7 @@ import SwiftUI
 struct AccountInfoView: View {
     @Environment(\.presentationMode) var presentationMode
     var onClickBtnLogout: () -> Void
+    var onClickBtnDeleteAccount: () -> Void
     var nickname: String
     var email: String
     @State private var isLogoutDialogPresented = false
@@ -121,7 +122,10 @@ struct AccountInfoView: View {
                     content: "탈퇴 시 계정에 저장된 모든 데이터가\n삭제되며, 복구되지 않아요.",
                     positiveButtonText: "탈퇴하기",
                     negativeButtonText: "취소",
-                    onClickBtnPositive: { showAccountDeletionDialog = false },
+                    onClickBtnPositive: {
+                        onClickBtnDeleteAccount()
+                        showAccountDeletionDialog = false
+                    },
                     onClickBtnNegative: { showAccountDeletionDialog = false },
                     onDismissRequest: { showAccountDeletionDialog = false }
                 )

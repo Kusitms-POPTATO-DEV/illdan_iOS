@@ -46,6 +46,12 @@ struct MyPageView: View {
                                     goToKaKaoLogin()
                                 }
                             },
+                            onClickBtnDeleteAccount: {
+                                Task {
+                                    await viewModel.deleteAccount()
+                                    goToKaKaoLogin()
+                                }
+                            },
                             nickname: viewModel.nickname,
                             email: viewModel.email
                         )) {

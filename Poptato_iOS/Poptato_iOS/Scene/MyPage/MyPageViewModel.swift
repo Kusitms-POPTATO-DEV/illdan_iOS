@@ -51,4 +51,14 @@ class MyPageViewModel: ObservableObject {
             print("Error logout: \(error)")
         }
     }
+    
+    func deleteAccount() async {
+        do {
+            try await authRepository.deleteAccount()
+            KeychainManager.shared.deleteToken(for: "accessToken")
+            KeychainManager.shared.deleteToken(for: "refreshToken")
+        } catch {
+            print("Error deleteAccount: \(error)")
+        }
+    }
 }
