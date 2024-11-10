@@ -152,7 +152,3 @@ struct AccountInfoItem: View {
         .padding(.horizontal, 8)
     }
 }
-
-#Preview {
-    AccountInfoView(onClickBtnLogout: {}, nickname: "손현수", email: "email1234@email.com")
-}
