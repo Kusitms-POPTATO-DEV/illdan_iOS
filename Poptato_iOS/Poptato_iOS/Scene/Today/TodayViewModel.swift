@@ -80,4 +80,13 @@ final class TodayViewModel: ObservableObject {
             }
         }
     }
+    
+    func dragAndDrop() async {
+        do {
+            let todoIds = todayList.map { $0.todoId }
+            try await todoRepository.dragAndDrop(type: "TODAY", todoIds: todoIds)
+        } catch {
+            print("Error dragAndDrop: \(error)")
+        }
+    }
 }

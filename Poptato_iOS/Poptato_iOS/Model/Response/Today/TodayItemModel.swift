@@ -6,7 +6,7 @@
 //
 
 struct TodayItemModel: Codable {
-    let todoId: Int
+    var todoId: Int
     var content: String
     var todayStatus: String
     let bookmark: Bool
