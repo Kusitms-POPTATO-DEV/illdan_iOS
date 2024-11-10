@@ -17,4 +17,8 @@ final class TodoRepositoryImpl: TodoRepository {
     func updateBookmark(todoId: Int) async throws {
         try await NetworkManager.shared.request(api: .updateBookmark(todoId: todoId))
     }
+    
+    func dragAndDrop(type: String, todoIds: Array<Int>) async throws {
+        try await NetworkManager.shared.request(api: .dragAndDrop(type: type, todoIds: todoIds))
+    }
 }

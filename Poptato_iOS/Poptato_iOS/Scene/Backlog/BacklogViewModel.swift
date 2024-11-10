@@ -161,4 +161,13 @@ class BacklogViewModel: ObservableObject {
     func updateSelectedItem(item: TodoItemModel?) {
         selectedTodoItem = item
     }
+    
+    func dragAndDrop() async {
+        do {
+            let todoIds = backlogList.map { $0.todoId }
+            try await todoRepository.dragAndDrop(type: "BACKLOG", todoIds: todoIds)
+        } catch {
+            print("Error dragAndDrop: \(error)")
+        }
+    }
 }
