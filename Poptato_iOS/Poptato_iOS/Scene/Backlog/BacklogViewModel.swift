@@ -178,7 +178,7 @@ class BacklogViewModel: ObservableObject {
             let response = try await todoRepository.getYesterdayList(page: page, size: size)
             await MainActor.run {
                 if !response.yesterdays.isEmpty { isExistYesterdayTodo = true }
-                else { isExistYesterdayTodo = true }
+                else { isExistYesterdayTodo = false }
             }
         } catch {
             print("Error getYesterdayList: \(error)")
