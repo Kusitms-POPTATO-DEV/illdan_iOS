@@ -25,7 +25,7 @@ class BacklogViewModel: ObservableObject {
         self.todoRepository = todoRepository
         Task {
             await fetchBacklogList()
-            await getYesterdayList()
+            await getYesterdayList(page: 0, size: 1)
         }
     }
     
@@ -173,12 +173,12 @@ class BacklogViewModel: ObservableObject {
         }
     }
     
-    func getYesterdayList() async {
+    func getYesterdayList(page: Int, size: Int) async {
         do {
-            let response = try await todoRepository.getYesterdayList(page: 0, size: 1)
+            let response = try await todoRepository.getYesterdayList(page: page, size: size)
             await MainActor.run {
                 if !response.yesterdays.isEmpty { isExistYesterdayTodo = true }
-                else { isExistYesterdayTodo = false }
+                else { isExistYesterdayTodo = true }
             }
         } catch {
             print("Error getYesterdayList: \(error)")

@@ -12,6 +12,7 @@ struct MainView: View {
     @State private var selectedTab: Int = 1
     @State private var isBottomSheetVisible = false
     @State private var isPolicyViewPresented = false
+    @State private var isYesterdayViewPresented = false
     @StateObject private var backlogViewModel = BacklogViewModel()
     @StateObject private var todayViewModel = TodayViewModel()
     
@@ -53,7 +54,8 @@ struct MainView: View {
                                 backlogViewModel.updateSelectedItem(item: item)
                                 isBottomSheetVisible = true
                             }
-                        }
+                        },
+                        isYesterdayTodoViewPresented: $isYesterdayViewPresented
                     )
                     .tabItem {
                         Label("할 일", image: selectedTab == 1 ? "ic_backlog_selected" : "ic_backlog_unselected")
@@ -72,6 +74,10 @@ struct MainView: View {
                 
                 if isPolicyViewPresented {
                     PolicyView(isPolicyViewPresented: $isPolicyViewPresented)
+                }
+                
+                if isYesterdayViewPresented {
+                    YesterdayTodoView(isYesterdayTodoViewPresented: $isYesterdayViewPresented)
                 }
             } else {
                 KaKaoLoginView(

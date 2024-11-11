@@ -12,6 +12,7 @@ struct BacklogView: View {
     @EnvironmentObject var viewModel: BacklogViewModel
     @FocusState private var isTextFieldFocused: Bool
     var onItemSelcted: (TodoItemModel) -> Void
+    @Binding var isYesterdayTodoViewPresented: Bool
     
     var body: some View {
         ZStack(alignment: .bottom) {
@@ -79,6 +80,9 @@ struct BacklogView: View {
                         Text("확인하기")
                             .font(PoptatoTypo.smSemiBold)
                             .foregroundColor(.gray100)
+                            .onTapGesture {
+                                isYesterdayTodoViewPresented = true
+                            }
                         Spacer().frame(width: 4)
                         Image("ic_arrow_right")
                             .resizable()
@@ -335,10 +339,4 @@ struct CreateBacklogTextField: View {
             }
         }
     }
-}
-
-#Preview {
-    BacklogView(
-        onItemSelcted: {item in}
-    )
 }
