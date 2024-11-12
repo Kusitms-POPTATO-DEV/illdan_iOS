@@ -9,6 +9,7 @@ import SwiftUI
 
 class YesterdayTodoViewModel: ObservableObject {
     private var todoRepository: TodoRepository
+    private var completionList: Array<Int> = []
     @Published var yesterdayList: Array<YesterdayItemModel> = []
     
     init(todoRepository: TodoRepository = TodoRepositoryImpl()) {
@@ -23,6 +24,28 @@ class YesterdayTodoViewModel: ObservableObject {
             }
         } catch {
             print("Error getYesterdayList: \(error)")
+        }
+    }
+    
+    func completeYesterdayTodo() async {
+        do {
+            for id in completionList {
+                try await todoRepository.updateTodoCompletion(todoId: id)
+            }
+            
+            await MainActor.run {
+                completionList.removeAll()
+            }
+        } catch {
+            print("Error CompleteYesterdayTodo: \(error)")
+        }
+    }
+    
+    func addCompletionList(todoId: Int) {
+        if let index = completionList.firstIndex(of: todoId) {
+            completionList.remove(at: index)
+        } else {
+            completionList.append(todoId)
         }
     }
 }

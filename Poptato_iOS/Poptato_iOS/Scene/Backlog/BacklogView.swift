@@ -93,7 +93,6 @@ struct BacklogView: View {
                 .frame(maxWidth: .infinity)
                 .frame(height: 45)
                 .clipShape(RoundedCorner(radius: 8, corners: [.topLeft, .topRight]))
-                .padding(.vertical, 12)
             }
         }
         .onTapGesture {

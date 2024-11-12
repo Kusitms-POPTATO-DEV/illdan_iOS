@@ -13,6 +13,7 @@ struct MainView: View {
     @State private var isBottomSheetVisible = false
     @State private var isPolicyViewPresented = false
     @State private var isYesterdayViewPresented = false
+    @State private var isMotivationViewPresented = false
     @StateObject private var backlogViewModel = BacklogViewModel()
     @StateObject private var todayViewModel = TodayViewModel()
     
@@ -77,7 +78,19 @@ struct MainView: View {
                 }
                 
                 if isYesterdayViewPresented {
-                    YesterdayTodoView(isYesterdayTodoViewPresented: $isYesterdayViewPresented)
+                    YesterdayTodoView(
+                        isYesterdayTodoViewPresented: $isYesterdayViewPresented,
+                        isMotivationViewPresented: $isMotivationViewPresented
+                    )
+                }
+                
+                if isMotivationViewPresented {
+                    MotivationView()
+                        .onAppear {
+                            DispatchQueue.main.asyncAfter(deadline: .now() + 2) {
+                                isMotivationViewPresented = false
+                            }
+                        }
                 }
             } else {
                 KaKaoLoginView(
