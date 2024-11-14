@@ -138,8 +138,12 @@ struct TodayItemView: View {
                         Text("D-day")
                             .font(PoptatoTypo.xsSemiBold)
                             .foregroundColor(.gray70)
-                    } else {
+                    } else if dDay > 0 {
                         Text("D-\(dDay)")
+                            .font(PoptatoTypo.xsSemiBold)
+                            .foregroundColor(.gray70)
+                    } else {
+                        Text("D+\(abs(dDay))")
                             .font(PoptatoTypo.xsSemiBold)
                             .foregroundColor(.gray70)
                     }

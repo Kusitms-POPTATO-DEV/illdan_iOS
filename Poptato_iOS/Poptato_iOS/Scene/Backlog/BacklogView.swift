@@ -12,9 +12,10 @@ struct BacklogView: View {
     @EnvironmentObject var viewModel: BacklogViewModel
     @FocusState private var isTextFieldFocused: Bool
     var onItemSelcted: (TodoItemModel) -> Void
+    @Binding var isYesterdayTodoViewPresented: Bool
     
     var body: some View {
-        ZStack {
+        ZStack(alignment: .bottom) {
             Color.gray100
                 .ignoresSafeArea()
             
@@ -66,6 +67,32 @@ struct BacklogView: View {
                 }
                 
                 Spacer()
+            }
+            
+            if viewModel.isExistYesterdayTodo {
+                ZStack {
+                    Color.primary60.ignoresSafeArea()
+                    HStack(spacing: 0) {
+                        Text("어제 한 일 체크를 깜빡했다면?")
+                            .font(PoptatoTypo.smMedium)
+                            .foregroundColor(.gray100)
+                        Spacer()
+                        Text("확인하기")
+                            .font(PoptatoTypo.smSemiBold)
+                            .foregroundColor(.gray100)
+                            .onTapGesture {
+                                isYesterdayTodoViewPresented = true
+                            }
+                        Spacer().frame(width: 4)
+                        Image("ic_arrow_right")
+                            .resizable()
+                            .frame(width: 12, height: 12)
+                    }
+                    .padding(.horizontal, 16)
+                }
+                .frame(maxWidth: .infinity)
+                .frame(height: 45)
+                .clipShape(RoundedCorner(radius: 8, corners: [.topLeft, .topRight]))
             }
         }
         .onTapGesture {
@@ -126,6 +153,7 @@ struct BacklogListView: View {
                     ))
                 }
             }
+            Spacer().frame(height: 45)
         }
         .frame(maxWidth: .infinity)
         .padding(.horizontal, 16)
@@ -164,8 +192,13 @@ struct BacklogItemView: View {
                                 .font(PoptatoTypo.xsSemiBold)
                                 .foregroundColor(.gray70)
                                 .frame(height: 12)
-                        } else {
+                        } else if dDay > 0 {
                             Text("D-\(dDay)")
+                                .font(PoptatoTypo.xsSemiBold)
+                                .foregroundColor(.gray70)
+                                .frame(height: 12)
+                        } else {
+                            Text("D+\(abs(dDay))")
                                 .font(PoptatoTypo.xsSemiBold)
                                 .foregroundColor(.gray70)
                                 .frame(height: 12)
@@ -305,10 +338,4 @@ struct CreateBacklogTextField: View {
             }
         }
     }
-}
-
-#Preview {
-    BacklogView(
-        onItemSelcted: {item in}
-    )
 }

@@ -21,4 +21,8 @@ final class TodoRepositoryImpl: TodoRepository {
     func dragAndDrop(type: String, todoIds: Array<Int>) async throws {
         try await NetworkManager.shared.request(api: .dragAndDrop(type: type, todoIds: todoIds))
     }
+    
+    func getYesterdayList(page: Int, size: Int) async throws -> YesterdayListResponse {
+        try await NetworkManager.shared.request(type: YesterdayListResponse.self, api: .getYesterdayList(page: page, size: size))
+    }
 }
