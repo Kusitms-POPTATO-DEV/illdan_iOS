@@ -26,7 +26,12 @@ struct HistoryView: View {
                 
                 CalendarView(
                     days: viewModel.days,
-                    selectedDay: $viewModel.selectedDay
+                    selectedDay: $viewModel.selectedDay,
+                    getHistory: {
+                        Task {
+                            await viewModel.initializeHistory()
+                        }
+                    }
                 )
                 
                 Spacer().frame(height: 36)
@@ -43,6 +48,7 @@ struct HistoryView: View {
 struct CalendarView: View {
     var days: [Int?]
     @Binding var selectedDay: Int?
+    var getHistory: () -> Void
     
     var body: some View {
         VStack {
@@ -78,6 +84,7 @@ struct CalendarView: View {
                         }
                         .onTapGesture {
                             selectedDay = date
+                            getHistory()
                         }
                     } else {
                         Text("")
@@ -94,18 +101,20 @@ struct HistoryListView: View {
     var historyList: [HistoryListItemModel]
     
     var body: some View {
-        LazyVStack(alignment: .leading, spacing: 16) {
-            ForEach(historyList, id: \.todoId) { item in
-                HStack(spacing: 8) {
-                    Image("ic_history_checkbox")
-                    Text(item.content)
-                        .font(PoptatoTypo.smMedium)
-                        .foregroundColor(.gray00)
+        ScrollView {
+            LazyVStack(alignment: .leading, spacing: 16) {
+                ForEach(historyList, id: \.todoId) { item in
+                    HStack(spacing: 8) {
+                        Image("ic_history_checkbox")
+                        Text(item.content)
+                            .font(PoptatoTypo.smMedium)
+                            .foregroundColor(.gray00)
+                    }
                 }
             }
+            .frame(maxWidth: .infinity)
+            .padding(.horizontal, 24)
         }
-        .frame(maxWidth: .infinity)
-        .padding(.horizontal, 24)
     }
 }
 

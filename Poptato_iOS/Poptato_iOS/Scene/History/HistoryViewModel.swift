@@ -13,17 +13,32 @@ final class HistoryViewModel: ObservableObject {
     @Published var day: Int = 0
     @Published var days: [Int?] = []
     @Published var selectedDay: Int? = nil
-    @Published var historyList: [HistoryListItemModel] = [ HistoryListItemModel(todoId: 1, content: "Test"), HistoryListItemModel(todoId: 2, content: "Test") ]
+    @Published var historyList: [HistoryListItemModel] = []
+    private var historyRepository: HistoryRepository
     
-    init() {
+    init(historyRepository: HistoryRepository = HistoryRepositoryImpl()) {
         let currentDate = Date()
         let calendar = Calendar.current
 
         self.year = calendar.component(.year, from: currentDate)
         self.month = calendar.component(.month, from: currentDate)
+        self.historyRepository = historyRepository
         self.day = calendar.component(.day, from: currentDate)
         selectedDay = self.day
+        
+        Task {
+            await initializeHistory()
+        }
+        
         generateCalendarDays()
+    }
+    
+    func initializeHistory() async {
+        if let day = selectedDay {
+            let formattedMonth = String(format: "%02d", month)
+            let formattedDay = String(format: "%02d", day)
+            await getHistory(date: "\(year)-\(formattedMonth)-\(formattedDay)")
+        }
     }
 
     func onClickIncreaseMonth() {
@@ -34,6 +49,9 @@ final class HistoryViewModel: ObservableObject {
             month += 1
         }
         generateCalendarDays()
+        Task {
+            await initializeHistory()
+        }
     }
     
     func onClickDecreaseMonth() {
@@ -44,6 +62,9 @@ final class HistoryViewModel: ObservableObject {
             month -= 1
         }
         generateCalendarDays()
+        Task {
+            await initializeHistory()
+        }
     }
     
     func generateCalendarDays() {
@@ -56,6 +77,18 @@ final class HistoryViewModel: ObservableObject {
 
         if let range = calendar.range(of: .day, in: .month, for: firstDayOfMonth) {
             days += range.map { Optional($0) }
+        }
+    }
+    
+    func getHistory(date: String) async {
+        do {
+            let response = try await historyRepository.getHistory(date: date)
+            
+            await MainActor.run {
+                historyList = response.histories
+            }
+        } catch {
+            print("Error getHistory: \(error)")
         }
     }
 }

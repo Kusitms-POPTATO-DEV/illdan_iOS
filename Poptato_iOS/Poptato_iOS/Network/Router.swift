@@ -38,6 +38,9 @@ enum Router: URLRequestConvertible {
     case getUserInfo
     case getPolicy
     
+    // history
+    case getHistory(date: String)
+    
     var accessToken: String? {
         KeychainManager.shared.readToken(for: "accessToken")
     }
@@ -218,6 +221,22 @@ enum Router: URLRequestConvertible {
             request = URLRequest(url: endpoint)
             request.httpMethod = "GET"
             request.addValue("application/json", forHTTPHeaderField: "Content-Type")
+            
+        // history
+        case .getHistory(let date):
+            var components = URLComponents(url: url.appendingPathComponent("/histories"), resolvingAgainstBaseURL: false)
+            components?.queryItems = [
+                URLQueryItem(name: "date", value: "\(date)")
+            ]
+            guard let endpoint = components?.url else {
+                throw URLError(.badURL)
+            }
+            request = URLRequest(url: endpoint)
+            request.httpMethod = "GET"
+            request.addValue("application/json", forHTTPHeaderField: "Content-Type")
+            if let accessToken = accessToken {
+                request.addValue("Bearer \(accessToken)", forHTTPHeaderField: "Authorization")
+            }
         }
     
         return request
