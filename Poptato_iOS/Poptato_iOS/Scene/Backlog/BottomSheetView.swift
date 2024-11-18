@@ -31,7 +31,7 @@ struct BottomSheetView: View {
                             Spacer()
                             Image(todo.bookmark ? "ic_star_filled" : "ic_star_empty")
                                 .resizable()
-                                .frame(width: 20, height: 20)
+                                .frame(width: 24, height: 24)
                                 .onTapGesture {
                                     updateBookmark()
                                 }
@@ -40,81 +40,15 @@ struct BottomSheetView: View {
                     .padding(.horizontal, 24)
                     .padding(.top, 24)
                     
-                    HStack {
-                        Button(
-                            action: {
-                                editTodo()
-                                withAnimation {
-                                    isVisible = false
-                                }
-                            }
-                        ) {
-                            Text("수정")
-                                .frame(maxWidth: .infinity)
-                                .frame(height: 40)
-                                .foregroundColor(.gray40)
-                                .background(Color(.gray95))
-                                .cornerRadius(8)
-                        }
-                        
-                        Button(
-                            action: {
-                                deleteTodo()
-                                withAnimation {
-                                    isVisible = false
-                                }
-                            }
-                        ) {
-                            Text("삭제")
-                                .frame(maxWidth: .infinity)
-                                .frame(height: 40)
-                                .foregroundColor(.danger40)
-                                .cornerRadius(8)
-                                .background(Color(.danger40).opacity(0.1))
-                                .cornerRadius(8)
-                        }
-                        
-                    }
-                    .frame(maxWidth: .infinity)
-                    .padding(.horizontal, 24)
-                    .padding(.vertical, 8)
-                    
-                    Divider()
-                        .background(Color(.gray95))
-                    
-                    if let todo = todoItem {
-                        HStack {
-                            if todo.deadline == nil {
-                                Image("ic_plus")
-                                    .onTapGesture {
-                                        showDateBottomSheet = true
-                                    }
-                            } else {
-                                Image("ic_minus")
-                                    .onTapGesture {
-                                        updateDeadline(nil)
-                                    }
-                            }
-                            
-                            Text("마감기한")
-                                .font(PoptatoTypo.mdMedium)
-                                .foregroundColor(.gray40)
-                            
-                            Spacer()
-                            
-                            if let deadline = todo.deadline {
-                                Text(deadline)
-                                    .font(PoptatoTypo.mdMedium)
-                                    .foregroundColor(.gray20)
-                            }
-                        }
-                        .frame(maxWidth: .infinity)
-                        .padding(.horizontal, 24)
-                        .padding(.vertical, 12)
-                    }
-
-                    Divider()
-                        .background(Color(.gray95))
+                    BottomSheetButton(image: "ic_pen", buttonText: "수정하기", buttonColor: .gray30, subText: "", onClickBtn: {
+                        isVisible = false
+                        editTodo()
+                    })
+                    BottomSheetButton(image: "ic_trash", buttonText: "삭제하기", buttonColor: .danger50, subText: "", onClickBtn: {
+                        isVisible = false
+                        deleteTodo()
+                    })
+                    BottomSheetButton(image: "ic_cal", buttonText: "마감기한", buttonColor: .gray30, subText: "설정하기", onClickBtn: { showDateBottomSheet = true })
                     
                     Spacer()
                 }
@@ -131,6 +65,33 @@ struct BottomSheetView: View {
                     updateDeadline: updateDeadline
                 )
             }
+        }
+    }
+}
+
+struct BottomSheetButton: View {
+    var image: String
+    var buttonText: String
+    var buttonColor: Color
+    var subText: String
+    var onClickBtn: () -> Void
+    
+    var body: some View {
+        HStack(spacing: 0) {
+            Image(image)
+            Spacer().frame(width: 8)
+            Text(buttonText)
+                .font(PoptatoTypo.mdRegular)
+                .foregroundColor(buttonColor)
+            Spacer()
+            Text(subText)
+                .font(PoptatoTypo.mdRegular)
+                .foregroundColor(.gray60)
+        }
+        .padding(.horizontal, 24)
+        .padding(.vertical, 12)
+        .onTapGesture {
+            onClickBtn()
         }
     }
 }
