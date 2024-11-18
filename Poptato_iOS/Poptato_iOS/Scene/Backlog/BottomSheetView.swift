@@ -48,7 +48,7 @@ struct BottomSheetView: View {
                         isVisible = false
                         deleteTodo()
                     })
-                    BottomSheetButton(image: "ic_cal", buttonText: "마감기한", buttonColor: .gray30, subText: "설정하기", onClickBtn: { showDateBottomSheet = true })
+                    BottomSheetButton(image: "ic_cal", buttonText: "마감기한", buttonColor: .gray30, subText: todoItem?.deadline ?? "설정하기", onClickBtn: { showDateBottomSheet = true })
                     
                     Spacer()
                 }
@@ -100,113 +100,169 @@ struct DateBottomSheet: View {
     @Binding var item: TodoItemModel?
     @State private var selectedYear = Calendar.current.component(.year, from: Date())
     @State private var selectedMonth = Calendar.current.component(.month, from: Date())
-    @State private var selectedDay = Calendar.current.component(.day, from: Date())
+    @State private var selectedDay: Int? = Calendar.current.component(.day, from: Date())
+    @State private var days: [Int?] = []
     var onDissmiss: () -> Void
     var updateDeadline: (String?) -> Void
-
-    let years = Array(2000...2100)
-    let months = Array(1...12)
-    let days = Array(1...31)
 
     var body: some View {
         VStack {
             Spacer()
-            
-            VStack {
-                HStack(spacing: 20) {
-                    Picker("Year", selection: $selectedYear) {
-                        ForEach(years, id: \.self) { year in
-                            Text(String(year))
-                                .tag(year)
-                                .font(PoptatoTypo.xLSemiBold)
-                                .foregroundColor(.gray00)
-                        }
+            VStack(spacing: 0) {
+                Spacer().frame(height: 24)
+                DateNavigatorView(
+                    year: selectedYear,
+                    month: selectedMonth,
+                    onClickIncreaseMonth: {
+                        if selectedMonth == 12 { selectedMonth = 1; selectedYear += 1 }
+                        else { selectedMonth += 1 }
+                        generateCalendarDays()
+                    },
+                    onClickDecreaseMonth: {
+                        if selectedMonth == 1 { selectedMonth = 12; selectedYear -= 1 }
+                        else { selectedMonth -= 1 }
+                        generateCalendarDays()
                     }
-                    .frame(maxWidth: .infinity)
-                    .clipped()
-                    .pickerStyle(WheelPickerStyle())
-                    
-                    Picker("Month", selection: $selectedMonth) {
-                        ForEach(months, id: \.self) { month in
-                            Text("\(month)")
-                                .tag(month)
-                                .font(PoptatoTypo.xLSemiBold)
-                                .foregroundColor(.gray00)
-                        }
-                    }
-                    .frame(maxWidth: .infinity)
-                    .clipped()
-                    .pickerStyle(WheelPickerStyle())
-                    
-                    Picker("Day", selection: $selectedDay) {
-                        ForEach(days(for: selectedYear, month: selectedMonth), id: \.self) { day in
-                            Text("\(day)")
-                                .tag(day)
-                                .font(PoptatoTypo.xLSemiBold)
-                                .foregroundColor(.gray00)
-                        }
-                    }
-                    .frame(maxWidth: .infinity)
-                    .clipped()
-                    .pickerStyle(WheelPickerStyle())
-                }
-                .frame(maxWidth: .infinity)
-                .padding(.horizontal, 40)
+                )
+                Spacer().frame(height: 16)
                 
-                HStack {
-                    Button(
-                        action: {
-                            onDissmiss()
-                        }
-                    ) {
-                        Text("취소")
-                            .frame(maxWidth: .infinity)
-                            .frame(height: 40)
-                            .foregroundColor(.gray40)
-                            .background(Color(.gray95))
-                            .cornerRadius(8)
-                    }
-                    
-                    Button(
-                        action: {
+                BottomSheetCalendarView(
+                    days: days,
+                    selectedDay: $selectedDay,
+                    onDissmiss: onDissmiss,
+                    updateDeadline: {
+                        if let day = selectedDay {
                             let formattedMonth = String(format: "%02d", selectedMonth)
-                            let formattedDay = String(format: "%02d", selectedDay)  
+                            let formattedDay = String(format: "%02d", day)
                             let deadline = "\(String(selectedYear))-\(formattedMonth)-\(formattedDay)"
                             updateDeadline(deadline)
-                            onDissmiss()
                         }
-                    ) {
-                        Text("확인")
-                            .frame(maxWidth: .infinity)
-                            .frame(height: 40)
-                            .foregroundColor(.gray100)
-                            .cornerRadius(8)
-                            .background(Color(.primary60))
-                            .cornerRadius(8)
-                    }
-                    
-                }
-                .frame(maxWidth: .infinity)
-                .padding(.horizontal, 24)
-                .padding(.vertical, 8)
+                    },
+                    onClickBtnDelete: { updateDeadline(nil) }
+                )
             }
             .frame(maxWidth: .infinity)
-            .frame(height: 300)
+            .fixedSize(horizontal: false, vertical: true)
             .background(Color(UIColor.gray100))
-            .clipShape(RoundedRectangle(cornerRadius: 16))
-            .shadow(radius: 10)
+            .clipShape(RoundedCorner(radius: 16, corners: [.topLeft, .topRight]))
+        }
+        .onAppear {
+            initializeSelectedDate()
+            generateCalendarDays()
         }
     }
     
-    private func days(for year: Int, month: Int) -> [Int] {
-        var components = DateComponents()
-        components.year = year
-        components.month = month
+    func initializeSelectedDate() {
+        guard let deadline = item?.deadline else { return }
         
+        let formatter = DateFormatter()
+        formatter.dateFormat = "yyyy-MM-dd"
+        formatter.timeZone = TimeZone.current
+        
+        if let date = formatter.date(from: deadline) {
+            let calendar = Calendar.current
+            selectedYear = calendar.component(.year, from: date)
+            selectedMonth = calendar.component(.month, from: date)
+            selectedDay = calendar.component(.day, from: date)
+        }
+    }
+    
+    func generateCalendarDays() {
         let calendar = Calendar.current
-        let date = calendar.date(from: components) ?? Date()
-        let range = calendar.range(of: .day, in: .month, for: date) ?? (1..<32)
-        return Array(range)
+        let dateComponents = DateComponents(year: selectedYear, month: selectedMonth)
+        guard let firstDayOfMonth = calendar.date(from: dateComponents) else { return }
+        let weekday = calendar.component(.weekday, from: firstDayOfMonth)
+
+        days = Array(repeating: nil, count: weekday - 1)
+
+        if let range = calendar.range(of: .day, in: .month, for: firstDayOfMonth) {
+            days += range.map { Optional($0) }
+        }
+    }
+}
+
+struct BottomSheetCalendarView: View {
+    var days: [Int?]
+    @Binding var selectedDay: Int?
+    var onDissmiss: () -> Void
+    var updateDeadline: () -> Void
+    var onClickBtnDelete: () -> Void
+    
+    var body: some View {
+        VStack {
+            HStack {
+                ForEach(["일", "월", "화", "수", "목", "금", "토"], id: \.self) { day in
+                    Text(day)
+                        .font(PoptatoTypo.xsRegular)
+                        .frame(maxWidth: .infinity)
+                        .foregroundColor(.gray60)
+                }
+            }
+            .padding(.horizontal, 24)
+            
+            LazyVGrid(columns: Array(repeating: GridItem(.flexible()), count: 7), spacing: 10) {
+                ForEach(Array(days.enumerated()), id: \.offset) { index, date in
+                    if let date = date {
+                        Text("\(date)")
+                            .frame(width: 32, height: 32)
+                            .font(PoptatoTypo.smMedium)
+                            .foregroundColor(selectedDay == date ? .gray100 : .gray70)
+                            .background(
+                                Rectangle()
+                                    .fill(selectedDay == date ? Color.primary60 : Color.gray100)
+                                    .cornerRadius(8)
+                            )
+                            .onTapGesture {
+                                selectedDay = date
+                            }
+                    } else {
+                        Text("")
+                            .frame(width: 32, height: 32)
+                    }
+                }
+            }
+            .padding(.horizontal, 24)
+            
+            Spacer().frame(height: 24)
+            
+            HStack {
+                Button(
+                    action: {
+                        onClickBtnDelete()
+                        onDissmiss()
+                    }
+                ) {
+                    Text("삭제")
+                        .font(PoptatoTypo.mdMedium)
+                        .frame(maxWidth: .infinity)
+                        .frame(height: 48)
+                        .foregroundColor(.gray40)
+                        .background(Color(.gray95))
+                        .cornerRadius(8)
+                }
+                
+                Button(
+                    action: {
+                        updateDeadline()
+                        onDissmiss()
+                    }
+                ) {
+                    Text("확인")
+                        .font(PoptatoTypo.mdSemiBold)
+                        .frame(maxWidth: .infinity)
+                        .frame(height: 48)
+                        .foregroundColor(.gray100)
+                        .background(Color(.primary60))
+                        .cornerRadius(8)
+                }
+                
+            }
+            .frame(maxWidth: .infinity)
+            .padding(.horizontal, 24)
+            .padding(.vertical, 8)
+            
+            Spacer().frame(height: 16)
+        }
     }
 }
 
