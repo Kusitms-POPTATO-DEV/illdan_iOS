@@ -17,7 +17,7 @@ enum Router: URLRequestConvertible {
     
     // backlog
     case createBacklog(createBacklogRequest: CreateBacklogRequest)
-    case getBacklogList(page: Int, size: Int)
+    case getBacklogList(page: Int, size: Int, categoryId: Int)
     case deleteBacklog(todoId: Int)
     case editBacklog(todoId: Int, content: String)
     case updateDeadline(updateRequest: UpdateDeadlineRequest, todoId: Int)
@@ -96,11 +96,12 @@ enum Router: URLRequestConvertible {
                 request.addValue("Bearer \(accessToken)", forHTTPHeaderField: "Authorization")
             }
             request.httpBody = try JSONEncoder().encode(createBacklogRequest)
-        case .getBacklogList(let page, let size):
+        case .getBacklogList(let page, let size, let categoryId):
             var components = URLComponents(url: url.appendingPathComponent("/backlogs"), resolvingAgainstBaseURL: false)
             components?.queryItems = [
                 URLQueryItem(name: "page", value: "\(page)"),
-                URLQueryItem(name: "size", value: "\(size)")
+                URLQueryItem(name: "size", value: "\(size)"),
+                URLQueryItem(name: "category", value: "\(categoryId)")
             ]
             guard let endpoint = components?.url else {
                 throw URLError(.badURL)

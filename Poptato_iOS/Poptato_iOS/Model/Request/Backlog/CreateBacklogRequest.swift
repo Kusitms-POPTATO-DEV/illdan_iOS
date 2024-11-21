@@ -6,5 +6,6 @@
 //
 
 struct CreateBacklogRequest: Codable {
+    let categoryId: Int
     let content: String
 }

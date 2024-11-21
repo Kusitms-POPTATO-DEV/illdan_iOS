@@ -10,8 +10,8 @@ final class BacklogRepositoryImpl: BacklogRepository {
         try await NetworkManager.shared.request(type: TodoIdModel.self, api: .createBacklog(createBacklogRequest: request))
     }
     
-    func getBacklogList(page: Int, size: Int) async throws -> BacklogListResponse {
-        try await NetworkManager.shared.request(type: BacklogListResponse.self, api: .getBacklogList(page: page, size: size))
+    func getBacklogList(page: Int, size: Int, categoryId: Int) async throws -> BacklogListResponse {
+        try await NetworkManager.shared.request(type: BacklogListResponse.self, api: .getBacklogList(page: page, size: size, categoryId: categoryId))
     }
     
     func deleteBacklog(todoId: Int) async throws {

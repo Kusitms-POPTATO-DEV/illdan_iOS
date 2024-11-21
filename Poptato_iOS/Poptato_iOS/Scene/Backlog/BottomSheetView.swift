@@ -29,7 +29,7 @@ struct BottomSheetView: View {
                                 .foregroundColor(.gray00)
                                 .lineLimit(1)
                             Spacer()
-                            Image(todo.bookmark ? "ic_star_filled" : "ic_star_empty")
+                            Image(todo.isBookmark ? "ic_star_filled" : "ic_star_empty")
                                 .resizable()
                                 .frame(width: 24, height: 24)
                                 .onTapGesture {

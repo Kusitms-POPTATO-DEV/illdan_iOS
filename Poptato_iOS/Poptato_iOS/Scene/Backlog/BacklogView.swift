@@ -175,7 +175,7 @@ struct BacklogItemView: View {
         HStack {
             VStack {
                 HStack(spacing: 6) {
-                    if (item.bookmark) {
+                    if (item.isBookmark) {
                         HStack(spacing: 2) {
                             Image("ic_star_filled")
                                 .resizable()
@@ -204,7 +204,7 @@ struct BacklogItemView: View {
                                 .frame(height: 12)
                         }
                     }
-                    if (item.bookmark || item.dday != nil) { Spacer() }
+                    if (item.isBookmark || item.dday != nil) { Spacer() }
                 }
                 
                 if activeItemId == item.todoId {
@@ -237,7 +237,7 @@ struct BacklogItemView: View {
             
             Spacer()
             
-            ZStack(alignment: (item.bookmark || item.dday != nil) ? .top : .center) {
+            ZStack(alignment: (item.isBookmark || item.dday != nil) ? .top : .center) {
                 Image("ic_dot")
                     .resizable()
                     .frame(width: 20, height: 20)

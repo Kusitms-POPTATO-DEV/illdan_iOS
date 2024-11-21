@@ -33,13 +33,13 @@ class BacklogViewModel: ObservableObject {
         let temporaryId = tempIdCounter
         tempIdCounter -= 1
         
-        let newItem = TodoItemModel(todoId: temporaryId, content: item, bookmark: false, dday: nil, deadline: nil)
+        let newItem = TodoItemModel(todoId: temporaryId, content: item, isBookmark: false, isRepeat: false, dday: nil, deadline: nil)
         await MainActor.run {
             backlogList.insert(newItem, at: 0)
         }
         
         do {
-            let response = try await backlogRepository.createBacklog(request: CreateBacklogRequest(content: item))
+            let response = try await backlogRepository.createBacklog(request: CreateBacklogRequest(categoryId: -1, content: item))
             await MainActor.run {
                 if let index = backlogList.firstIndex(where: { $0.todoId == temporaryId }) {
                     backlogList[index].todoId = response.todoId
@@ -55,13 +55,14 @@ class BacklogViewModel: ObservableObject {
     
     func fetchBacklogList() async {
         do {
-            let response = try await backlogRepository.getBacklogList(page: 0, size: 100)
+            let response = try await backlogRepository.getBacklogList(page: 0, size: 100, categoryId: -1)
             DispatchQueue.main.async {
                 self.backlogList = response.backlogs.map { item in
                     TodoItemModel(
                         todoId: item.todoId,
                         content: item.content,
-                        bookmark: item.bookmark,
+                        isBookmark: item.isBookmark,
+                        isRepeat: item.isRepeat,
                         dday: item.dday,
                         deadline: item.deadline
                     )
@@ -108,14 +109,14 @@ class BacklogViewModel: ObservableObject {
     }
     
     func updateBookmark(todoId: Int) async {
-        await MainActor.run { selectedTodoItem?.bookmark.toggle() }
+        await MainActor.run { selectedTodoItem?.isBookmark.toggle() }
         
         do {
             try await todoRepository.updateBookmark(todoId: todoId)
             
             await MainActor.run {
                 if let index = backlogList.firstIndex(where: { $0.todoId == todoId }) {
-                    backlogList[index].bookmark.toggle()
+                    backlogList[index].isBookmark.toggle()
                 }
             }
         } catch {
