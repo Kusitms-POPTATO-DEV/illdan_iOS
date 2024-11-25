@@ -7,4 +7,5 @@
 
 protocol HistoryRepository {
     func getHistory(date: String) async throws -> HistoryListModel
+    func getMonthlyHistory(year: String, month: Int) async throws -> HistoryCalendarResponse
 }
