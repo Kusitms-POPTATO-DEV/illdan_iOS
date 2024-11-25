@@ -9,6 +9,7 @@ import Foundation
 import SwiftUI
 
 struct BacklogListModel: Codable {
+    let categoryName: String
     let totalCount: Int
     let backlogs: Array<TodoItemModel>
     let totalPageCount: Int

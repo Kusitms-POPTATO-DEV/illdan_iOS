@@ -44,4 +44,8 @@ struct PoptatoTypo {
     static let xsSemiBold: Font = .custom(pretendardSemiBold, size: 12).weight(.semibold)
     static let xsMedium: Font = .custom(pretendardMedium, size: 12).weight(.medium)
     static let xsRegular: Font = .custom(pretendardRegular, size: 12).weight(.regular)
+    
+    static let calRegular: Font = .custom(pretendardRegular, size: 10).weight(.regular)
+    static let calMedium: Font = .custom(pretendardMedium, size: 10).weight(.medium)
+    static let calSemiBold: Font = .custom(pretendardSemiBold, size: 10).weight(.semibold)
 }

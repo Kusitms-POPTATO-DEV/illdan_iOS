@@ -17,7 +17,7 @@ enum Router: URLRequestConvertible {
     
     // backlog
     case createBacklog(createBacklogRequest: CreateBacklogRequest)
-    case getBacklogList(page: Int, size: Int)
+    case getBacklogList(page: Int, size: Int, categoryId: Int)
     case deleteBacklog(todoId: Int)
     case editBacklog(todoId: Int, content: String)
     case updateDeadline(updateRequest: UpdateDeadlineRequest, todoId: Int)
@@ -37,6 +37,10 @@ enum Router: URLRequestConvertible {
     // mypage
     case getUserInfo
     case getPolicy
+    
+    // history
+    case getHistory(date: String)
+    case getMonthlyHistory(year: String, month: Int)
     
     var accessToken: String? {
         KeychainManager.shared.readToken(for: "accessToken")
@@ -93,11 +97,12 @@ enum Router: URLRequestConvertible {
                 request.addValue("Bearer \(accessToken)", forHTTPHeaderField: "Authorization")
             }
             request.httpBody = try JSONEncoder().encode(createBacklogRequest)
-        case .getBacklogList(let page, let size):
+        case .getBacklogList(let page, let size, let categoryId):
             var components = URLComponents(url: url.appendingPathComponent("/backlogs"), resolvingAgainstBaseURL: false)
             components?.queryItems = [
                 URLQueryItem(name: "page", value: "\(page)"),
-                URLQueryItem(name: "size", value: "\(size)")
+                URLQueryItem(name: "size", value: "\(size)"),
+                URLQueryItem(name: "category", value: "\(categoryId)")
             ]
             guard let endpoint = components?.url else {
                 throw URLError(.badURL)
@@ -218,6 +223,37 @@ enum Router: URLRequestConvertible {
             request = URLRequest(url: endpoint)
             request.httpMethod = "GET"
             request.addValue("application/json", forHTTPHeaderField: "Content-Type")
+            
+        // history
+        case .getHistory(let date):
+            var components = URLComponents(url: url.appendingPathComponent("/histories"), resolvingAgainstBaseURL: false)
+            components?.queryItems = [
+                URLQueryItem(name: "date", value: "\(date)")
+            ]
+            guard let endpoint = components?.url else {
+                throw URLError(.badURL)
+            }
+            request = URLRequest(url: endpoint)
+            request.httpMethod = "GET"
+            request.addValue("application/json", forHTTPHeaderField: "Content-Type")
+            if let accessToken = accessToken {
+                request.addValue("Bearer \(accessToken)", forHTTPHeaderField: "Authorization")
+            }
+        case .getMonthlyHistory(let year, let month):
+            var components = URLComponents(url: url.appendingPathComponent("/calendar"), resolvingAgainstBaseURL: false)
+            components?.queryItems = [
+                URLQueryItem(name: "year", value: "\(year)"),
+                URLQueryItem(name: "month", value: "\(month)")
+            ]
+            guard let endpoint = components?.url else {
+                throw URLError(.badURL)
+            }
+            request = URLRequest(url: endpoint)
+            request.httpMethod = "GET"
+            request.addValue("application/json", forHTTPHeaderField: "Content-Type")
+            if let accessToken = accessToken {
+                request.addValue("Bearer \(accessToken)", forHTTPHeaderField: "Authorization")
+            }
         }
     
         return request

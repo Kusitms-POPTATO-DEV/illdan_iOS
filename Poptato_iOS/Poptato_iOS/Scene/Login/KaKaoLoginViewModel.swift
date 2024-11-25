@@ -19,7 +19,7 @@ final class KaKaoLoginViewModel: ObservableObject {
     
     func kakaoLogin(token: String) async {
         do {
-            let response = try await repository.kakaoLogin(request: KaKaoLoginRequest(kakaoCode: token))
+            let response = try await repository.kakaoLogin(request: KaKaoLoginRequest(socialType: "KAKAO", accessToken: token))
             DispatchQueue.main.async {
                 self.isLoginSuccess = true
                 print("Login successful: \(response)")

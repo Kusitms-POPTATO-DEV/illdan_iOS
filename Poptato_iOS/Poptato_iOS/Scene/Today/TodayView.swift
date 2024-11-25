@@ -122,7 +122,7 @@ struct TodayItemView: View {
     var body: some View {
         VStack {
             HStack(spacing: 6) {
-                if (item.bookmark) {
+                if (item.isBookmark) {
                     HStack(spacing: 2) {
                         Image("ic_star_filled")
                             .resizable()
@@ -148,7 +148,7 @@ struct TodayItemView: View {
                             .foregroundColor(.gray70)
                     }
                 }
-                if (item.bookmark || item.dday != nil) { Spacer() }
+                if (item.isBookmark || item.dday != nil) { Spacer() }
             }
             
             HStack {

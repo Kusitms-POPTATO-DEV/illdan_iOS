@@ -35,7 +35,7 @@ final class TodayViewModel: ObservableObject {
                         todoId: item.todoId,
                         content: item.content,
                         todayStatus: item.todayStatus,
-                        bookmark: item.bookmark,
+                        isBookmark: item.isBookmark,
                         dday: item.dday,
                         deadline: item.deadline
                     )

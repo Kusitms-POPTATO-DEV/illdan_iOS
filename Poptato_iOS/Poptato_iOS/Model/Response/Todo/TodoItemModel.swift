@@ -11,7 +11,8 @@ import SwiftUI
 struct TodoItemModel: Codable {
     var todoId: Int
     var content: String
-    var bookmark: Bool
+    var isBookmark: Bool
+    var isRepeat: Bool
     var dday: Int?
     var deadline: String?
 }

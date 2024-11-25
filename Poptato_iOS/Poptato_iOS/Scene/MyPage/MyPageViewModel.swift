@@ -10,8 +10,8 @@ import SwiftUI
 class MyPageViewModel: ObservableObject {
     private var userRepository: UserRepository
     private var authRepository: AuthRepository
-    @Published var nickname: String = "손현수"
-    @Published var email: String = "email1234@email.com"
+    @Published var nickname: String = ""
+    @Published var email: String = ""
     @Published var policyContent: String = ""
     
     init(userRepository: UserRepository = UserRepositoryImpl(), authRepository: AuthRepository = AuthRepositoryImpl()) {
