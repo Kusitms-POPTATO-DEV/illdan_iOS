@@ -6,5 +6,8 @@
 //
 
 struct KaKaoLoginRequest: Codable {
-    let kakaoCode: String
+    let socialType: String
+    let accessToken: String
+    let mobileType: String = "IOS"
+    let clientId: String = "12345"
 }
