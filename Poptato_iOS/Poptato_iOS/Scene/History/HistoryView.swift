@@ -31,7 +31,10 @@ struct HistoryView: View {
                         Task {
                             await viewModel.initializeHistory()
                         }
-                    }
+                    },
+                    monthlyHistory: viewModel.monthlyHistory,
+                    currentYear: viewModel.year,
+                    currentMonth: viewModel.month
                 )
                 
                 Spacer().frame(height: 36)
@@ -49,8 +52,15 @@ struct CalendarView: View {
     var days: [Int?]
     @Binding var selectedDay: Int?
     var getHistory: () -> Void
+    var monthlyHistory: [String]
+    var currentYear: Int
+    var currentMonth: Int
     
     var body: some View {
+        let today = Date()
+        let calendar = Calendar.current
+        let todayComponents = calendar.dateComponents([.year, .month, .day], from: today)
+
         VStack {
             HStack {
                 ForEach(["일", "월", "화", "수", "목", "금", "토"], id: \.self) { day in
@@ -66,10 +76,19 @@ struct CalendarView: View {
             LazyVGrid(columns: Array(repeating: GridItem(.flexible()), count: 7), spacing: 10) {
                 ForEach(Array(days.enumerated()), id: \.offset) { index, date in
                     if let date = date {
+                        let formattedDate = String(format: "%04d-%02d-%02d", currentYear, currentMonth, date)
+                        let isPast = todayComponents.year! > currentYear ||
+                            (todayComponents.year == currentYear && todayComponents.month! > currentMonth) ||
+                            (todayComponents.year == currentYear && todayComponents.month == currentMonth && todayComponents.day! > date)
+                        
                         VStack(spacing: 0) {
-                            Image("ic_empty_emoji")
-                                .resizable()
-                                .frame(width: 32, height: 32)
+                            
+                            Image(
+                                monthlyHistory.contains(formattedDate) ? "ic_history_star" :
+                                                                    isPast ? "ic_history_moon" : "ic_empty_emoji"
+                            )
+                            .resizable()
+                            .frame(width: 32, height: 32)
                             
                             Spacer().frame(height: 4)
                             

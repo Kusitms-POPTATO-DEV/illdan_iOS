@@ -14,6 +14,7 @@ final class HistoryViewModel: ObservableObject {
     @Published var days: [Int?] = []
     @Published var selectedDay: Int? = nil
     @Published var historyList: [HistoryListItemModel] = []
+    @Published var monthlyHistory: [String] = []
     private var historyRepository: HistoryRepository
     
     init(historyRepository: HistoryRepository = HistoryRepositoryImpl()) {
@@ -28,6 +29,7 @@ final class HistoryViewModel: ObservableObject {
         
         Task {
             await initializeHistory()
+            await getMonthlyHistory()
         }
         
         generateCalendarDays()
@@ -51,6 +53,7 @@ final class HistoryViewModel: ObservableObject {
         generateCalendarDays()
         Task {
             await initializeHistory()
+            await getMonthlyHistory()
         }
     }
     
@@ -64,6 +67,7 @@ final class HistoryViewModel: ObservableObject {
         generateCalendarDays()
         Task {
             await initializeHistory()
+            await getMonthlyHistory()
         }
     }
     
@@ -89,6 +93,17 @@ final class HistoryViewModel: ObservableObject {
             }
         } catch {
             print("Error getHistory: \(error)")
+        }
+    }
+    
+    func getMonthlyHistory() async {
+        do {
+            let response = try await historyRepository.getMonthlyHistory(year: String(year), month: month)
+            await MainActor.run {
+                monthlyHistory = response.dates
+            }
+        } catch {
+            print("Error getMonthlyHistory: \(error)")
         }
     }
 }
