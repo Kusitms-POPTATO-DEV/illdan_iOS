@@ -45,6 +45,13 @@ struct HistoryView: View {
             }
             .frame(maxWidth: .infinity, maxHeight: .infinity)
         }
+        .onAppear {
+            Task {
+                await viewModel.initializeHistory()
+                await viewModel.getMonthlyHistory()
+            }
+            viewModel.generateCalendarDays()
+        }
     }
 }
 
