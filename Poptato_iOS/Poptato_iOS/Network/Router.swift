@@ -42,6 +42,9 @@ enum Router: URLRequestConvertible {
     case getHistory(date: String)
     case getMonthlyHistory(year: String, month: Int)
     
+    // category
+    case getCategoryList(page: Int, size: Int)
+    
     var accessToken: String? {
         KeychainManager.shared.readToken(for: "accessToken")
     }
@@ -244,6 +247,23 @@ enum Router: URLRequestConvertible {
             components?.queryItems = [
                 URLQueryItem(name: "year", value: "\(year)"),
                 URLQueryItem(name: "month", value: "\(month)")
+            ]
+            guard let endpoint = components?.url else {
+                throw URLError(.badURL)
+            }
+            request = URLRequest(url: endpoint)
+            request.httpMethod = "GET"
+            request.addValue("application/json", forHTTPHeaderField: "Content-Type")
+            if let accessToken = accessToken {
+                request.addValue("Bearer \(accessToken)", forHTTPHeaderField: "Authorization")
+            }
+            
+        // category
+        case .getCategoryList(let page, let size):
+            var components = URLComponents(url: url.appendingPathComponent("/category/list"), resolvingAgainstBaseURL: false)
+            components?.queryItems = [
+                URLQueryItem(name: "page", value: "\(page)"),
+                URLQueryItem(name: "size", value: "\(size)")
             ]
             guard let endpoint = components?.url else {
                 throw URLError(.badURL)
