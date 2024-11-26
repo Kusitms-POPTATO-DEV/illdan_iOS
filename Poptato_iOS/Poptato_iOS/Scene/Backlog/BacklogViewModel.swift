@@ -12,20 +12,26 @@ class BacklogViewModel: ObservableObject {
     private var tempIdCounter = -1
     private let backlogRepository: BacklogRepository
     private let todoRepository: TodoRepository
+    private let categoryRepository: CategoryRepository
     var isExistYesterdayTodo: Bool = false
     @Published var backlogList: Array<TodoItemModel> = []
     @Published var activeItemId: Int? = nil
     @Published var selectedTodoItem: TodoItemModel? = nil
+    @Published var categoryList: Array<CategoryModel> = []
+    @Published var selectedCategoryIndex: Int = 0
     
     init(
         backlogRepository: BacklogRepository = BacklogRepositoryImpl(),
-        todoRepository: TodoRepository = TodoRepositoryImpl()
+        todoRepository: TodoRepository = TodoRepositoryImpl(),
+        categoryRepository: CategoryRepository = CategoryRepositoryImpl()
     ) {
         self.backlogRepository = backlogRepository
         self.todoRepository = todoRepository
+        self.categoryRepository = categoryRepository
         Task {
             await fetchBacklogList()
             await getYesterdayList(page: 0, size: 1)
+            await getCategoryList(page: 0, size: 100)
         }
     }
     
@@ -183,6 +189,17 @@ class BacklogViewModel: ObservableObject {
             }
         } catch {
             print("Error getYesterdayList: \(error)")
+        }
+    }
+    
+    func getCategoryList(page: Int, size: Int) async {
+        do {
+            let response = try await categoryRepository.getCategoryList(page: page, size: size)
+            await MainActor.run {
+                categoryList = response.categories
+            }
+        } catch {
+            print("Error getCategoryList: \(error)")
         }
     }
 }

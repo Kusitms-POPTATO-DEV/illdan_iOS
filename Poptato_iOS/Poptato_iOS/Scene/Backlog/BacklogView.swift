@@ -19,7 +19,19 @@ struct BacklogView: View {
             Color.gray100
                 .ignoresSafeArea()
             
-            VStack {
+            VStack(spacing: 0) {
+                HStack(spacing: 12) {
+                    CategoryListView(
+                        categoryList: viewModel.categoryList,
+                        selectedIndex: $viewModel.selectedCategoryIndex
+                    )
+                    Image("ic_create_category")
+                }
+                .frame(maxWidth: .infinity, alignment: .leading)
+                .frame(height: 42)
+                .padding(.leading, 16)
+                .padding(.top, 16)
+                
                 TopBar(
                     titleText: "할 일",
                     subText: String(viewModel.backlogList.count)
@@ -102,6 +114,59 @@ struct BacklogView: View {
             Task {
                 await viewModel.fetchBacklogList()
             }
+        }
+    }
+}
+
+struct CategoryListView: View {
+    var categoryList: [CategoryModel]
+    @Binding var selectedIndex: Int
+    
+    var body: some View {
+        LazyHStack(spacing: 12) {
+            ForEach(Array(categoryList.enumerated()), id: \.element.id) { index, item in
+                let image = imageName(for: index)
+                CategoryItemView(item: item, image: image, isSelected: index == selectedIndex)
+                    .onTapGesture {
+                        selectedIndex = index
+                    }
+            }
+        }
+    }
+    
+    private func imageName(for index: Int) -> String? {
+        switch index {
+        case 0: return "ic_category_all"
+        case 1: return "ic_category_bookmark"
+        default: return nil
+        }
+    }
+}
+
+struct CategoryItemView: View {
+    var item: CategoryModel
+    var image: String?
+    var isSelected: Bool
+    
+    var body: some View {
+        ZStack(alignment: .center) {
+            Circle()
+                .frame(width: 40, height: 40)
+                .foregroundColor(.gray100)
+                .overlay(
+                    Circle()
+                        .stroke(isSelected ? Color.gray00 : Color.gray95, lineWidth: 1)
+                )
+            if image == nil {
+                AsyncImageView(imageURL: item.imageUrl, width: 24, height: 24)
+            } else {
+                if let image = image {
+                    Image(image)
+                        .resizable()
+                        .frame(width: 24, height: 24)
+                }
+            }
+            
         }
     }
 }
