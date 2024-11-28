@@ -13,6 +13,7 @@ struct BacklogView: View {
     @FocusState private var isTextFieldFocused: Bool
     var onItemSelcted: (TodoItemModel) -> Void
     @Binding var isYesterdayTodoViewPresented: Bool
+    @Binding var isCreateCategoryViewPresented: Bool
     
     var body: some View {
         ZStack(alignment: .bottom) {
@@ -26,6 +27,9 @@ struct BacklogView: View {
                         selectedIndex: $viewModel.selectedCategoryIndex
                     )
                     Image("ic_create_category")
+                        .onTapGesture {
+                            isCreateCategoryViewPresented = true
+                        }
                 }
                 .frame(maxWidth: .infinity, alignment: .leading)
                 .frame(height: 42)
@@ -113,6 +117,15 @@ struct BacklogView: View {
         .onAppear {
             Task {
                 await viewModel.fetchBacklogList()
+                await viewModel.getCategoryList(page: 0, size: 100)
+            }
+        }
+        .onChange(of: isCreateCategoryViewPresented) {
+            print("isCreateCategoryViewPresented changed to: \(isCreateCategoryViewPresented)")
+            if !isCreateCategoryViewPresented {
+                Task {
+                    await viewModel.getCategoryList(page: 0, size: 100)
+                }
             }
         }
     }
@@ -158,7 +171,7 @@ struct CategoryItemView: View {
                         .stroke(isSelected ? Color.gray00 : Color.gray95, lineWidth: 1)
                 )
             if image == nil {
-                AsyncImageView(imageURL: item.imageUrl, width: 24, height: 24)
+                SVGImageView(imageURL: item.imageUrl, width: 24, height: 24)
             } else {
                 if let image = image {
                     Image(image)
