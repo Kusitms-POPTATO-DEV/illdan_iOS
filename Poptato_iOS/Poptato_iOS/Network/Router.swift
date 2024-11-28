@@ -44,6 +44,8 @@ enum Router: URLRequestConvertible {
     
     // category
     case getCategoryList(page: Int, size: Int)
+    case getEmojiList
+    case createCategory(category: CreateCategoryRequest)
     
     var accessToken: String? {
         KeychainManager.shared.readToken(for: "accessToken")
@@ -274,6 +276,23 @@ enum Router: URLRequestConvertible {
             if let accessToken = accessToken {
                 request.addValue("Bearer \(accessToken)", forHTTPHeaderField: "Authorization")
             }
+        case .getEmojiList:
+            let endpoint = url.appendingPathComponent("/emojis")
+            request = URLRequest(url: endpoint)
+            request.httpMethod = "GET"
+            request.addValue("application/json", forHTTPHeaderField: "Content-Type")
+            if let accessToken = accessToken {
+                request.addValue("Bearer \(accessToken)", forHTTPHeaderField: "Authorization")
+            }
+        case .createCategory(let category):
+            let endpoint = url.appendingPathComponent("/category")
+            request = URLRequest(url: endpoint)
+            request.httpMethod = "POST"
+            request.addValue("application/json", forHTTPHeaderField: "Content-Type")
+            if let accessToken = accessToken {
+                request.addValue("Bearer \(accessToken)", forHTTPHeaderField: "Authorization")
+            }
+            request.httpBody = try JSONEncoder().encode(category)
         }
     
         return request
