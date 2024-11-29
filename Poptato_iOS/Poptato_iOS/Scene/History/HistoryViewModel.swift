@@ -26,13 +26,6 @@ final class HistoryViewModel: ObservableObject {
         self.historyRepository = historyRepository
         self.day = calendar.component(.day, from: currentDate)
         selectedDay = self.day
-        
-        Task {
-            await initializeHistory()
-            await getMonthlyHistory()
-        }
-        
-        generateCalendarDays()
     }
     
     func initializeHistory() async {

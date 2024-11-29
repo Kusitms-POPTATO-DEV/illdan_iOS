@@ -13,15 +13,32 @@ struct BacklogView: View {
     @FocusState private var isTextFieldFocused: Bool
     var onItemSelcted: (TodoItemModel) -> Void
     @Binding var isYesterdayTodoViewPresented: Bool
+    @Binding var isCreateCategoryViewPresented: Bool
     
     var body: some View {
         ZStack(alignment: .bottom) {
             Color.gray100
                 .ignoresSafeArea()
             
-            VStack {
+            VStack(spacing: 0) {
+                HStack(spacing: 12) {
+                    CategoryListView(
+                        categoryList: viewModel.categoryList,
+                        onClickCategory: { Task{ await viewModel.fetchBacklogList() } },
+                        selectedIndex: $viewModel.selectedCategoryIndex
+                    )
+                    Image("ic_create_category")
+                        .onTapGesture {
+                            isCreateCategoryViewPresented = true
+                        }
+                }
+                .frame(maxWidth: .infinity, alignment: .leading)
+                .frame(height: 42)
+                .padding(.leading, 16)
+                .padding(.top, 16)
+                
                 TopBar(
-                    titleText: "할 일",
+                    titleText: viewModel.categoryList.isEmpty ? "전체" : viewModel.categoryList[viewModel.selectedCategoryIndex].name,
                     subText: String(viewModel.backlogList.count)
                 )
                 
@@ -100,8 +117,72 @@ struct BacklogView: View {
         }
         .onAppear {
             Task {
+                await viewModel.getCategoryList(page: 0, size: 100)
                 await viewModel.fetchBacklogList()
             }
+        }
+        .onChange(of: isCreateCategoryViewPresented) {
+            print("isCreateCategoryViewPresented changed to: \(isCreateCategoryViewPresented)")
+            if !isCreateCategoryViewPresented {
+                Task {
+                    await viewModel.getCategoryList(page: 0, size: 100)
+                }
+            }
+        }
+    }
+}
+
+struct CategoryListView: View {
+    var categoryList: [CategoryModel]
+    var onClickCategory: () -> Void
+    @Binding var selectedIndex: Int
+    
+    var body: some View {
+        LazyHStack(spacing: 12) {
+            ForEach(Array(categoryList.enumerated()), id: \.element.id) { index, item in
+                let image = imageName(for: index)
+                CategoryItemView(item: item, image: image, isSelected: index == selectedIndex)
+                    .onTapGesture {
+                        selectedIndex = index
+                        onClickCategory()
+                    }
+            }
+        }
+    }
+    
+    private func imageName(for index: Int) -> String? {
+        switch index {
+        case 0: return "ic_category_all"
+        case 1: return "ic_category_bookmark"
+        default: return nil
+        }
+    }
+}
+
+struct CategoryItemView: View {
+    var item: CategoryModel
+    var image: String?
+    var isSelected: Bool
+    
+    var body: some View {
+        ZStack(alignment: .center) {
+            Circle()
+                .frame(width: 40, height: 40)
+                .foregroundColor(.gray100)
+                .overlay(
+                    Circle()
+                        .stroke(isSelected ? Color.gray00 : Color.gray95, lineWidth: 1)
+                )
+            if image == nil {
+                SVGImageView(imageURL: item.imageUrl, width: 24, height: 24)
+            } else {
+                if let image = image {
+                    Image(image)
+                        .resizable()
+                        .frame(width: 24, height: 24)
+                }
+            }
+            
         }
     }
 }

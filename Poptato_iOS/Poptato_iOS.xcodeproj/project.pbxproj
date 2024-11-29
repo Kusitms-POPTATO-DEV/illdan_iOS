@@ -7,6 +7,8 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		E24D98132CF710F700877BD7 /* SVGKit in Frameworks */ = {isa = PBXBuildFile; productRef = E24D98122CF710F700877BD7 /* SVGKit */; };
+		E24D98152CF710F700877BD7 /* SVGKitSwift in Frameworks */ = {isa = PBXBuildFile; productRef = E24D98142CF710F700877BD7 /* SVGKitSwift */; };
 		E2C6E85D2CC8D09C000D43C0 /* KakaoSDKAuth in Frameworks */ = {isa = PBXBuildFile; productRef = E2C6E85C2CC8D09C000D43C0 /* KakaoSDKAuth */; };
 		E2C6E85F2CC8D09C000D43C0 /* KakaoSDKCommon in Frameworks */ = {isa = PBXBuildFile; productRef = E2C6E85E2CC8D09C000D43C0 /* KakaoSDKCommon */; };
 		E2C6E8612CC8D09C000D43C0 /* KakaoSDKUser in Frameworks */ = {isa = PBXBuildFile; productRef = E2C6E8602CC8D09C000D43C0 /* KakaoSDKUser */; };
@@ -60,6 +62,8 @@
 			files = (
 				E2C6E85F2CC8D09C000D43C0 /* KakaoSDKCommon in Frameworks */,
 				E2C6E85D2CC8D09C000D43C0 /* KakaoSDKAuth in Frameworks */,
+				E24D98152CF710F700877BD7 /* SVGKitSwift in Frameworks */,
+				E24D98132CF710F700877BD7 /* SVGKit in Frameworks */,
 				E2C6E8612CC8D09C000D43C0 /* KakaoSDKUser in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -124,6 +128,8 @@
 				E2C6E85C2CC8D09C000D43C0 /* KakaoSDKAuth */,
 				E2C6E85E2CC8D09C000D43C0 /* KakaoSDKCommon */,
 				E2C6E8602CC8D09C000D43C0 /* KakaoSDKUser */,
+				E24D98122CF710F700877BD7 /* SVGKit */,
+				E24D98142CF710F700877BD7 /* SVGKitSwift */,
 			);
 			productName = Poptato_iOS;
 			productReference = E220715B2CC63C1C00AC6694 /* Poptato_iOS.app */;
@@ -209,6 +215,7 @@
 			minimizedProjectReferenceProxies = 1;
 			packageReferences = (
 				E2C6E85B2CC8D09C000D43C0 /* XCRemoteSwiftPackageReference "kakao-ios-sdk" */,
+				E24D98112CF7105E00877BD7 /* XCRemoteSwiftPackageReference "SVGKit" */,
 			);
 			preferredProjectObjectVersion = 77;
 			productRefGroup = E220715C2CC63C1C00AC6694 /* Products */;
@@ -573,6 +580,14 @@
 /* End XCConfigurationList section */
 
 /* Begin XCRemoteSwiftPackageReference section */
+		E24D98112CF7105E00877BD7 /* XCRemoteSwiftPackageReference "SVGKit" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/SVGKit/SVGKit";
+			requirement = {
+				kind = upToNextMajorVersion;
+				minimumVersion = 3.0.0;
+			};
+		};
 		E2C6E85B2CC8D09C000D43C0 /* XCRemoteSwiftPackageReference "kakao-ios-sdk" */ = {
 			isa = XCRemoteSwiftPackageReference;
 			repositoryURL = "https://github.com/kakao/kakao-ios-sdk";
@@ -584,6 +599,16 @@
 /* End XCRemoteSwiftPackageReference section */
 
 /* Begin XCSwiftPackageProductDependency section */
+		E24D98122CF710F700877BD7 /* SVGKit */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = E24D98112CF7105E00877BD7 /* XCRemoteSwiftPackageReference "SVGKit" */;
+			productName = SVGKit;
+		};
+		E24D98142CF710F700877BD7 /* SVGKitSwift */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = E24D98112CF7105E00877BD7 /* XCRemoteSwiftPackageReference "SVGKit" */;
+			productName = SVGKitSwift;
+		};
 		E2C6E85C2CC8D09C000D43C0 /* KakaoSDKAuth */ = {
 			isa = XCSwiftPackageProductDependency;
 			package = E2C6E85B2CC8D09C000D43C0 /* XCRemoteSwiftPackageReference "kakao-ios-sdk" */;

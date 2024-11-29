@@ -14,6 +14,7 @@ struct MainView: View {
     @State private var isPolicyViewPresented = false
     @State private var isYesterdayViewPresented = false
     @State private var isMotivationViewPresented = false
+    @State private var isCreateCategoryViewPresented = false
     @StateObject private var backlogViewModel = BacklogViewModel()
     @StateObject private var todayViewModel = TodayViewModel()
     
@@ -55,7 +56,8 @@ struct MainView: View {
                                 isBottomSheetVisible = true
                             }
                         },
-                        isYesterdayTodoViewPresented: $isYesterdayViewPresented
+                        isYesterdayTodoViewPresented: $isYesterdayViewPresented,
+                        isCreateCategoryViewPresented: $isCreateCategoryViewPresented
                     )
                     .tabItem {
                         Label("할 일", image: selectedTab == 1 ? "ic_backlog_selected" : "ic_backlog_unselected")
@@ -102,6 +104,12 @@ struct MainView: View {
                                 isMotivationViewPresented = false
                             }
                         }
+                }
+                
+                if isCreateCategoryViewPresented {
+                    CreateCategoryView(
+                        isPresented: $isCreateCategoryViewPresented
+                    )
                 }
             } else {
                 KaKaoLoginView(

@@ -42,6 +42,11 @@ enum Router: URLRequestConvertible {
     case getHistory(date: String)
     case getMonthlyHistory(year: String, month: Int)
     
+    // category
+    case getCategoryList(page: Int, size: Int)
+    case getEmojiList
+    case createCategory(category: CreateCategoryRequest)
+    
     var accessToken: String? {
         KeychainManager.shared.readToken(for: "accessToken")
     }
@@ -254,6 +259,40 @@ enum Router: URLRequestConvertible {
             if let accessToken = accessToken {
                 request.addValue("Bearer \(accessToken)", forHTTPHeaderField: "Authorization")
             }
+            
+        // category
+        case .getCategoryList(let page, let size):
+            var components = URLComponents(url: url.appendingPathComponent("/category/list"), resolvingAgainstBaseURL: false)
+            components?.queryItems = [
+                URLQueryItem(name: "page", value: "\(page)"),
+                URLQueryItem(name: "size", value: "\(size)")
+            ]
+            guard let endpoint = components?.url else {
+                throw URLError(.badURL)
+            }
+            request = URLRequest(url: endpoint)
+            request.httpMethod = "GET"
+            request.addValue("application/json", forHTTPHeaderField: "Content-Type")
+            if let accessToken = accessToken {
+                request.addValue("Bearer \(accessToken)", forHTTPHeaderField: "Authorization")
+            }
+        case .getEmojiList:
+            let endpoint = url.appendingPathComponent("/emojis")
+            request = URLRequest(url: endpoint)
+            request.httpMethod = "GET"
+            request.addValue("application/json", forHTTPHeaderField: "Content-Type")
+            if let accessToken = accessToken {
+                request.addValue("Bearer \(accessToken)", forHTTPHeaderField: "Authorization")
+            }
+        case .createCategory(let category):
+            let endpoint = url.appendingPathComponent("/category")
+            request = URLRequest(url: endpoint)
+            request.httpMethod = "POST"
+            request.addValue("application/json", forHTTPHeaderField: "Content-Type")
+            if let accessToken = accessToken {
+                request.addValue("Bearer \(accessToken)", forHTTPHeaderField: "Authorization")
+            }
+            request.httpBody = try JSONEncoder().encode(category)
         }
     
         return request
