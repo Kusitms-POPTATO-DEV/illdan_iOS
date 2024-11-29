@@ -29,7 +29,6 @@ class BacklogViewModel: ObservableObject {
         self.todoRepository = todoRepository
         self.categoryRepository = categoryRepository
         Task {
-            await fetchBacklogList()
             await getYesterdayList(page: 0, size: 1)
         }
     }
@@ -44,7 +43,7 @@ class BacklogViewModel: ObservableObject {
         }
         
         do {
-            let response = try await backlogRepository.createBacklog(request: CreateBacklogRequest(categoryId: -1, content: item))
+            let response = try await backlogRepository.createBacklog(request: CreateBacklogRequest(categoryId: categoryList[selectedCategoryIndex].id, content: item))
             await MainActor.run {
                 if let index = backlogList.firstIndex(where: { $0.todoId == temporaryId }) {
                     backlogList[index].todoId = response.todoId
@@ -60,7 +59,7 @@ class BacklogViewModel: ObservableObject {
     
     func fetchBacklogList() async {
         do {
-            let response = try await backlogRepository.getBacklogList(page: 0, size: 100, categoryId: -1)
+            let response = try await backlogRepository.getBacklogList(page: 0, size: 100, categoryId: categoryList[selectedCategoryIndex].id)
             DispatchQueue.main.async {
                 self.backlogList = response.backlogs.map { item in
                     TodoItemModel(

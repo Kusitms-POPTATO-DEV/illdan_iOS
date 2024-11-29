@@ -24,6 +24,7 @@ struct BacklogView: View {
                 HStack(spacing: 12) {
                     CategoryListView(
                         categoryList: viewModel.categoryList,
+                        onClickCategory: { Task{ await viewModel.fetchBacklogList() } },
                         selectedIndex: $viewModel.selectedCategoryIndex
                     )
                     Image("ic_create_category")
@@ -37,7 +38,7 @@ struct BacklogView: View {
                 .padding(.top, 16)
                 
                 TopBar(
-                    titleText: "할 일",
+                    titleText: viewModel.categoryList.isEmpty ? "전체" : viewModel.categoryList[viewModel.selectedCategoryIndex].name,
                     subText: String(viewModel.backlogList.count)
                 )
                 
@@ -116,8 +117,8 @@ struct BacklogView: View {
         }
         .onAppear {
             Task {
-                await viewModel.fetchBacklogList()
                 await viewModel.getCategoryList(page: 0, size: 100)
+                await viewModel.fetchBacklogList()
             }
         }
         .onChange(of: isCreateCategoryViewPresented) {
@@ -133,6 +134,7 @@ struct BacklogView: View {
 
 struct CategoryListView: View {
     var categoryList: [CategoryModel]
+    var onClickCategory: () -> Void
     @Binding var selectedIndex: Int
     
     var body: some View {
@@ -142,6 +144,7 @@ struct CategoryListView: View {
                 CategoryItemView(item: item, image: image, isSelected: index == selectedIndex)
                     .onTapGesture {
                         selectedIndex = index
+                        onClickCategory()
                     }
             }
         }
