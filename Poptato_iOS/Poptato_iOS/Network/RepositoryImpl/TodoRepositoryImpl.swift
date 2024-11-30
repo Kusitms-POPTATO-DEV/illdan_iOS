@@ -1,3 +1,4 @@
+Poptato_iOS/Poptato_iOS/Network/RepositoryImpl/TodoRepositoryImpl.swift
 //
 //  TodoRepositoryImpl.swift
 //  Poptato_iOS
@@ -24,5 +25,9 @@ final class TodoRepositoryImpl: TodoRepository {
     
     func getYesterdayList(page: Int, size: Int) async throws -> YesterdayListResponse {
         try await NetworkManager.shared.request(type: YesterdayListResponse.self, api: .getYesterdayList(page: page, size: size))
+    }
+    
+    func updateTodoRepeat(todoId: Int) async throws {
+        try await NetworkManager.shared.request(api: .updateTodoRepeat(todoId: todoId))
     }
 }
