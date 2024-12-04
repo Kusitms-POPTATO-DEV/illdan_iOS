@@ -154,6 +154,11 @@ struct MainView: View {
                                 deadline: deadline
                             )
                         }
+                    },
+                    updateTodoRepeat: {
+                        Task {
+                            await backlogViewModel.updateTodoRepeat(todoId: todoItem.todoId)
+                        }
                     }
                 )
                 .transition(.move(edge: .bottom))

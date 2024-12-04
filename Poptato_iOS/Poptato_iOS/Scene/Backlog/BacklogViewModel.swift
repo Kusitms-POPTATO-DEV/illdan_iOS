@@ -200,4 +200,18 @@ class BacklogViewModel: ObservableObject {
             print("Error getCategoryList: \(error)")
         }
     }
+
+    func updateTodoRepeat(todoId: Int) async {
+        do {
+            try await todoRepository.updateTodoRepeat(todoId: todoId)
+            
+            await MainActor.run {
+                if let index = backlogList.firstIndex(where: { $0.todoId == todoId }) {
+                    backlogList[index].isRepeat.toggle()
+                }
+            }
+        } catch {
+            print("Error updateTodoRepeat: \(error)")
+        }
+    }
 }

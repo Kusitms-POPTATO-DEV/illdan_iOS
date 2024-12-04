@@ -15,9 +15,10 @@ struct BottomSheetView: View {
     var editTodo: () -> Void
     var updateBookmark: () -> Void
     var updateDeadline: (String?) -> Void
+    var updateTodoRepeat: () -> Void
     
     var body: some View {
-        ZStack{
+        ZStack {
             VStack {
                 Spacer()
 
@@ -40,15 +41,65 @@ struct BottomSheetView: View {
                     .padding(.horizontal, 24)
                     .padding(.top, 24)
                     
-                    BottomSheetButton(image: "ic_pen", buttonText: "수정하기", buttonColor: .gray30, subText: "", onClickBtn: {
-                        isVisible = false
-                        editTodo()
-                    })
-                    BottomSheetButton(image: "ic_trash", buttonText: "삭제하기", buttonColor: .danger50, subText: "", onClickBtn: {
-                        isVisible = false
-                        deleteTodo()
-                    })
-                    BottomSheetButton(image: "ic_cal", buttonText: "마감기한", buttonColor: .gray30, subText: todoItem?.deadline ?? "설정하기", onClickBtn: { showDateBottomSheet = true })
+                    BottomSheetButton(
+                        image: "ic_pen",
+                        buttonText: "수정하기",
+                        buttonColor: .gray30,
+                        subText: "",
+                        onClickBtn: {
+                            isVisible = false
+                            editTodo()
+                        },
+                        isRepeat: Binding(
+                            get: { todoItem?.isRepeat ?? false },
+                            set: { newValue in
+                                todoItem?.isRepeat = newValue
+                            }
+                        )
+                    )
+                    BottomSheetButton(
+                        image: "ic_trash",
+                        buttonText: "삭제하기",
+                        buttonColor: .danger50,
+                        subText: "",
+                        onClickBtn: {
+                            isVisible = false
+                            deleteTodo()
+                        },
+                        isRepeat: Binding(
+                            get: { todoItem?.isRepeat ?? false },
+                            set: { newValue in
+                                todoItem?.isRepeat = newValue
+                            }
+                        )
+                    )
+                    BottomSheetButton(
+                        image: "ic_refresh",
+                        buttonText: "반복 할 일",
+                        buttonColor: .gray30,
+                        subText: "",
+                        onClickBtn: {},
+                        isRepeat: Binding(
+                            get: { todoItem?.isRepeat ?? false },
+                            set: { newValue in
+                                todoItem?.isRepeat = newValue
+                                updateTodoRepeat()
+                            }
+                        )
+                    )
+                    BottomSheetButton(
+                        image: "ic_cal",
+                        buttonText: "마감기한",
+                        buttonColor: .gray30,
+                        subText: todoItem?.deadline ?? "설정하기",
+                        onClickBtn: { showDateBottomSheet = true },
+                        isRepeat: Binding(
+                            get: { todoItem?.isRepeat ?? false },
+                            set: { newValue in
+                                todoItem?.isRepeat = newValue
+                            }
+                        )
+                    )
                     
                     Spacer()
                 }
@@ -75,6 +126,7 @@ struct BottomSheetButton: View {
     var buttonColor: Color
     var subText: String
     var onClickBtn: () -> Void
+    @Binding var isRepeat: Bool
     
     var body: some View {
         HStack(spacing: 0) {
@@ -84,6 +136,9 @@ struct BottomSheetButton: View {
                 .font(PoptatoTypo.mdRegular)
                 .foregroundColor(buttonColor)
             Spacer()
+            if buttonText == "반복 할 일" {
+                Toggle("", isOn: $isRepeat)
+            }
             Text(subText)
                 .font(PoptatoTypo.mdRegular)
                 .foregroundColor(.gray60)
