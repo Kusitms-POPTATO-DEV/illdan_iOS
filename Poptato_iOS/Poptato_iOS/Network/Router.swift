@@ -206,7 +206,7 @@ enum Router: URLRequestConvertible {
                 request.addValue("Bearer \(accessToken)", forHTTPHeaderField: "Authorization")
             }
         case .dragAndDrop(let type, let todoIds):
-            let endpoint = url.appendingPathComponent("/dragAndDrop")
+            let endpoint = url.appendingPathComponent("todo/dragAndDrop")
             request = URLRequest(url: endpoint)
             request.httpMethod = "PATCH"
             request.addValue("application/json", forHTTPHeaderField: "Content-Type")
