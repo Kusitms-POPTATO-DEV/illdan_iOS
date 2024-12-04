@@ -262,30 +262,55 @@ struct BacklogItemView: View {
                                 .resizable()
                                 .frame(width: 12, height: 12)
                             Text("중요")
-                                .font(PoptatoTypo.xsSemiBold)
+                                .font(PoptatoTypo.calSemiBold)
                                 .foregroundColor(.primary60)
                         }
+                        .padding(.horizontal, 4)
+                        .padding(.vertical, 2)
+                        .background(Color.gray90)
+                        .cornerRadius(4)
+                    }
+                    
+                    if item.isRepeat {
+                        HStack(spacing: 2) {
+                            Image("ic_refresh")
+                                .resizable()
+                                .frame(width: 12, height: 12)
+                            Text("반복")
+                                .font(PoptatoTypo.calSemiBold)
+                                .foregroundColor(.gray50)
+                        }
+                        .padding(.horizontal, 4)
+                        .padding(.vertical, 2)
+                        .background(Color.gray90)
+                        .cornerRadius(4)
                     }
                     
                     if let dDay = item.dday {
-                        if dDay == 0 {
-                            Text("D-day")
-                                .font(PoptatoTypo.xsSemiBold)
-                                .foregroundColor(.gray70)
-                                .frame(height: 12)
-                        } else if dDay > 0 {
-                            Text("D-\(dDay)")
-                                .font(PoptatoTypo.xsSemiBold)
-                                .foregroundColor(.gray70)
-                                .frame(height: 12)
-                        } else {
-                            Text("D+\(abs(dDay))")
-                                .font(PoptatoTypo.xsSemiBold)
-                                .foregroundColor(.gray70)
-                                .frame(height: 12)
+                        ZStack {
+                            if dDay == 0 {
+                                Text("D-day")
+                                    .font(PoptatoTypo.calMedium)
+                                    .foregroundColor(.gray50)
+                                    .frame(height: 12)
+                            } else if dDay > 0 {
+                                Text("D-\(dDay)")
+                                    .font(PoptatoTypo.calMedium)
+                                    .foregroundColor(.gray50)
+                                    .frame(height: 12)
+                            } else {
+                                Text("D+\(abs(dDay))")
+                                    .font(PoptatoTypo.calMedium)
+                                    .foregroundColor(.gray50)
+                                    .frame(height: 12)
+                            }
                         }
+                        .padding(.horizontal, 4)
+                        .padding(.vertical, 2)
+                        .background(Color.gray90)
+                        .cornerRadius(4)
                     }
-                    if (item.isBookmark || item.dday != nil) { Spacer() }
+                    if (item.isBookmark || item.dday != nil || item.isRepeat) { Spacer() }
                 }
                 
                 if activeItemId == item.todoId {
