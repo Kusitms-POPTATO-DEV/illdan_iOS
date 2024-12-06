@@ -10,6 +10,7 @@ import SwiftUI
 final class CreateCategoryViewModel: ObservableObject {
     private var categoryRepository: CategoryRepository
     @Published var emojiList: [String : [EmojiModel]] = [:]
+    @Published var categoryId: Int = 0
     @Published var categoryInput: String = ""
     @Published var selectedEmoji: EmojiModel?
     
@@ -36,6 +37,14 @@ final class CreateCategoryViewModel: ObservableObject {
             try await categoryRepository.createCategory(request: CreateCategoryRequest(name: name, emojiId: emojiId))
         } catch {
             print("Error createCategory: \(error)")
+        }
+    }
+    
+    func editCategory(name: String, emojiId: Int) async {
+        do {
+            try await categoryRepository.editCategory(categoryId: categoryId, category: CreateCategoryRequest(name: name, emojiId: emojiId))
+        } catch {
+            print("Error editCategory: \(error)")
         }
     }
 }

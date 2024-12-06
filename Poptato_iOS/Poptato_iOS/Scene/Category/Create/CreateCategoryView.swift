@@ -12,6 +12,10 @@ struct CreateCategoryView: View {
     @Binding var isPresented: Bool
     @FocusState private var isTextFieldFocused: Bool
     @State private var showBottomSheet: Bool = false
+    var initialCategoryId: Int
+    var initialCategoryName: String
+    var initialSelectedEmoji: EmojiModel
+    var isCategoryEditMode: Bool
     
     var body: some View {
         ZStack {
@@ -29,7 +33,16 @@ struct CreateCategoryView: View {
                                 isPresented = false
                             }
                         }
-                    }
+                    },
+                    editCategory: {
+                        if !viewModel.categoryInput.isEmpty && viewModel.selectedEmoji != nil {
+                            Task {
+                                await viewModel.editCategory(name: viewModel.categoryInput, emojiId: viewModel.selectedEmoji!.emojiId)
+                                isPresented = false
+                            }
+                        }
+                    },
+                    isCategoryEditMode: isCategoryEditMode
                 )
                 
                 Spacer().frame(height: 27)
@@ -72,6 +85,11 @@ struct CreateCategoryView: View {
             Task {
                 await viewModel.getEmojiList()
             }
+            if isCategoryEditMode {
+                viewModel.categoryId = initialCategoryId
+                viewModel.categoryInput = initialCategoryName
+                viewModel.selectedEmoji = initialSelectedEmoji
+            }
         }
         .onTapGesture {
             isTextFieldFocused = false
@@ -82,10 +100,12 @@ struct CreateCategoryView: View {
 struct CreateCategoryTopBar: View {
     @Binding var isPresented: Bool
     var createCategory: () -> Void
+    var editCategory: () -> Void
+    var isCategoryEditMode: Bool
     
     var body: some View {
         ZStack(alignment: .center) {
-            Text("카테고리 추가")
+            Text(isCategoryEditMode ? "카테고리 수정" : "카테고리 추가")
                 .font(PoptatoTypo.mdSemiBold)
                 .foregroundColor(.gray00)
             
@@ -101,7 +121,11 @@ struct CreateCategoryTopBar: View {
                 
                 Button(
                     action: {
-                        createCategory()
+                        if isCategoryEditMode {
+                            editCategory()
+                        } else {
+                            createCategory()
+                        }
                     }
                 ) {
                     Text("완료")

@@ -30,6 +30,7 @@ struct BacklogView: View {
                     )
                     Image("ic_create_category")
                         .onTapGesture {
+                            viewModel.isCategoryEditMode = false
                             isCreateCategoryViewPresented = true
                         }
                 }
@@ -114,6 +115,10 @@ struct BacklogView: View {
                             .font(PoptatoTypo.smMedium)
                             .foregroundColor(.gray30)
                         Spacer().frame(width: 16)
+                    }
+                    .onTapGesture {
+                        viewModel.isCategoryEditMode = true
+                        isCreateCategoryViewPresented = true
                     }
                     Divider().background(Color.gray90)
                     HStack(spacing: 0) {

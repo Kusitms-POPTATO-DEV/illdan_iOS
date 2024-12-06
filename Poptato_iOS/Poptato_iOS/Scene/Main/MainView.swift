@@ -108,7 +108,14 @@ struct MainView: View {
                 
                 if isCreateCategoryViewPresented {
                     CreateCategoryView(
-                        isPresented: $isCreateCategoryViewPresented
+                        isPresented: $isCreateCategoryViewPresented,
+                        initialCategoryId: backlogViewModel.categoryList[backlogViewModel.selectedCategoryIndex].id,
+                        initialCategoryName: backlogViewModel.categoryList[backlogViewModel.selectedCategoryIndex].name,
+                        initialSelectedEmoji: EmojiModel(
+                            emojiId: backlogViewModel.categoryList[backlogViewModel.selectedCategoryIndex].emojiId,
+                            imageUrl: backlogViewModel.categoryList[backlogViewModel.selectedCategoryIndex].imageUrl
+                        ),
+                        isCategoryEditMode: backlogViewModel.isCategoryEditMode
                     )
                 }
             } else {

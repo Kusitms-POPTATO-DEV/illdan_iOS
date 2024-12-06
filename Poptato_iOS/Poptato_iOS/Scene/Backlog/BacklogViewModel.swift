@@ -21,6 +21,7 @@ class BacklogViewModel: ObservableObject {
     @Published var selectedCategoryIndex: Int = 0
     @Published var showCategorySettingMenu: Bool = false
     @Published var showDeleteCategoryDialog: Bool = false
+    @Published var isCategoryEditMode: Bool = false
     
     init(
         backlogRepository: BacklogRepository = BacklogRepositoryImpl(),
@@ -223,16 +224,17 @@ class BacklogViewModel: ObservableObject {
             let categoryId = categoryList[selectedCategoryIndex].id
             
             await MainActor.run {
-                self.categoryList.removeAll { $0.id ==  categoryId }
-            }
-            
-            try await categoryRepository.deleteCategory(categoryId: categoryId)
-            
-            await MainActor.run {
                 self.selectedCategoryIndex = 0
                 self.showCategorySettingMenu = false
                 self.showDeleteCategoryDialog = false
             }
+            
+            await MainActor.run {
+                self.categoryList.removeAll { $0.id ==  categoryId }
+            }
+            
+            try await categoryRepository.deleteCategory(categoryId: categoryId)
+            await fetchBacklogList()
         } catch {
             print("Error deleteCategory: \(error)")
         }
