@@ -18,47 +18,55 @@ struct CommonDialog: View {
     
     var body: some View {
         ZStack(alignment: .center) {
-            Color.gray100.ignoresSafeArea()
+            Color.gray100.opacity(0.5)
             
-            VStack {
-                Spacer()
-                if !title.isEmpty {
-                    Text(title)
-                        .font(PoptatoTypo.lgSemiBold)
+            ZStack(alignment: .center) {
+                Color.gray100.ignoresSafeArea()
+                
+                VStack {
+                    Spacer()
+                    if !title.isEmpty {
+                        Text(title)
+                            .font(PoptatoTypo.lgSemiBold)
+                            .foregroundColor(.gray00)
+                        Spacer().frame(height: 16)
+                    }
+                    Text(content)
+                        .font(PoptatoTypo.mdSemiBold)
                         .foregroundColor(.gray00)
-                    Spacer().frame(height: 16)
-                }
-                Text(content)
-                    .font(PoptatoTypo.mdSemiBold)
-                    .foregroundColor(.gray00)
-                    .multilineTextAlignment(.center)
-                Spacer()
-                HStack(spacing: 0) {
-                    ZStack {
-                        Color.gray95
+                        .multilineTextAlignment(.center)
+                    Spacer()
+                    HStack(spacing: 0) {
+                        ZStack {
+                            Color.gray95
+                            
+                            Text(negativeButtonText)
+                                .font(PoptatoTypo.mdSemiBold)
+                                .foregroundColor(.gray05)
+                        }
+                        .frame(height: 56)
+                        .onTapGesture { onClickBtnNegative() }
                         
-                        Text(negativeButtonText)
-                            .font(PoptatoTypo.mdSemiBold)
-                            .foregroundColor(.gray05)
+                        ZStack {
+                            Color.danger50
+                            
+                            Text(positiveButtonText)
+                                .font(PoptatoTypo.mdSemiBold)
+                                .foregroundColor(.gray100)
+                        }
+                        .frame(height: 56)
+                        .onTapGesture { onClickBtnPositive() }
                     }
+                    .frame(maxWidth: .infinity)
                     .frame(height: 56)
-                    .onTapGesture { onClickBtnNegative() }
-                    
-                    ZStack {
-                        Color.danger50
-                        
-                        Text(positiveButtonText)
-                            .font(PoptatoTypo.mdSemiBold)
-                            .foregroundColor(.gray100)
-                    }
-                    .frame(height: 56)
-                    .onTapGesture { onClickBtnPositive() }
                 }
-                .frame(maxWidth: .infinity)
-                .frame(height: 56)
             }
+            .cornerRadius(16)
+            .frame(maxWidth: 328, maxHeight: 160)
         }
-        .cornerRadius(16)
-        .frame(maxWidth: 328, maxHeight: 160)
+        .frame(maxWidth: .infinity, maxHeight: .infinity)
+        .onTapGesture {
+            onDismissRequest()
+        }
     }
 }

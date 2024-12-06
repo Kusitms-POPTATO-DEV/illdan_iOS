@@ -14,6 +14,7 @@ struct BacklogView: View {
     var onItemSelcted: (TodoItemModel) -> Void
     @Binding var isYesterdayTodoViewPresented: Bool
     @Binding var isCreateCategoryViewPresented: Bool
+    @State private var settingsMenuPosition: CGPoint = .zero
     
     var body: some View {
         ZStack(alignment: .bottom) {
@@ -37,10 +38,24 @@ struct BacklogView: View {
                 .padding(.leading, 16)
                 .padding(.top, 16)
                 
-                TopBar(
-                    titleText: viewModel.categoryList.isEmpty ? "전체" : viewModel.categoryList[viewModel.selectedCategoryIndex].name,
-                    subText: String(viewModel.backlogList.count)
-                )
+                HStack {
+                    TopBar(
+                        titleText: viewModel.categoryList.isEmpty ? "전체" : viewModel.categoryList[viewModel.selectedCategoryIndex].name,
+                        subText: String(viewModel.backlogList.count)
+                    )
+                    Spacer()
+                    if viewModel.selectedCategoryIndex != 0 && viewModel.selectedCategoryIndex != 1 {
+                        GeometryReader { geometry in
+                            Image("ic_settings")
+                                .onTapGesture {
+                                    settingsMenuPosition = geometry.frame(in: .global).origin
+                                    viewModel.showCategorySettingMenu = true
+                                }
+                        }
+                        .frame(width: 20, height: 20)
+                    }
+                }
+                .padding(.trailing, 14)
                 
                 CreateBacklogTextField(
                     isFocused: $isTextFieldFocused,
@@ -86,6 +101,43 @@ struct BacklogView: View {
                 Spacer()
             }
             
+            if (viewModel.showCategorySettingMenu) {
+                VStack(spacing: 0) {
+                    HStack(spacing: 0) {
+                        Spacer().frame(width: 12)
+                        Image("ic_pen")
+                            .resizable()
+                            .frame(width: 16, height: 16)
+                        Spacer().frame(width: 4)
+                        Text("수정하기")
+                            .padding(.vertical, 10)
+                            .font(PoptatoTypo.smMedium)
+                            .foregroundColor(.gray30)
+                        Spacer().frame(width: 16)
+                    }
+                    Divider().background(Color.gray90)
+                    HStack(spacing: 0) {
+                        Spacer().frame(width: 12)
+                        Image("ic_trash")
+                            .resizable()
+                            .frame(width: 16, height: 16)
+                        Spacer().frame(width: 4)
+                        Text("삭제하기")
+                            .padding(.vertical, 10)
+                            .font(PoptatoTypo.smMedium)
+                            .foregroundColor(.danger50)
+                        Spacer().frame(width: 16)
+                    }
+                    .onTapGesture {
+                        viewModel.showDeleteCategoryDialog = true
+                    }
+                }
+                .frame(width: 97, height: 82)
+                .background(Color.gray95)
+                .cornerRadius(12)
+                .position(x: settingsMenuPosition.x - 30, y: settingsMenuPosition.y + 20)
+            }
+            
             if viewModel.isExistYesterdayTodo {
                 ZStack {
                     Color.primary60.ignoresSafeArea()
@@ -111,8 +163,25 @@ struct BacklogView: View {
                 .frame(height: 45)
                 .clipShape(RoundedCorner(radius: 8, corners: [.topLeft, .topRight]))
             }
+            
+            if viewModel.showDeleteCategoryDialog {
+                CommonDialog(
+                    title: "카테고리를 삭제하시겠어요?",
+                    content: "카테고리에 저장된 할 일도 함께 삭제돼요",
+                    positiveButtonText: "삭제",
+                    negativeButtonText: "취소",
+                    onClickBtnPositive: {
+                        Task {
+                            await viewModel.deleteCategory()
+                        }
+                    },
+                    onClickBtnNegative: { viewModel.showDeleteCategoryDialog = false },
+                    onDismissRequest: { viewModel.showDeleteCategoryDialog = false }
+                )
+            }
         }
         .onTapGesture {
+            viewModel.showCategorySettingMenu = false
             isTextFieldFocused = false
         }
         .onAppear {
@@ -122,7 +191,6 @@ struct BacklogView: View {
             }
         }
         .onChange(of: isCreateCategoryViewPresented) {
-            print("isCreateCategoryViewPresented changed to: \(isCreateCategoryViewPresented)")
             if !isCreateCategoryViewPresented {
                 Task {
                     await viewModel.getCategoryList(page: 0, size: 100)
@@ -151,8 +219,8 @@ struct CategoryListView: View {
     }
     
     private func imageName(for index: Int) -> String? {
-        switch index {
-        case 0: return "ic_category_all"
+        switch categoryList[index].id {
+        case -1: return "ic_category_all"
         case 1: return "ic_category_bookmark"
         default: return nil
         }
