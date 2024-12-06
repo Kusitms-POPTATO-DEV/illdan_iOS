@@ -40,7 +40,13 @@ struct MainView: View {
             if isLogined {
                 TabView(selection: $selectedTab) {
                     TodayView(
-                        goToBacklog: { selectedTab = 1 }
+                        goToBacklog: { selectedTab = 1 },
+                        onItemSelcted: { item in
+                            withTransaction(Transaction(animation: .easeInOut)) {
+                                todayViewModel.selectedTodoItem = item
+                                isBottomSheetVisible = true
+                            }
+                        }
                     )
                     .tabItem {
                         Label("오늘", image: selectedTab == 0 ? "ic_today_selected" : "ic_today_unselected")
@@ -133,6 +139,7 @@ struct MainView: View {
                         withAnimation {
                             isBottomSheetVisible = false
                             backlogViewModel.updateSelectedItem(item: nil)
+                            todayViewModel.selectedTodoItem = nil
                         }
                     }
             }
@@ -165,6 +172,41 @@ struct MainView: View {
                     updateTodoRepeat: {
                         Task {
                             await backlogViewModel.updateTodoRepeat(todoId: todoItem.todoId)
+                        }
+                    }
+                )
+                .transition(.move(edge: .bottom))
+                .zIndex(1)
+            }
+            
+            if isBottomSheetVisible, let todoItem = todayViewModel.selectedTodoItem {
+                BottomSheetView(
+                    isVisible: $isBottomSheetVisible,
+                    todoItem: $todayViewModel.selectedTodoItem,
+                    deleteTodo: {
+                        Task {
+                            await todayViewModel.deleteTodo(todoId: todoItem.todoId)
+                        }
+                    },
+                    editTodo: {
+                        todayViewModel.activeItemId = todoItem.todoId
+                    },
+                    updateBookmark: {
+                        Task {
+                            await todayViewModel.updateBookmark(todoId: todoItem.todoId)
+                        }
+                    },
+                    updateDeadline: { deadline in
+                        Task {
+                            await todayViewModel.updateDeadline(
+                                todoId: todoItem.todoId,
+                                deadline: deadline
+                            )
+                        }
+                    },
+                    updateTodoRepeat: {
+                        Task {
+                            await todayViewModel.updateTodoRepeat(todoId: todoItem.todoId)
                         }
                     }
                 )

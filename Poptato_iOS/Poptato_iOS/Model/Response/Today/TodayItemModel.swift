@@ -9,7 +9,8 @@ struct TodayItemModel: Codable {
     var todoId: Int
     var content: String
     var todayStatus: String
-    let isBookmark: Bool
-    let dday: Int?
-    let deadline: String?
+    var isBookmark: Bool
+    var dday: Int?
+    var deadline: String?
+    var isRepeat: Bool
 }

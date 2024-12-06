@@ -9,7 +9,9 @@ import SwiftUI
 
 struct TodayView: View {
     @EnvironmentObject var viewModel: TodayViewModel
+    @FocusState private var isTextFieldFocused: Bool
     var goToBacklog: () -> Void
+    var onItemSelcted: (TodoItemModel) -> Void
     @State private var isViewActive = false
     
     var body: some View {
@@ -45,6 +47,9 @@ struct TodayView: View {
                                 Task {
                                     await viewModel.dragAndDrop()
                                 }
+                            },
+                            onItemSelected: { item in
+                                onItemSelcted(item)
                             }
                         )
                     }
@@ -68,6 +73,7 @@ struct TodayListView: View {
     var swipeToday: (Int) -> Void
     var updateTodoCompletion: (Int) -> Void
     var onDragEnd: () -> Void
+    var onItemSelected: (TodoItemModel) -> Void
     @State private var draggedItem: TodayItemModel?
     @State private var draggedIndex: Int?
     
@@ -88,7 +94,8 @@ struct TodayListView: View {
                         ),
                         todayList: $todayList,
                         swipeToday: swipeToday,
-                        updateTodoCompletion: updateTodoCompletion
+                        updateTodoCompletion: updateTodoCompletion,
+                        onItemSelected: onItemSelected
                     )
                     .onDrag {
                         self.draggedItem = item
@@ -117,62 +124,114 @@ struct TodayItemView: View {
     @Binding var todayList: [TodayItemModel]
     var swipeToday: (Int) -> Void
     var updateTodoCompletion: (Int) -> Void
+    var onItemSelected: (TodoItemModel) -> Void
     @State private var offset: CGFloat = 0
 
     var body: some View {
-        VStack {
-            HStack(spacing: 6) {
-                if (item.isBookmark) {
-                    HStack(spacing: 2) {
-                        Image("ic_star_filled")
-                            .resizable()
-                            .frame(width: 12, height: 12)
-                        Text("중요")
-                            .font(PoptatoTypo.xsSemiBold)
-                            .foregroundColor(.primary60)
+        HStack {
+            VStack(spacing: 6) {
+                HStack(spacing: 6) {
+                    if (item.isBookmark) {
+                        HStack(spacing: 2) {
+                            Image("ic_star_filled")
+                                .resizable()
+                                .frame(width: 12, height: 12)
+                            Text("중요")
+                                .font(PoptatoTypo.calSemiBold)
+                                .foregroundColor(.primary60)
+                        }
+                        .padding(.horizontal, 4)
+                        .padding(.vertical, 2)
+                        .background(Color.gray90)
+                        .cornerRadius(4)
                     }
+                    
+                    if item.isRepeat {
+                        HStack(spacing: 2) {
+                            Image("ic_refresh")
+                                .resizable()
+                                .frame(width: 12, height: 12)
+                            Text("반복")
+                                .font(PoptatoTypo.calSemiBold)
+                                .foregroundColor(.gray50)
+                        }
+                        .padding(.horizontal, 4)
+                        .padding(.vertical, 2)
+                        .background(Color.gray90)
+                        .cornerRadius(4)
+                    }
+                    
+                    if let dDay = item.dday {
+                        ZStack {
+                            if dDay == 0 {
+                                Text("D-day")
+                                    .font(PoptatoTypo.calMedium)
+                                    .foregroundColor(.gray50)
+                                    .frame(height: 12)
+                            } else if dDay > 0 {
+                                Text("D-\(dDay)")
+                                    .font(PoptatoTypo.calMedium)
+                                    .foregroundColor(.gray50)
+                                    .frame(height: 12)
+                            } else {
+                                Text("D+\(abs(dDay))")
+                                    .font(PoptatoTypo.calMedium)
+                                    .foregroundColor(.gray50)
+                                    .frame(height: 12)
+                            }
+                        }
+                        .padding(.horizontal, 4)
+                        .padding(.vertical, 2)
+                        .background(Color.gray90)
+                        .cornerRadius(4)
+                    }
+                    if (item.isBookmark || item.dday != nil || item.isRepeat) { Spacer() }
                 }
                 
-                if let dDay = item.dday {
-                    if dDay == 0 {
-                        Text("D-day")
-                            .font(PoptatoTypo.xsSemiBold)
-                            .foregroundColor(.gray70)
-                    } else if dDay > 0 {
-                        Text("D-\(dDay)")
-                            .font(PoptatoTypo.xsSemiBold)
-                            .foregroundColor(.gray70)
-                    } else {
-                        Text("D+\(abs(dDay))")
-                            .font(PoptatoTypo.xsSemiBold)
-                            .foregroundColor(.gray70)
-                    }
+                HStack {
+                    Image(item.todayStatus == "COMPLETED" ? "ic_checked" : "ic_unchecked")
+                        .resizable()
+                        .frame(width: 20, height: 20)
+                        .onTapGesture {
+                            updateTodoCompletion(item.todoId)
+                            if item.todayStatus == "INCOMPLETE" {
+                                moveItemToCompleted()
+                            } else {
+                                moveItemToIncomplete()
+                            }
+                        }
+
+                    Text(item.content)
+                        .font(PoptatoTypo.mdRegular)
+                        .foregroundColor(.gray00)
+
+                    Spacer()
                 }
-                if (item.isBookmark || item.dday != nil) { Spacer() }
             }
             
-            HStack {
-                Image(item.todayStatus == "COMPLETED" ? "ic_checked" : "ic_unchecked")
+            Spacer()
+            
+            ZStack(alignment: (item.isBookmark || item.dday != nil) ? .top : .center) {
+                Image("ic_dot")
                     .resizable()
                     .frame(width: 20, height: 20)
                     .onTapGesture {
-                        updateTodoCompletion(item.todoId)
-                        if item.todayStatus == "INCOMPLETE" {
-                            moveItemToCompleted()
-                        } else {
-                            moveItemToIncomplete()
-                        }
+                        onItemSelected(
+                            TodoItemModel(
+                                todoId: item.todoId,
+                                content: item.content,
+                                isBookmark: item.isBookmark,
+                                isRepeat: item.isRepeat,
+                                dday: item.dday,
+                                deadline: item.deadline
+                            )
+                        )
                     }
-
-                Text(item.content)
-                    .font(PoptatoTypo.mdRegular)
-                    .foregroundColor(.gray00)
-
-                Spacer()
             }
         }
         .frame(maxWidth: .infinity)
-        .padding()
+        .padding(.vertical, 12)
+        .padding(.horizontal, 16)
         .background(RoundedRectangle(cornerRadius: 8))
         .foregroundColor(.gray95)
         .offset(x: offset)
@@ -263,10 +322,4 @@ struct EmptyTodayView: View {
         }
         .frame(maxWidth: .infinity, maxHeight: .infinity)
     }
-}
-
-#Preview {
-    TodayView(
-        goToBacklog: {}
-    )
 }
