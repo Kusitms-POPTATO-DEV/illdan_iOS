@@ -47,6 +47,7 @@ enum Router: URLRequestConvertible {
     case getCategoryList(page: Int, size: Int)
     case getEmojiList
     case createCategory(category: CreateCategoryRequest)
+    case deleteCategory(categoryId: Int)
     
     var accessToken: String? {
         KeychainManager.shared.readToken(for: "accessToken")
@@ -302,6 +303,14 @@ enum Router: URLRequestConvertible {
                 request.addValue("Bearer \(accessToken)", forHTTPHeaderField: "Authorization")
             }
             request.httpBody = try JSONEncoder().encode(category)
+        case .deleteCategory(let categoryId):
+            let endpoint = url.appendingPathComponent("/category/\(categoryId)")
+            request = URLRequest(url: endpoint)
+            request.httpMethod = "DELETE"
+            request.addValue("application/json", forHTTPHeaderField: "Content-Type")
+            if let accessToken = accessToken {
+                request.addValue("Bearer \(accessToken)", forHTTPHeaderField: "Authorization")
+            }
         }
     
         return request
