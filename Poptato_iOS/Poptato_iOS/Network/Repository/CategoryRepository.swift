@@ -10,4 +10,5 @@ protocol CategoryRepository {
     func getEmojiList() async throws -> EmojiResponse
     func createCategory(request: CreateCategoryRequest) async throws -> Void
     func deleteCategory(categoryId: Int) async throws -> Void
+    func editCategory(categoryId: Int, category: CreateCategoryRequest) async throws -> Void
 }
