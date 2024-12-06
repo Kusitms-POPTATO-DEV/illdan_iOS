@@ -226,7 +226,7 @@ struct CategoryListView: View {
     private func imageName(for index: Int) -> String? {
         switch categoryList[index].id {
         case -1: return "ic_category_all"
-        case 1: return "ic_category_bookmark"
+        case 0: return "ic_category_bookmark"
         default: return nil
         }
     }
