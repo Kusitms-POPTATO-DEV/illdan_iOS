@@ -15,6 +15,7 @@ struct TodoItemModel: Codable {
     var isRepeat: Bool
     var dday: Int?
     var deadline: String?
+    var categoryId: Int?
     var categoryName: String?
     var emojiImageUrl: String?
 }

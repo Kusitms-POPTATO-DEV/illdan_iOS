@@ -32,4 +32,7 @@ final class TodoRepositoryImpl: TodoRepository {
     func getTodoDetail(todoId: Int) async throws -> TodoDetailModel {
         try await NetworkManager.shared.request(type: TodoDetailModel.self, api: .getTodoDetail(todoId: todoId))
     }
+    func updateCategory(todoId: Int, categoryId: CategoryIdModel) async throws {
+        try await NetworkManager.shared.request(api: .updateCategory(todoId: todoId, categoryId: categoryId))
+    }
 }
