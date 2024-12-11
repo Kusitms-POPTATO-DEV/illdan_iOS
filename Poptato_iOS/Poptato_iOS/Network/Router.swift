@@ -34,6 +34,7 @@ enum Router: URLRequestConvertible {
     case updateBookmark(todoId: Int)
     case dragAndDrop(type: String, todoIds: Array<Int>)
     case updateTodoRepeat(todoId: Int)
+    case getTodoDetail(todoId: Int)
     
     // mypage
     case getUserInfo
@@ -220,6 +221,14 @@ enum Router: URLRequestConvertible {
             let endpoint = url.appendingPathComponent("/todo/\(todoId)/repeat")
             request = URLRequest(url: endpoint)
             request.httpMethod = "PATCH"
+            request.addValue("application/json", forHTTPHeaderField: "Content-Type")
+            if let accessToken = accessToken {
+                request.addValue("Bearer \(accessToken)", forHTTPHeaderField: "Authorization")
+            }
+        case .getTodoDetail(let todoId):
+            let endpoint = url.appendingPathComponent("/todo/\(todoId)")
+            request = URLRequest(url: endpoint)
+            request.httpMethod = "GET"
             request.addValue("application/json", forHTTPHeaderField: "Content-Type")
             if let accessToken = accessToken {
                 request.addValue("Bearer \(accessToken)", forHTTPHeaderField: "Authorization")
