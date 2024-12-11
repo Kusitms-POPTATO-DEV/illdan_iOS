@@ -129,7 +129,7 @@ struct TodayItemView: View {
 
     var body: some View {
         HStack {
-            VStack(spacing: 6) {
+            VStack {
                 HStack(spacing: 6) {
                     if (item.isBookmark) {
                         HStack(spacing: 2) {
