@@ -19,6 +19,9 @@ class BacklogViewModel: ObservableObject {
     @Published var selectedTodoItem: TodoItemModel? = nil
     @Published var categoryList: Array<CategoryModel> = []
     @Published var selectedCategoryIndex: Int = 0
+    @Published var showCategorySettingMenu: Bool = false
+    @Published var showDeleteCategoryDialog: Bool = false
+    @Published var isCategoryEditMode: Bool = false
     
     init(
         backlogRepository: BacklogRepository = BacklogRepositoryImpl(),
@@ -81,10 +84,11 @@ class BacklogViewModel: ObservableObject {
     
     func deleteBacklog(todoId: Int) async {
         do {
-            try await backlogRepository.deleteBacklog(todoId: todoId)
-            DispatchQueue.main.async {
+            await MainActor.run {
                 self.backlogList.removeAll { $0.todoId == todoId }
             }
+            
+            try await backlogRepository.deleteBacklog(todoId: todoId)
         } catch {
             DispatchQueue.main.async {
                 print("Error delete backlog: \(error)")
@@ -212,6 +216,27 @@ class BacklogViewModel: ObservableObject {
             }
         } catch {
             print("Error updateTodoRepeat: \(error)")
+        }
+    }
+    
+    func deleteCategory() async {
+        do {
+            let categoryId = categoryList[selectedCategoryIndex].id
+            
+            await MainActor.run {
+                self.selectedCategoryIndex = 0
+                self.showCategorySettingMenu = false
+                self.showDeleteCategoryDialog = false
+            }
+            
+            await MainActor.run {
+                self.categoryList.removeAll { $0.id ==  categoryId }
+            }
+            
+            try await categoryRepository.deleteCategory(categoryId: categoryId)
+            await fetchBacklogList()
+        } catch {
+            print("Error deleteCategory: \(error)")
         }
     }
 }

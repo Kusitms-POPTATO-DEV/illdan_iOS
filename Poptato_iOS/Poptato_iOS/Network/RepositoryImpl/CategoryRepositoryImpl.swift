@@ -17,4 +17,12 @@ final class CategoryRepositoryImpl: CategoryRepository {
     func createCategory(request: CreateCategoryRequest) async throws {
         try await NetworkManager.shared.request(api: .createCategory(category: request))
     }
+    
+    func deleteCategory(categoryId: Int) async throws {
+        try await NetworkManager.shared.request(api: .deleteCategory(categoryId: categoryId))
+    }
+    
+    func editCategory(categoryId: Int, category: CreateCategoryRequest) async throws {
+        try await NetworkManager.shared.request(api: .editCategory(categoryId: categoryId, category: category))
+    }
 }
