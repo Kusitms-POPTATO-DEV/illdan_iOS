@@ -148,4 +148,21 @@ extension Color {
     static let kakaoMain = Color(uiColor: .kakaoMain)
     static let bookmark = Color(uiColor: .bookmark)
     static let bgSnackBar = Color(uiColor: .bgSnackBar)
+    
+    static let kakaoLogin = LinearGradient(
+        gradient: Gradient(colors: [
+            Color(hex: 0x1E1E20).opacity(0.5),
+            Color(hex: 0x1E1E20)
+        ]),
+        startPoint: .top,
+        endPoint: .bottom
+    )
+    static let splash = LinearGradient(
+        gradient: Gradient(colors: [
+            Color(hex: 0x1E1E20).opacity(0.1),
+            Color(hex: 0x1CB59C)
+        ]),
+        startPoint: .top,
+        endPoint: .bottom
+    )
 }
