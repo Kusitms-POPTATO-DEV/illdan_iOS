@@ -169,6 +169,32 @@ class BacklogViewModel: ObservableObject {
         }
     }
     
+    func getTodoDetail(item: TodoItemModel) async {
+        do {
+            let response = try await todoRepository.getTodoDetail(todoId: item.todoId)
+            let categoryId = categoryList.first { category in
+                category.name == response.categoryName && category.imageUrl == response.emojiImageUrl
+            }?.id
+            
+            await MainActor.run {
+                let newItem = TodoItemModel(
+                    todoId: item.todoId,
+                    content: item.content,
+                    isBookmark: item.isBookmark,
+                    isRepeat: item.isRepeat,
+                    dday: item.dday,
+                    deadline: item.deadline,
+                    categoryId: categoryId,
+                    categoryName: response.categoryName,
+                    emojiImageUrl: response.emojiImageUrl
+                )
+                updateSelectedItem(item: newItem)
+            }
+        } catch {
+            print("Error getTodoDetail: \(error)")
+        }
+    }
+    
     func updateSelectedItem(item: TodoItemModel?) {
         selectedTodoItem = item
     }
@@ -237,6 +263,25 @@ class BacklogViewModel: ObservableObject {
             await fetchBacklogList()
         } catch {
             print("Error deleteCategory: \(error)")
+        }
+    }
+    
+    func updateCategory(categoryId: Int?, todoId: Int) async {
+        do {
+            let resolvedCategory = categoryId.flatMap { id in
+                categoryList.first(where: { $0.id == id })
+            }
+
+            await MainActor.run {
+                selectedTodoItem?.categoryId = resolvedCategory?.id
+                selectedTodoItem?.categoryName = resolvedCategory?.name
+                selectedTodoItem?.emojiImageUrl = resolvedCategory?.imageUrl
+            }
+            
+            try await todoRepository.updateCategory(todoId: todoId, categoryId: CategoryIdModel(categoryId: categoryId))
+            await fetchBacklogList()
+        } catch {
+            print("Error updateCategory: \(error)")
         }
     }
 }

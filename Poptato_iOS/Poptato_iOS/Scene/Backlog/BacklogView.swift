@@ -28,11 +28,14 @@ struct BacklogView: View {
                         onClickCategory: { Task{ await viewModel.fetchBacklogList() } },
                         selectedIndex: $viewModel.selectedCategoryIndex
                     )
-                    Image("ic_create_category")
-                        .onTapGesture {
-                            viewModel.isCategoryEditMode = false
-                            isCreateCategoryViewPresented = true
-                        }
+                    HStack {
+                        Image("ic_create_category")
+                            .onTapGesture {
+                                viewModel.isCategoryEditMode = false
+                                isCreateCategoryViewPresented = true
+                            }
+                        Spacer().frame(width: 16)
+                    }
                 }
                 .frame(maxWidth: .infinity, alignment: .leading)
                 .frame(height: 42)
@@ -211,14 +214,16 @@ struct CategoryListView: View {
     @Binding var selectedIndex: Int
     
     var body: some View {
-        LazyHStack(spacing: 12) {
-            ForEach(Array(categoryList.enumerated()), id: \.element.id) { index, item in
-                let image = imageName(for: index)
-                CategoryItemView(item: item, image: image, isSelected: index == selectedIndex)
-                    .onTapGesture {
-                        selectedIndex = index
-                        onClickCategory()
-                    }
+        ScrollView(.horizontal) {
+            LazyHStack(spacing: 12) {
+                ForEach(Array(categoryList.enumerated()), id: \.element.id) { index, item in
+                    let image = imageName(for: index)
+                    CategoryItemView(item: item, image: image, isSelected: index == selectedIndex)
+                        .onTapGesture {
+                            selectedIndex = index
+                            onClickCategory()
+                        }
+                }
             }
         }
     }
