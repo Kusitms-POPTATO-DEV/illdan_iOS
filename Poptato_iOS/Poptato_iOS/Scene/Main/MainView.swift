@@ -11,6 +11,8 @@ struct MainView: View {
     @Binding var isLogined: Bool
     @State private var selectedTab: Int = 1
     @State private var isBottomSheetVisible = false
+    @State private var isDateBottomSheetVisible = false
+    @State private var isCategoryBottomSheetVisible = false
     @State private var isPolicyViewPresented = false
     @State private var isYesterdayViewPresented = false
     @State private var isMotivationViewPresented = false
@@ -42,9 +44,12 @@ struct MainView: View {
                     TodayView(
                         goToBacklog: { selectedTab = 1 },
                         onItemSelcted: { item in
-                            withTransaction(Transaction(animation: .easeInOut)) {
-                                todayViewModel.selectedTodoItem = item
-                                isBottomSheetVisible = true
+                            Task {
+                                await todayViewModel.getTodoDetail(item: item)
+                                
+                                withTransaction(Transaction(animation: .easeInOut)) {
+                                    isBottomSheetVisible = true
+                                }
                             }
                         }
                     )
@@ -57,9 +62,12 @@ struct MainView: View {
                     
                     BacklogView(
                         onItemSelcted: { item in
-                            withTransaction(Transaction(animation: .easeInOut)) {
-                                backlogViewModel.updateSelectedItem(item: item)
-                                isBottomSheetVisible = true
+                            Task {
+                                await backlogViewModel.getTodoDetail(item: item)
+                                
+                                withTransaction(Transaction(animation: .easeInOut)) {
+                                    isBottomSheetVisible = true
+                                }
                             }
                         },
                         isYesterdayTodoViewPresented: $isYesterdayViewPresented,
@@ -141,6 +149,8 @@ struct MainView: View {
                             backlogViewModel.updateSelectedItem(item: nil)
                             todayViewModel.selectedTodoItem = nil
                         }
+                        isDateBottomSheetVisible = false
+                        isCategoryBottomSheetVisible = false
                     }
             }
             
@@ -148,6 +158,8 @@ struct MainView: View {
                 BottomSheetView(
                     isVisible: $isBottomSheetVisible,
                     todoItem: $backlogViewModel.selectedTodoItem,
+                    showDateBottomSheet: $isDateBottomSheetVisible,
+                    showCategoryBottomSheet: $isCategoryBottomSheetVisible,
                     deleteTodo: {
                         Task {
                             await backlogViewModel.deleteBacklog(todoId: todoItem.todoId)
@@ -173,7 +185,13 @@ struct MainView: View {
                         Task {
                             await backlogViewModel.updateTodoRepeat(todoId: todoItem.todoId)
                         }
-                    }
+                    },
+                    updateCategory: { id in
+                        Task {
+                            await backlogViewModel.updateCategory(categoryId: id, todoId: backlogViewModel.selectedTodoItem!.todoId)
+                        }
+                    },
+                    categoryList: backlogViewModel.categoryList
                 )
                 .transition(.move(edge: .bottom))
                 .zIndex(1)
@@ -183,6 +201,8 @@ struct MainView: View {
                 BottomSheetView(
                     isVisible: $isBottomSheetVisible,
                     todoItem: $todayViewModel.selectedTodoItem,
+                    showDateBottomSheet: $isDateBottomSheetVisible,
+                    showCategoryBottomSheet: $isCategoryBottomSheetVisible,
                     deleteTodo: {
                         Task {
                             await todayViewModel.deleteTodo(todoId: todoItem.todoId)
@@ -208,7 +228,13 @@ struct MainView: View {
                         Task {
                             await todayViewModel.updateTodoRepeat(todoId: todoItem.todoId)
                         }
-                    }
+                    },
+                    updateCategory: { id in
+                        Task {
+                            await todayViewModel.updateCategory(categoryId: id, todoId: todayViewModel.selectedTodoItem!.todoId)
+                        }
+                    },
+                    categoryList: backlogViewModel.categoryList
                 )
                 .transition(.move(edge: .bottom))
                 .zIndex(1)

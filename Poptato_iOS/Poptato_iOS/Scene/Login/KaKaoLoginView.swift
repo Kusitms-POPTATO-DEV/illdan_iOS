@@ -15,15 +15,30 @@ struct KaKaoLoginView: View {
     var onSuccessLogin: () -> Void
     
     var body: some View {
-        ZStack {
+        ZStack(alignment: .top) {
             Color.gray100
                 .edgesIgnoringSafeArea(.all)
+            Color.splash
+                .edgesIgnoringSafeArea(.all)
             
-            Image("ic_splash")
+            VStack {
+                Spacer()
+                
+                Image("ic_stairs")
+                    .resizable()
+                    .ignoresSafeArea()
+                    .aspectRatio(contentMode: .fit)
+                    .frame(maxWidth: .infinity)
+            }
+            
+            Color.kakaoLogin
+                .edgesIgnoringSafeArea(.all)
+            
+            Image("ic_login")
                 .resizable()
                 .scaledToFit()
                 .frame(width: 200, height: 137)
-                .offset(y: -50)
+                .offset(y: 80)
             
             VStack {
                 Spacer()
@@ -41,33 +56,6 @@ struct KaKaoLoginView: View {
                             print("kakao success: \(oauthToken)")
                         }
                     }
-//                    if (UserApi.isKakaoTalkLoginAvailable()) {
-//                        UserApi.shared.loginWithKakaoTalk {(oauthToken, error) in
-//                            if let error = error {
-//                                print(error)
-//                            }
-//                            if let oauthToken = oauthToken{
-//                                Task {
-//                                    await viewModel.kakaoLogin(token: oauthToken.accessToken)
-//                                    onSuccessLogin()
-//                                }
-//                                print("kakao success: \(oauthToken)")
-//                            }
-//                        }
-//                    } else {
-//                        UserApi.shared.loginWithKakaoAccount {(oauthToken, error) in
-//                            if let error = error {
-//                                print(error)
-//                            }
-//                            if let oauthToken = oauthToken{
-//                                Task {
-//                                    await viewModel.kakaoLogin(token: oauthToken.accessToken)
-//                                    onSuccessLogin()
-//                                }
-//                                print("kakao success: \(oauthToken)")
-//                            }
-//                        }
-//                    }
                 }) {
                     HStack {
                         Image("ic_kakao")
