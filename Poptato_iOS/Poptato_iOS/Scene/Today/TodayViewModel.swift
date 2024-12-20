@@ -19,15 +19,18 @@ final class TodayViewModel: ObservableObject {
     private let todayRepository: TodayRepository
     private let todoRepository: TodoRepository
     private let backlogRepository: BacklogRepository
+    private let categoryRepository: CategoryRepository
     
     init(
         todayRepository: TodayRepository = TodayRepositoryImpl(),
         todoRepository: TodoRepository = TodoRepositoryImpl(),
-        backlogRepository: BacklogRepository = BacklogRepositoryImpl()
+        backlogRepository: BacklogRepository = BacklogRepositoryImpl(),
+        categoryRepository: CategoryRepository = CategoryRepositoryImpl()
     ) {
         self.todayRepository = todayRepository
         self.todoRepository = todoRepository
         self.backlogRepository = backlogRepository
+        self.categoryRepository = categoryRepository
         let formatter = DateFormatter()
         formatter.dateFormat = "MM.dd"
         currentDate = formatter.string(from: Date())
@@ -196,5 +199,46 @@ final class TodayViewModel: ObservableObject {
         } catch {
             print("Error updateCategory: \(error)")
         }
+    }
+    
+    func getCategoryList(page: Int, size: Int) async {
+        do {
+            let response = try await categoryRepository.getCategoryList(page: page, size: size)
+            await MainActor.run {
+                categoryList = response.categories
+            }
+        } catch {
+            print("Error getCategoryList: \(error)")
+        }
+    }
+    
+    func getTodoDetail(item: TodoItemModel) async {
+        do {
+            let response = try await todoRepository.getTodoDetail(todoId: item.todoId)
+            let categoryId = categoryList.first { category in
+                category.name == response.categoryName && category.imageUrl == response.emojiImageUrl
+            }?.id
+            
+            await MainActor.run {
+                let newItem = TodoItemModel(
+                    todoId: item.todoId,
+                    content: item.content,
+                    isBookmark: item.isBookmark,
+                    isRepeat: item.isRepeat,
+                    dday: item.dday,
+                    deadline: item.deadline,
+                    categoryId: categoryId,
+                    categoryName: response.categoryName,
+                    emojiImageUrl: response.emojiImageUrl
+                )
+                updateSelectedItem(item: newItem)
+            }
+        } catch {
+            print("Error getTodoDetail: \(error)")
+        }
+    }
+    
+    func updateSelectedItem(item: TodoItemModel?) {
+        selectedTodoItem = item
     }
 }

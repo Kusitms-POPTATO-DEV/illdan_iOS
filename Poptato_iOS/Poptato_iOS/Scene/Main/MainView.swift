@@ -44,9 +44,12 @@ struct MainView: View {
                     TodayView(
                         goToBacklog: { selectedTab = 1 },
                         onItemSelcted: { item in
-                            withTransaction(Transaction(animation: .easeInOut)) {
-                                todayViewModel.selectedTodoItem = item
-                                isBottomSheetVisible = true
+                            Task {
+                                await todayViewModel.getTodoDetail(item: item)
+                                
+                                withTransaction(Transaction(animation: .easeInOut)) {
+                                    isBottomSheetVisible = true
+                                }
                             }
                         }
                     )
@@ -227,7 +230,9 @@ struct MainView: View {
                         }
                     },
                     updateCategory: { id in
-                        
+                        Task {
+                            await todayViewModel.updateCategory(categoryId: id, todoId: todayViewModel.selectedTodoItem!.todoId)
+                        }
                     },
                     categoryList: backlogViewModel.categoryList
                 )

@@ -59,6 +59,7 @@ struct TodayView: View {
         .onAppear {
             Task {
                 isViewActive = true
+                await viewModel.getCategoryList(page: 0, size: 100)
                 await viewModel.getTodayList()
             }
         }
