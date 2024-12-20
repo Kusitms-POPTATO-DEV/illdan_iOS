@@ -20,16 +20,16 @@ final class KaKaoLoginViewModel: ObservableObject {
     func kakaoLogin(token: String) async {
         do {
             let response = try await repository.kakaoLogin(request: KaKaoLoginRequest(socialType: "KAKAO", accessToken: token))
-            DispatchQueue.main.async {
-                self.isLoginSuccess = true
+            await MainActor.run {
+                isLoginSuccess = true
                 print("Login successful: \(response)")
                 
                 KeychainManager.shared.saveToken(response.accessToken, for: "accessToken")
                 KeychainManager.shared.saveToken(response.refreshToken, for: "refreshToken")
             }
         } catch {
-            DispatchQueue.main.async {
-                self.loginError = error
+            await MainActor.run {
+                loginError = error
                 print("Login error: \(error)")
             }
         }

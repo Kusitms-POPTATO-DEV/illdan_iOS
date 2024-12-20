@@ -12,6 +12,8 @@ final class TodayViewModel: ObservableObject {
     @Published var todayList: Array<TodayItemModel> = []
     @Published var currentDate: String = ""
     @Published var selectedTodoItem: TodoItemModel? = nil
+    @Published var categoryList: Array<CategoryModel> = []
+    @Published var selectedCategoryIndex: Int = 0
     @Published var activeItemId: Int? = nil
     private var snapshotList: [TodayItemModel] = []
     private let todayRepository: TodayRepository
@@ -34,8 +36,8 @@ final class TodayViewModel: ObservableObject {
     func getTodayList() async {
         do {
             let response = try await todayRepository.getTodayList(page: 0, size: 50)
-            DispatchQueue.main.async {
-                self.todayList = response.todays.map { item in
+            await MainActor.run {
+                todayList = response.todays.map { item in
                     TodayItemModel(
                         todoId: item.todoId,
                         content: item.content,
@@ -80,9 +82,9 @@ final class TodayViewModel: ObservableObject {
             try await todoRepository.updateTodoCompletion(todoId: todoId)
             snapshotList = todayList
         } catch {
-            DispatchQueue.main.async {
+            await MainActor.run {
                 print("Error update todocompletion: \(error)")
-                self.todayList = previousSnapshot
+                todayList = previousSnapshot
             }
         }
     }
@@ -174,6 +176,25 @@ final class TodayViewModel: ObservableObject {
             }
         } catch {
             print("Error updateTodoRepeat: \(error)")
+        }
+    }
+    
+    func updateCategory(categoryId: Int?, todoId: Int) async {
+        do {
+            let resolvedCategory = categoryId.flatMap { id in
+                categoryList.first(where: { $0.id == id })
+            }
+
+            await MainActor.run {
+                selectedTodoItem?.categoryId = resolvedCategory?.id
+                selectedTodoItem?.categoryName = resolvedCategory?.name
+                selectedTodoItem?.emojiImageUrl = resolvedCategory?.imageUrl
+            }
+            
+            try await todoRepository.updateCategory(todoId: todoId, categoryId: CategoryIdModel(categoryId: categoryId))
+            await getTodayList()
+        } catch {
+            print("Error updateCategory: \(error)")
         }
     }
 }

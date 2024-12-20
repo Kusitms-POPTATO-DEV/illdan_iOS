@@ -63,8 +63,8 @@ class BacklogViewModel: ObservableObject {
     func fetchBacklogList() async {
         do {
             let response = try await backlogRepository.getBacklogList(page: 0, size: 100, categoryId: categoryList[selectedCategoryIndex].id)
-            DispatchQueue.main.async {
-                self.backlogList = response.backlogs.map { item in
+            await MainActor.run {
+                backlogList = response.backlogs.map { item in
                     TodoItemModel(
                         todoId: item.todoId,
                         content: item.content,
