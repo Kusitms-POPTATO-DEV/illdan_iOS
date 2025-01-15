@@ -493,9 +493,12 @@ struct CreateBacklogTextField: View {
                             taskInput.removeLast()
                             if !taskInput.isEmpty {
                                 createBacklog(taskInput)
-                                taskInput = "" 
+                                taskInput = ""
+                                isFocused = true
+                            } else {
+                                isFocused = false
                             }
-                            isFocused = true
+                            
                         }
                     }
                     .foregroundColor(.white)

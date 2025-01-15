@@ -40,7 +40,7 @@ class BacklogViewModel: ObservableObject {
         let temporaryId = tempIdCounter
         tempIdCounter -= 1
         
-        let newItem = TodoItemModel(todoId: temporaryId, content: item, isBookmark: false, isRepeat: false, dday: nil, deadline: nil)
+        let newItem = TodoItemModel(todoId: temporaryId, content: item, isBookmark: selectedCategoryIndex == 1, isRepeat: false, dday: nil, deadline: nil)
         await MainActor.run {
             backlogList.insert(newItem, at: 0)
         }
