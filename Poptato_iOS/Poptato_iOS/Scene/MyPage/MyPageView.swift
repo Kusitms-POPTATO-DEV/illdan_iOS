@@ -9,7 +9,7 @@ import SwiftUI
 
 struct MyPageView: View {
     var goToKaKaoLogin: () -> Void
-    @ObservedObject private var viewModel = MyPageViewModel()
+    @StateObject private var viewModel = MyPageViewModel()
     @Binding var isPolicyViewPresented: Bool
     
     var body: some View {
