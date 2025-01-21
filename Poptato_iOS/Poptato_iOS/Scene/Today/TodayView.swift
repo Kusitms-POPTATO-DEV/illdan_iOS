@@ -89,6 +89,7 @@ struct TodayListView: View {
     var onItemSelected: (TodoItemModel) -> Void
     @State private var draggedItem: TodayItemModel?
     @State private var draggedIndex: Int?
+    @State private var hapticFeedback = UIImpactFeedbackGenerator(style: .medium)
     
     var body: some View {
         ScrollView {
@@ -111,6 +112,7 @@ struct TodayListView: View {
                         onItemSelected: onItemSelected
                     )
                     .onDrag {
+                        hapticFeedback.impactOccurred()
                         self.draggedItem = item
                         self.draggedIndex = index
                         let provider = NSItemProvider(object: String(item.todoId) as NSString)
