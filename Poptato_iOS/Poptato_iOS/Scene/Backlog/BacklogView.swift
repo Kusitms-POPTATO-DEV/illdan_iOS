@@ -274,6 +274,7 @@ struct BacklogListView: View {
     @Binding var activeItemId: Int?
     @State private var draggedItem: TodoItemModel?
     @State private var draggedIndex: Int?
+    @State private var hapticFeedback = UIImpactFeedbackGenerator(style: .medium)
     
     var body: some View {
         ScrollView {
@@ -297,6 +298,7 @@ struct BacklogListView: View {
                         activeItemId: $activeItemId
                     )
                     .onDrag {
+                        hapticFeedback.impactOccurred()
                         self.draggedItem = item
                         self.draggedIndex = index
                         let provider = NSItemProvider(object: String(item.todoId) as NSString)
@@ -486,7 +488,7 @@ struct CreateBacklogTextField: View {
 
                 TextField("", text: $taskInput, axis: .vertical)
                     .focused($isFocused)
-                    .onChange(of: taskInput) {
+                    .onChange(of: taskInput) { 
                         guard let newValueLastChar = taskInput.last else { return }
                         
                         if newValueLastChar == "\n" {

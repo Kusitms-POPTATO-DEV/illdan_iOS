@@ -6,6 +6,7 @@
 //
 
 import SwiftUI
+import UIKit
 
 struct TodayView: View {
     @EnvironmentObject var viewModel: TodayViewModel
@@ -13,6 +14,7 @@ struct TodayView: View {
     var goToBacklog: () -> Void
     var onItemSelcted: (TodoItemModel) -> Void
     @State private var isViewActive = false
+    @State private var hapticFeedback = UIImpactFeedbackGenerator(style: .medium)
     
     var body: some View {
         ZStack {
@@ -41,6 +43,10 @@ struct TodayView: View {
                             updateTodoCompletion: { id in
                                 Task {
                                     await viewModel.updateTodoCompletion(todoId: id)
+                                    
+                                    if viewModel.checkAllTodoCompleted() {
+                                        performDoubleHapticFeedback()
+                                    }
                                 }
                             },
                             onDragEnd: {
@@ -67,6 +73,12 @@ struct TodayView: View {
             isViewActive = false
         }
     }
+    
+    private func performDoubleHapticFeedback() {
+        DispatchQueue.main.asyncAfter(deadline: .now() + 0.3) {
+            hapticFeedback.impactOccurred()
+        }
+    }
 }
 
 struct TodayListView: View {
@@ -77,6 +89,7 @@ struct TodayListView: View {
     var onItemSelected: (TodoItemModel) -> Void
     @State private var draggedItem: TodayItemModel?
     @State private var draggedIndex: Int?
+    @State private var hapticFeedback = UIImpactFeedbackGenerator(style: .medium)
     
     var body: some View {
         ScrollView {
@@ -99,6 +112,7 @@ struct TodayListView: View {
                         onItemSelected: onItemSelected
                     )
                     .onDrag {
+                        hapticFeedback.impactOccurred()
                         self.draggedItem = item
                         self.draggedIndex = index
                         let provider = NSItemProvider(object: String(item.todoId) as NSString)
@@ -126,6 +140,7 @@ struct TodayItemView: View {
     var swipeToday: (Int) -> Void
     var updateTodoCompletion: (Int) -> Void
     var onItemSelected: (TodoItemModel) -> Void
+    let hapticFeedback = UIImpactFeedbackGenerator(style: .medium)
     @State private var offset: CGFloat = 0
 
     var body: some View {
@@ -196,6 +211,7 @@ struct TodayItemView: View {
                         .onTapGesture {
                             updateTodoCompletion(item.todoId)
                             if item.todayStatus == "INCOMPLETE" {
+                                hapticFeedback.impactOccurred()
                                 moveItemToCompleted()
                             } else {
                                 moveItemToIncomplete()
