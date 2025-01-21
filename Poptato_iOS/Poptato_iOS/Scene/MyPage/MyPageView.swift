@@ -9,8 +9,10 @@ import SwiftUI
 
 struct MyPageView: View {
     var goToKaKaoLogin: () -> Void
-    @ObservedObject private var viewModel = MyPageViewModel()
+    @StateObject private var viewModel = MyPageViewModel()
     @Binding var isPolicyViewPresented: Bool
+    @State private var isNoticeViewPresented = false
+    @State private var isFaqViewPresented = false
     
     var body: some View {
         NavigationView {
@@ -78,9 +80,15 @@ struct MyPageView: View {
                         Text("공지사항")
                             .font(PoptatoTypo.mdMedium)
                             .foregroundColor(.gray20)
+                            .onTapGesture {
+                                isNoticeViewPresented = true
+                            }
                         Text("문의 & FAQ")
                             .font(PoptatoTypo.mdMedium)
                             .foregroundColor(.gray20)
+                            .onTapGesture {
+                                isFaqViewPresented = true
+                            }
                         Text("개인정보처리 방침")
                             .font(PoptatoTypo.mdMedium)
                             .foregroundColor(.gray20)
@@ -103,6 +111,12 @@ struct MyPageView: View {
                 Task {
                     await viewModel.getUserInfo()
                 }
+            }
+            .fullScreenCover(isPresented: $isNoticeViewPresented) {
+                WebViewScreen(url: URL(string: "https://www.notion.so/164d60b563cc8091a84cf5fa4b2addad")!)
+            }
+            .fullScreenCover(isPresented: $isFaqViewPresented) {
+                WebViewScreen(url: URL(string: "https://www.notion.so/FAQ-164d60b563cc80beb7e5c388954353b5")!)
             }
         }
         
