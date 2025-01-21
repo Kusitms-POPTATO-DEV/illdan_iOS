@@ -92,6 +92,10 @@ final class TodayViewModel: ObservableObject {
         }
     }
     
+    func checkAllTodoCompleted() -> Bool {
+        return todayList.allSatisfy { $0.todayStatus == "COMPLETED" }
+    }
+    
     func dragAndDrop() async {
         do {
             let todoIds = todayList.filter{ $0.todayStatus == "INCOMPLETE" }.map{ $0.todoId }

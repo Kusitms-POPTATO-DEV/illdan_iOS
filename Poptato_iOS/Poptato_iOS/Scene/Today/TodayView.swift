@@ -14,6 +14,7 @@ struct TodayView: View {
     var goToBacklog: () -> Void
     var onItemSelcted: (TodoItemModel) -> Void
     @State private var isViewActive = false
+    @State private var hapticFeedback = UIImpactFeedbackGenerator(style: .medium)
     
     var body: some View {
         ZStack {
@@ -42,6 +43,10 @@ struct TodayView: View {
                             updateTodoCompletion: { id in
                                 Task {
                                     await viewModel.updateTodoCompletion(todoId: id)
+                                    
+                                    if viewModel.checkAllTodoCompleted() {
+                                        performDoubleHapticFeedback()
+                                    }
                                 }
                             },
                             onDragEnd: {
@@ -66,6 +71,12 @@ struct TodayView: View {
         }
         .onDisappear {
             isViewActive = false
+        }
+    }
+    
+    private func performDoubleHapticFeedback() {
+        DispatchQueue.main.asyncAfter(deadline: .now() + 0.3) {
+            hapticFeedback.impactOccurred()
         }
     }
 }
