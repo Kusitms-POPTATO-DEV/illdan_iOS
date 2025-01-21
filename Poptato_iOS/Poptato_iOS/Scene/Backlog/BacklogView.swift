@@ -486,7 +486,7 @@ struct CreateBacklogTextField: View {
 
                 TextField("", text: $taskInput, axis: .vertical)
                     .focused($isFocused)
-                    .onChange(of: taskInput) {
+                    .onChange(of: taskInput) { 
                         guard let newValueLastChar = taskInput.last else { return }
                         
                         if newValueLastChar == "\n" {

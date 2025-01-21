@@ -6,6 +6,7 @@
 //
 
 import SwiftUI
+import UIKit
 
 struct TodayView: View {
     @EnvironmentObject var viewModel: TodayViewModel
@@ -126,6 +127,7 @@ struct TodayItemView: View {
     var swipeToday: (Int) -> Void
     var updateTodoCompletion: (Int) -> Void
     var onItemSelected: (TodoItemModel) -> Void
+    let hapticFeedback = UIImpactFeedbackGenerator(style: .medium)
     @State private var offset: CGFloat = 0
 
     var body: some View {
@@ -196,6 +198,7 @@ struct TodayItemView: View {
                         .onTapGesture {
                             updateTodoCompletion(item.todoId)
                             if item.todayStatus == "INCOMPLETE" {
+                                hapticFeedback.impactOccurred()
                                 moveItemToCompleted()
                             } else {
                                 moveItemToIncomplete()
