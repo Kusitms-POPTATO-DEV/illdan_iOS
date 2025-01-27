@@ -87,3 +87,5 @@ Poptato_iOS/Poptato_iOS/Secrets.swift
 Secrets.swift
 
 Config.swift
+Poptato_iOS.entitlements
+Poptato_iOS/Poptato_iOS/Poptato_iOS.entitlements
