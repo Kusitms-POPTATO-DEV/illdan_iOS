@@ -7,6 +7,7 @@
 
 import Foundation
 import SwiftUI
+import Firebase
 
 final class LoginViewModel: ObservableObject {
     private let repository: AuthRepository
@@ -19,7 +20,11 @@ final class LoginViewModel: ObservableObject {
     
     func kakaoLogin(token: String) async {
         do {
-            let response = try await repository.kakaoLogin(request: KaKaoLoginRequest(socialType: "KAKAO", accessToken: token))
+            guard let fcmToken = try await getFCMToken() else {
+                throw NSError(domain: "FCM", code: -1, userInfo: [NSLocalizedDescriptionKey: "FCM 토큰 발급에 실패했습니다."])
+            }
+            
+            let response = try await repository.kakaoLogin(request: LoginRequest(socialType: "KAKAO", accessToken: token, mobileType: "IOS", clientId: fcmToken))
             await MainActor.run {
                 isLoginSuccess = true
                 print("Login successful: \(response)")
@@ -31,6 +36,18 @@ final class LoginViewModel: ObservableObject {
             await MainActor.run {
                 loginError = error
                 print("Login error: \(error)")
+            }
+        }
+    }
+    
+    private func getFCMToken() async throws -> String? {
+        try await withCheckedThrowingContinuation { continuation in
+            Messaging.messaging().token { token, error in
+                if let error = error {
+                    continuation.resume(throwing: error)
+                } else {
+                    continuation.resume(returning: token)
+                }
             }
         }
     }
