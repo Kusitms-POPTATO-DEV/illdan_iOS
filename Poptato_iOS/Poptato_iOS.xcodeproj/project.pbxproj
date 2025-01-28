@@ -12,6 +12,8 @@
 		E2C6E85D2CC8D09C000D43C0 /* KakaoSDKAuth in Frameworks */ = {isa = PBXBuildFile; productRef = E2C6E85C2CC8D09C000D43C0 /* KakaoSDKAuth */; };
 		E2C6E85F2CC8D09C000D43C0 /* KakaoSDKCommon in Frameworks */ = {isa = PBXBuildFile; productRef = E2C6E85E2CC8D09C000D43C0 /* KakaoSDKCommon */; };
 		E2C6E8612CC8D09C000D43C0 /* KakaoSDKUser in Frameworks */ = {isa = PBXBuildFile; productRef = E2C6E8602CC8D09C000D43C0 /* KakaoSDKUser */; };
+		E2D0C2942D44D25100753168 /* FirebaseAnalytics in Frameworks */ = {isa = PBXBuildFile; productRef = E2D0C2932D44D25100753168 /* FirebaseAnalytics */; };
+		E2D0C2962D44D25100753168 /* FirebaseMessaging in Frameworks */ = {isa = PBXBuildFile; productRef = E2D0C2952D44D25100753168 /* FirebaseMessaging */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -62,6 +64,8 @@
 			files = (
 				E2C6E85F2CC8D09C000D43C0 /* KakaoSDKCommon in Frameworks */,
 				E2C6E85D2CC8D09C000D43C0 /* KakaoSDKAuth in Frameworks */,
+				E2D0C2962D44D25100753168 /* FirebaseMessaging in Frameworks */,
+				E2D0C2942D44D25100753168 /* FirebaseAnalytics in Frameworks */,
 				E24D98152CF710F700877BD7 /* SVGKitSwift in Frameworks */,
 				E24D98132CF710F700877BD7 /* SVGKit in Frameworks */,
 				E2C6E8612CC8D09C000D43C0 /* KakaoSDKUser in Frameworks */,
@@ -130,6 +134,8 @@
 				E2C6E8602CC8D09C000D43C0 /* KakaoSDKUser */,
 				E24D98122CF710F700877BD7 /* SVGKit */,
 				E24D98142CF710F700877BD7 /* SVGKitSwift */,
+				E2D0C2932D44D25100753168 /* FirebaseAnalytics */,
+				E2D0C2952D44D25100753168 /* FirebaseMessaging */,
 			);
 			productName = Poptato_iOS;
 			productReference = E220715B2CC63C1C00AC6694 /* Poptato_iOS.app */;
@@ -216,6 +222,7 @@
 			packageReferences = (
 				E2C6E85B2CC8D09C000D43C0 /* XCRemoteSwiftPackageReference "kakao-ios-sdk" */,
 				E24D98112CF7105E00877BD7 /* XCRemoteSwiftPackageReference "SVGKit" */,
+				E2D0C2922D44D25100753168 /* XCRemoteSwiftPackageReference "firebase-ios-sdk" */,
 			);
 			preferredProjectObjectVersion = 77;
 			productRefGroup = E220715C2CC63C1C00AC6694 /* Products */;
@@ -415,6 +422,7 @@
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
+				CODE_SIGN_ENTITLEMENTS = Poptato_iOS/Poptato_iOS.entitlements;
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
 				DEVELOPMENT_ASSET_PATHS = "\"Poptato_iOS/Preview Content\"";
@@ -445,6 +453,7 @@
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
+				CODE_SIGN_ENTITLEMENTS = Poptato_iOS/Poptato_iOS.entitlements;
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
 				DEVELOPMENT_ASSET_PATHS = "\"Poptato_iOS/Preview Content\"";
@@ -596,6 +605,14 @@
 				kind = branch;
 			};
 		};
+		E2D0C2922D44D25100753168 /* XCRemoteSwiftPackageReference "firebase-ios-sdk" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/firebase/firebase-ios-sdk.git";
+			requirement = {
+				kind = upToNextMajorVersion;
+				minimumVersion = 11.7.0;
+			};
+		};
 /* End XCRemoteSwiftPackageReference section */
 
 /* Begin XCSwiftPackageProductDependency section */
@@ -623,6 +640,16 @@
 			isa = XCSwiftPackageProductDependency;
 			package = E2C6E85B2CC8D09C000D43C0 /* XCRemoteSwiftPackageReference "kakao-ios-sdk" */;
 			productName = KakaoSDKUser;
+		};
+		E2D0C2932D44D25100753168 /* FirebaseAnalytics */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = E2D0C2922D44D25100753168 /* XCRemoteSwiftPackageReference "firebase-ios-sdk" */;
+			productName = FirebaseAnalytics;
+		};
+		E2D0C2952D44D25100753168 /* FirebaseMessaging */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = E2D0C2922D44D25100753168 /* XCRemoteSwiftPackageReference "firebase-ios-sdk" */;
+			productName = FirebaseMessaging;
 		};
 /* End XCSwiftPackageProductDependency section */
 	};
