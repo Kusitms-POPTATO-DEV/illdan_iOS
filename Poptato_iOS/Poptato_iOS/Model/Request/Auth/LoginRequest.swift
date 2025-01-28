@@ -5,9 +5,9 @@
 //  Created by 현수 노트북 on 10/26/24.
 //
 
-struct KaKaoLoginRequest: Codable {
+struct LoginRequest: Codable {
     let socialType: String
     let accessToken: String
-    let mobileType: String = "IOS"
-    let clientId: String = "12345"
+    let mobileType: String
+    let clientId: String
 }
