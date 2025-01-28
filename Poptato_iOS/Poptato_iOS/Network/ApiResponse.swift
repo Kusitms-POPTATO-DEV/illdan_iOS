@@ -6,8 +6,8 @@
 //
 
 struct ApiResponse<T: Decodable>: Decodable {
-    let code: Int
-    let status: Int
+    let isSuccess: Bool
+    let code: String
     let message: String
     let result: T
 }
