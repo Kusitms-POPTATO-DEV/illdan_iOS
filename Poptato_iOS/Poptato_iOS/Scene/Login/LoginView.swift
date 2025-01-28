@@ -10,8 +10,8 @@ import KakaoSDKCommon
 import KakaoSDKAuth
 import KakaoSDKUser
 
-struct KaKaoLoginView: View {
-    @StateObject private var viewModel = KaKaoLoginViewModel()
+struct LoginView: View {
+    @StateObject private var viewModel = LoginViewModel()
     var onSuccessLogin: () -> Void
     
     var body: some View {
@@ -40,8 +40,26 @@ struct KaKaoLoginView: View {
                 .frame(width: 200, height: 137)
                 .offset(y: 80)
             
-            VStack {
+            VStack(spacing: 0) {
                 Spacer()
+                
+                Button(action: {
+                    
+                }) {
+                    HStack {
+                        Image("ic_apple")
+                        Spacer().frame(width: 8)
+                        Text("Apple 로그인")
+                            .font(.custom("PoptatoTypo-Medium", size: 16))
+                            .foregroundColor(.gray00)
+                    }
+                    .frame(maxWidth: .infinity, maxHeight: 56)
+                    .background(Color.gray100)
+                    .cornerRadius(8)
+                }
+                .padding(.horizontal, 16)
+                
+                Spacer().frame(height: 12)
 
                 Button(action: {
                     UserApi.shared.loginWithKakaoAccount {(oauthToken, error) in
@@ -77,7 +95,7 @@ struct KaKaoLoginView: View {
 }
 
 #Preview {
-    KaKaoLoginView(
+    LoginView(
         onSuccessLogin: {}
     )
 }
