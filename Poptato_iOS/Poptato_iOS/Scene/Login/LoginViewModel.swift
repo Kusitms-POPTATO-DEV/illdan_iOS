@@ -8,7 +8,7 @@
 import Foundation
 import SwiftUI
 
-final class KaKaoLoginViewModel: ObservableObject {
+final class LoginViewModel: ObservableObject {
     private let repository: AuthRepository
     @Published var isLoginSuccess: Bool = false
     @Published var loginError: Error?

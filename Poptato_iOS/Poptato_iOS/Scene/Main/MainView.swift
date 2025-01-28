@@ -133,7 +133,7 @@ struct MainView: View {
                     )
                 }
             } else {
-                KaKaoLoginView(
+                LoginView(
                     onSuccessLogin: { isLogined = true }
                 )
             }
