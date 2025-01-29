@@ -9,6 +9,7 @@ import SwiftUI
 import KakaoSDKCommon
 import KakaoSDKAuth
 import KakaoSDKUser
+import AuthenticationServices
 
 struct LoginView: View {
     @StateObject private var viewModel = LoginViewModel()
@@ -43,20 +44,31 @@ struct LoginView: View {
             VStack(spacing: 0) {
                 Spacer()
                 
-                Button(action: {
-                    
-                }) {
-                    HStack {
-                        Image("ic_apple")
-                        Spacer().frame(width: 8)
-                        Text("Apple 로그인")
-                            .font(.custom("PoptatoTypo-Medium", size: 16))
-                            .foregroundColor(.gray00)
+                SignInWithAppleButton(
+                    .signIn,
+                    onRequest: { request in
+                        request.requestedScopes = [.fullName, .email]
+                    },
+                    onCompletion: { result in
+                        switch result {
+                        case .success(let authResults):
+                            Task {
+                                do {
+                                    // 애플 로그인 성공 처리
+                                    try await viewModel.handleAppleLogin(result: authResults)
+                                    onSuccessLogin()
+                                } catch {
+                                    print("Apple Login Error: \(error)")
+                                }
+                            }
+                        case .failure(let error):
+                            print("Apple Login Failed: \(error)")
+                        }
                     }
-                    .frame(maxWidth: .infinity, maxHeight: 56)
-                    .background(Color.gray100)
-                    .cornerRadius(8)
-                }
+                )
+                .signInWithAppleButtonStyle(.black)
+                .frame(maxWidth: .infinity, maxHeight: 56)
+                .cornerRadius(8)
                 .padding(.horizontal, 16)
                 
                 Spacer().frame(height: 12)
@@ -68,7 +80,7 @@ struct LoginView: View {
                         }
                         if let oauthToken = oauthToken{
                             Task {
-                                await viewModel.kakaoLogin(token: oauthToken.accessToken)
+                                await viewModel.login(token: oauthToken.accessToken)
                                 onSuccessLogin()
                             }
                             print("kakao success: \(oauthToken)")
