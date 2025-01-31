@@ -19,7 +19,7 @@ final class LoginViewModel: ObservableObject {
         self.repository = repository
     }
     
-    func login(token: String) async {
+    func kakaoLogin(token: String) async {
         do {
             guard let fcmToken = try await getFCMToken() else {
                 throw NSError(domain: "FCM", code: -1, userInfo: [NSLocalizedDescriptionKey: "FCM 토큰 발급에 실패했습니다."])

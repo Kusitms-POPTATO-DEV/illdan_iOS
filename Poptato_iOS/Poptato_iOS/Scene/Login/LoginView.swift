@@ -54,7 +54,17 @@ struct LoginView: View {
                         case .success(let authResults):
                             Task {
                                 do {
-                                    // 애플 로그인 성공 처리
+                                    guard let credential = authResults.credential as? ASAuthorizationAppleIDCredential else { return }
+                                    
+                                    let email = credential.email
+                                    let fullName = credential.fullName?.givenName
+                                    
+                                    if email == nil || fullName == nil {
+                                        // TODO: 토스트 메시지 구현 이후에 정보 제공에 동의해야 함을 알리는 토스트 메시지 렌더링
+                                        print("이메일, 이름 제공에 동의해야 함.")
+                                        return
+                                    }
+                                    
                                     try await viewModel.handleAppleLogin(result: authResults)
                                     onSuccessLogin()
                                 } catch {
@@ -80,10 +90,9 @@ struct LoginView: View {
                         }
                         if let oauthToken = oauthToken{
                             Task {
-                                await viewModel.login(token: oauthToken.accessToken)
+                                await viewModel.kakaoLogin(token: oauthToken.accessToken)
                                 onSuccessLogin()
                             }
-                            print("kakao success: \(oauthToken)")
                         }
                     }
                 }) {
