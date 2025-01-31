@@ -9,6 +9,7 @@ import SwiftUI
 import KakaoSDKCommon
 import KakaoSDKAuth
 import KakaoSDKUser
+import AuthenticationServices
 
 struct LoginView: View {
     @StateObject private var viewModel = LoginViewModel()
@@ -43,20 +44,41 @@ struct LoginView: View {
             VStack(spacing: 0) {
                 Spacer()
                 
-                Button(action: {
-                    
-                }) {
-                    HStack {
-                        Image("ic_apple")
-                        Spacer().frame(width: 8)
-                        Text("Apple 로그인")
-                            .font(.custom("PoptatoTypo-Medium", size: 16))
-                            .foregroundColor(.gray00)
+                SignInWithAppleButton(
+                    .signIn,
+                    onRequest: { request in
+                        request.requestedScopes = [.fullName, .email]
+                    },
+                    onCompletion: { result in
+                        switch result {
+                        case .success(let authResults):
+                            Task {
+                                do {
+                                    guard let credential = authResults.credential as? ASAuthorizationAppleIDCredential else { return }
+                                    
+                                    let email = credential.email
+                                    let fullName = credential.fullName?.givenName
+                                    
+                                    if email == nil || fullName == nil {
+                                        // TODO: 토스트 메시지 구현 이후에 정보 제공에 동의해야 함을 알리는 토스트 메시지 렌더링
+                                        print("이메일, 이름 제공에 동의해야 함.")
+                                        return
+                                    }
+                                    
+                                    try await viewModel.handleAppleLogin(result: authResults)
+                                    onSuccessLogin()
+                                } catch {
+                                    print("Apple Login Error: \(error)")
+                                }
+                            }
+                        case .failure(let error):
+                            print("Apple Login Failed: \(error)")
+                        }
                     }
-                    .frame(maxWidth: .infinity, maxHeight: 56)
-                    .background(Color.gray100)
-                    .cornerRadius(8)
-                }
+                )
+                .signInWithAppleButtonStyle(.black)
+                .frame(maxWidth: .infinity, maxHeight: 56)
+                .cornerRadius(8)
                 .padding(.horizontal, 16)
                 
                 Spacer().frame(height: 12)
@@ -71,7 +93,6 @@ struct LoginView: View {
                                 await viewModel.kakaoLogin(token: oauthToken.accessToken)
                                 onSuccessLogin()
                             }
-                            print("kakao success: \(oauthToken)")
                         }
                     }
                 }) {

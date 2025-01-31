@@ -31,6 +31,17 @@ final class NetworkManager {
     }
     
     private func performRequest<T: Decodable>(type: T.Type, api: Router) async throws -> T {
+        let request = try api.asURLRequest()
+        
+        print("""
+            [API 요청] \(api)
+            [URL] \(request.url?.absoluteString ?? "URL 없음")
+            [HTTP Method] \(request.httpMethod ?? "METHOD 없음")
+            [헤더] \(request.allHTTPHeaderFields ?? [:])
+            [요청 Body]
+            \(prettyPrintedJSON(data: request.httpBody))
+        """)
+        
         let dataTask = try AF.request(api.asURLRequest()).serializingDecodable(ApiResponse<T>.self)
         let responseData = await dataTask.response.data
         print(String(data: responseData ?? Data(), encoding: .utf8) ?? "데이터 없음")
@@ -47,10 +58,16 @@ final class NetworkManager {
         
         switch await dataTask.result {
         case .success(let apiResponse):
-            print("result", apiResponse.result)
+//            print("result", apiResponse.result)
+            if let data = responseData {
+                print(prettyPrintedJSON(data: data))
+            }
             return apiResponse.result
         case .failure(let error):
-            print("error", error)
+            print("""
+            [에러 타입] \(error.localizedDescription)
+            [상세 에러] \(error)
+            """)
             throw error
         }
     }
@@ -92,7 +109,10 @@ final class NetworkManager {
         case .success:
             print("Request succeeded")
         case .failure(let error):
-            print("error", error)
+            print("""
+            [에러 타입] \(error.localizedDescription)
+            [상세 에러] \(error)
+            """)
             throw error
         }
     }
@@ -116,6 +136,16 @@ final class NetworkManager {
             print("토큰 갱신 실패: \(error)")
             return false
         }
+    }
+    
+    private func prettyPrintedJSON(data: Data?) -> String {
+        guard let data = data,
+              let jsonObject = try? JSONSerialization.jsonObject(with: data, options: []),
+              let prettyData = try? JSONSerialization.data(withJSONObject: jsonObject, options: [.prettyPrinted]),
+              let jsonString = String(data: prettyData, encoding: .utf8) else {
+            return "Body 없음"
+        }
+        return jsonString
     }
 }
 
