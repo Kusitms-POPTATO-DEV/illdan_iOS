@@ -34,6 +34,7 @@ class YesterdayTodoViewModel: ObservableObject {
             }
             
             await MainActor.run {
+                AppStorageManager.hasSeenYesterday = true
                 completionList.removeAll()
             }
         } catch {
