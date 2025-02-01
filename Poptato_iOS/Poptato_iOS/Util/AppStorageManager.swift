@@ -18,7 +18,7 @@ struct AppStorageManager {
         }
         set {
             UserDefaults.standard.set(newValue, forKey: hasSeenYesterdayKey)
-            UserDefaults.standard.set(TimeFormatter.currentDateString(), forKey: lastUpdatedDateKey) 
+            UserDefaults.standard.set(TimeFormatter.currentDateString(), forKey: lastUpdatedDateKey)
         }
     }
     

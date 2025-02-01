@@ -366,7 +366,7 @@ struct BacklogItemView: View {
                         .cornerRadius(4)
                     }
                     
-                    if let dDay = item.dday {
+                    if let dDay = item.dDay {
                         ZStack {
                             if dDay == 0 {
                                 Text("D-day")
@@ -390,7 +390,7 @@ struct BacklogItemView: View {
                         .background(Color.gray90)
                         .cornerRadius(4)
                     }
-                    if (item.isBookmark || item.dday != nil || item.isRepeat) { Spacer() }
+                    if (item.isBookmark || item.dDay != nil || item.isRepeat) { Spacer() }
                 }
                 
                 if activeItemId == item.todoId {
@@ -423,7 +423,7 @@ struct BacklogItemView: View {
             
             Spacer()
             
-            ZStack(alignment: (item.isBookmark || item.dday != nil) ? .top : .center) {
+            ZStack(alignment: (item.isBookmark || item.dDay != nil) ? .top : .center) {
                 Image("ic_dot")
                     .resizable()
                     .frame(width: 20, height: 20)

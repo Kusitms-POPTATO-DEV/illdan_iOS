@@ -13,7 +13,7 @@ struct TodoItemModel: Codable {
     var content: String
     var isBookmark: Bool
     var isRepeat: Bool
-    var dday: Int?
+    var dDay: Int?
     var deadline: String?
     var categoryId: Int?
     var categoryName: String?
