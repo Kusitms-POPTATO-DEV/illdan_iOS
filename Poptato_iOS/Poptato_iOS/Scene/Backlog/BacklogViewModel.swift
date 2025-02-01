@@ -32,7 +32,9 @@ class BacklogViewModel: ObservableObject {
         self.todoRepository = todoRepository
         self.categoryRepository = categoryRepository
         Task {
-            await getYesterdayList(page: 0, size: 1)
+            if !AppStorageManager.hasSeenYesterday {
+                await getYesterdayList(page: 0, size: 1)
+            } else { isExistYesterdayTodo = false }
         }
     }
     
