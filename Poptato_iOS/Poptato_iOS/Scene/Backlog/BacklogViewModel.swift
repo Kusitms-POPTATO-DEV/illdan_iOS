@@ -13,7 +13,7 @@ class BacklogViewModel: ObservableObject {
     private let backlogRepository: BacklogRepository
     private let todoRepository: TodoRepository
     private let categoryRepository: CategoryRepository
-    var isExistYesterdayTodo: Bool = false
+    @Published var isExistYesterdayTodo: Bool = false
     @Published var backlogList: Array<TodoItemModel> = []
     @Published var activeItemId: Int? = nil
     @Published var selectedTodoItem: TodoItemModel? = nil
