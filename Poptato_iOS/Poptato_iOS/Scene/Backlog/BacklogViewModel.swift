@@ -13,7 +13,7 @@ class BacklogViewModel: ObservableObject {
     private let backlogRepository: BacklogRepository
     private let todoRepository: TodoRepository
     private let categoryRepository: CategoryRepository
-    var isExistYesterdayTodo: Bool = false
+    @Published var isExistYesterdayTodo: Bool = false
     @Published var backlogList: Array<TodoItemModel> = []
     @Published var activeItemId: Int? = nil
     @Published var selectedTodoItem: TodoItemModel? = nil
@@ -42,7 +42,7 @@ class BacklogViewModel: ObservableObject {
         let temporaryId = tempIdCounter
         tempIdCounter -= 1
         
-        let newItem = TodoItemModel(todoId: temporaryId, content: item, isBookmark: selectedCategoryIndex == 1, isRepeat: false, dday: nil, deadline: nil)
+        let newItem = TodoItemModel(todoId: temporaryId, content: item, isBookmark: selectedCategoryIndex == 1, isRepeat: false, dDay: nil, deadline: nil)
         await MainActor.run {
             backlogList.insert(newItem, at: 0)
         }
@@ -72,7 +72,7 @@ class BacklogViewModel: ObservableObject {
                         content: item.content,
                         isBookmark: item.isBookmark,
                         isRepeat: item.isRepeat,
-                        dday: item.dday,
+                        dDay: item.dDay,
                         deadline: item.deadline
                     )
                 }
@@ -157,12 +157,12 @@ class BacklogViewModel: ObservableObject {
 
                         let components = calendar.dateComponents([.day], from: currentDate, to: deadlineDate)
                         if let daysDifference = components.day {
-                            backlogList[index].dday = daysDifference
-                            selectedTodoItem?.dday = daysDifference
+                            backlogList[index].dDay = daysDifference
+                            selectedTodoItem?.dDay = daysDifference
                         }
                     } else {
-                        backlogList[index].dday = nil
-                        selectedTodoItem?.dday = nil
+                        backlogList[index].dDay = nil
+                        selectedTodoItem?.dDay = nil
                     }
                 }
             }
@@ -184,7 +184,7 @@ class BacklogViewModel: ObservableObject {
                     content: item.content,
                     isBookmark: item.isBookmark,
                     isRepeat: item.isRepeat,
-                    dday: item.dday,
+                    dDay: item.dDay,
                     deadline: item.deadline,
                     categoryId: categoryId,
                     categoryName: response.categoryName,

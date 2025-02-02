@@ -239,7 +239,7 @@ struct TodayItemView: View {
                                 content: item.content,
                                 isBookmark: item.isBookmark,
                                 isRepeat: item.isRepeat,
-                                dday: item.dday,
+                                dDay: item.dday,
                                 deadline: item.deadline
                             )
                         )

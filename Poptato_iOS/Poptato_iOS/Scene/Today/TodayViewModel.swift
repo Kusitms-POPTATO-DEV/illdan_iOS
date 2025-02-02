@@ -159,11 +159,11 @@ final class TodayViewModel: ObservableObject {
                         let components = calendar.dateComponents([.day], from: currentDate, to: deadlineDate)
                         if let daysDifference = components.day {
                             todayList[index].dday = daysDifference
-                            selectedTodoItem?.dday = daysDifference
+                            selectedTodoItem?.dDay = daysDifference
                         }
                     } else {
                         todayList[index].dday = nil
-                        selectedTodoItem?.dday = nil
+                        selectedTodoItem?.dDay = nil
                     }
                 }
             }
@@ -229,7 +229,7 @@ final class TodayViewModel: ObservableObject {
                     content: item.content,
                     isBookmark: item.isBookmark,
                     isRepeat: item.isRepeat,
-                    dday: item.dday,
+                    dDay: item.dDay,
                     deadline: item.deadline,
                     categoryId: categoryId,
                     categoryName: response.categoryName,
