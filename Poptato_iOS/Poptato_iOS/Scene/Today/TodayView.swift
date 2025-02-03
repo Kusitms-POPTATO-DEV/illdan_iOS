@@ -74,6 +74,7 @@ struct TodayView: View {
             isViewActive = false
         }
         .toast(isPresented: $viewModel.showToastMessage, message: "와우! 수고한 나 자신에게 박수!👏")
+        .toast(isPresented: $viewModel.showDeleteTodoToastMessage, message: "할 일이 삭제되었어요.")
     }
     
     private func performDoubleHapticFeedback() {
