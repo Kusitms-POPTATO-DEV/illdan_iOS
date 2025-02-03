@@ -15,6 +15,7 @@ final class TodayViewModel: ObservableObject {
     @Published var categoryList: Array<CategoryModel> = []
     @Published var selectedCategoryIndex: Int = 0
     @Published var activeItemId: Int? = nil
+    @Published var showToastMessage: Bool = false
     private var snapshotList: [TodayItemModel] = []
     private let todayRepository: TodayRepository
     private let todoRepository: TodoRepository
