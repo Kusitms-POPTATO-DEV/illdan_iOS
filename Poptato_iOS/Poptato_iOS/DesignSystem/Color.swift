@@ -102,6 +102,11 @@ extension UIColor {
     static let bgSnackBar = UIColor(hex: 0xFF121214)
 }
 
+// Toast
+extension UIColor {
+    static let toast = UIColor(hex: 0xFF000000)
+}
+
 // SwiftUI Color 대응
 extension Color {
     static let gray00 = Color(uiColor: .gray00)
@@ -165,4 +170,6 @@ extension Color {
         startPoint: .top,
         endPoint: .bottom
     )
+    
+    static let toast = Color(uiColor: .toast)
 }
