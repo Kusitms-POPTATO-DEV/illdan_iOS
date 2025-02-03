@@ -205,6 +205,7 @@ struct BacklogView: View {
                 }
             }
         }
+        .toast(isPresented: $viewModel.showDeleteToaseMessage, message: "할 일이 삭제되었어요.")
     }
 }
 
