@@ -48,10 +48,10 @@ final class NetworkManager {
 
         if let responseData = responseData,
            let jsonObject = try? JSONSerialization.jsonObject(with: responseData) as? [String: Any],
-           let errorCode = jsonObject["code"] as? Int {
-            if errorCode == 6001 {
+           let errorCode = jsonObject["code"] as? String {
+            if errorCode == "AUTH-002" {
                 throw RequestError.unauthorized
-            } else if errorCode == 6002 {
+            } else if errorCode == "AUTH-008" {
                 throw RequestError.invalidToken
             }
         }
