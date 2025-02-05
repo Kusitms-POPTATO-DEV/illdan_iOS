@@ -91,6 +91,17 @@ final class NetworkManager {
     }
 
     private func performRequest(api: Router) async throws {
+        let request = try api.asURLRequest()
+        
+        print("""
+            [API 요청] \(api)
+            [URL] \(request.url?.absoluteString ?? "URL 없음")
+            [HTTP Method] \(request.httpMethod ?? "METHOD 없음")
+            [헤더] \(request.allHTTPHeaderFields ?? [:])
+            [요청 Body]
+            \(prettyPrintedJSON(data: request.httpBody))
+        """)
+        
         let req = try AF.request(api.asURLRequest()).serializingData()
         let data = await req.response.data
         print(String(data: data ?? Data(), encoding: .utf8) ?? "데이터 없음")
