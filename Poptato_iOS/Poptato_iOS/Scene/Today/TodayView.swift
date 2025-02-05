@@ -255,7 +255,7 @@ struct TodayItemView: View {
         .background(RoundedRectangle(cornerRadius: 8))
         .foregroundColor(.gray95)
         .offset(x: offset)
-        .simultaneousGesture(
+        .highPriorityGesture(
             DragGesture(minimumDistance: 20)
                 .onChanged { gesture in
                     if item.todayStatus != "COMPLETED" && gesture.translation.width > 0 {
