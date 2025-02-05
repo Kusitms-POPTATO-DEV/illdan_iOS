@@ -9,7 +9,8 @@ import SwiftUI
 
 struct MainView: View {
     @Binding var isLogined: Bool
-    @State private var selectedTab: Int = 1
+    @State private var selectedTab: Int? = nil
+    @State private var isLoading: Bool = true
     @State private var isBottomSheetVisible = false
     @State private var isDateBottomSheetVisible = false
     @State private var isCategoryBottomSheetVisible = false
@@ -39,205 +40,219 @@ struct MainView: View {
 
     var body: some View {
         ZStack {
-            if isLogined {
-                TabView(selection: $selectedTab) {
-                    TodayView(
-                        goToBacklog: { selectedTab = 1 },
-                        onItemSelcted: { item in
-                            Task {
-                                await todayViewModel.getTodoDetail(item: item)
-                                
-                                withTransaction(Transaction(animation: .easeInOut)) {
-                                    isBottomSheetVisible = true
+            if isLoading {
+                Color.gray100.edgesIgnoringSafeArea(.all)  
+            } else {
+                if isLogined {
+                     if let selectedTab = selectedTab {
+                         TabView(selection: Binding(
+                             get: { selectedTab },
+                             set: { newValue in self.selectedTab = newValue }
+                         )) {
+                             TodayView(
+                                 goToBacklog: { self.selectedTab = 1 },
+                                 onItemSelcted: { item in
+                                     Task {
+                                         await todayViewModel.getTodoDetail(item: item)
+                                         withTransaction(Transaction(animation: .easeInOut)) {
+                                             isBottomSheetVisible = true
+                                         }
+                                     }
+                                 }
+                             )
+                             .tabItem {
+                                 Label("오늘", image: selectedTab == 0 ? "ic_today_selected" : "ic_today_unselected")
+                                     .font(PoptatoTypo.xsMedium)
+                             }
+                             .environmentObject(todayViewModel)
+                             .tag(0)
+                             
+                             BacklogView(
+                                 onItemSelcted: { item in
+                                     Task {
+                                         await backlogViewModel.getTodoDetail(item: item)
+                                         withTransaction(Transaction(animation: .easeInOut)) {
+                                             isBottomSheetVisible = true
+                                         }
+                                     }
+                                 },
+                                 isYesterdayTodoViewPresented: $isYesterdayViewPresented,
+                                 isCreateCategoryViewPresented: $isCreateCategoryViewPresented
+                             )
+                             .tabItem {
+                                 Label("할 일", image: selectedTab == 1 ? "ic_backlog_selected" : "ic_backlog_unselected")
+                                     .font(PoptatoTypo.xsMedium)
+                             }
+                             .environmentObject(backlogViewModel)
+                             .tag(1)
+                             
+                             HistoryView()
+                                 .tabItem {
+                                     Label("기록", image: selectedTab == 2 ? "ic_clock_selected" : "ic_clock_unselected")
+                                 }
+                                 .tag(2)
+                             
+                             MyPageView(
+                                 goToKaKaoLogin: { isLogined = false },
+                                 isPolicyViewPresented: $isPolicyViewPresented
+                             )
+                             .tabItem {
+                                 Label("마이", image: "ic_mypage")
+                                     .font(PoptatoTypo.xsMedium)
+                             }
+                             .tag(3)
+                         }
+                     }
+                    
+                    if isPolicyViewPresented {
+                        PolicyView(isPolicyViewPresented: $isPolicyViewPresented)
+                    }
+                    
+                    if isYesterdayViewPresented {
+                        YesterdayTodoView(
+                            isYesterdayTodoViewPresented: $isYesterdayViewPresented,
+                            isMotivationViewPresented: $isMotivationViewPresented
+                        )
+                    }
+                    
+                    if isMotivationViewPresented {
+                        MotivationView()
+                            .onAppear {
+                                DispatchQueue.main.asyncAfter(deadline: .now() + 2) {
+                                    isMotivationViewPresented = false
                                 }
                             }
-                        }
-                    )
-                    .tabItem {
-                        Label("오늘", image: selectedTab == 0 ? "ic_today_selected" : "ic_today_unselected")
-                            .font(PoptatoTypo.xsMedium)
                     }
-                    .environmentObject(todayViewModel)
-                    .tag(0)
                     
-                    BacklogView(
-                        onItemSelcted: { item in
+                    if isCreateCategoryViewPresented {
+                        CreateCategoryView(
+                            isPresented: $isCreateCategoryViewPresented,
+                            initialCategoryId: backlogViewModel.categoryList[backlogViewModel.selectedCategoryIndex].id,
+                            initialCategoryName: backlogViewModel.categoryList[backlogViewModel.selectedCategoryIndex].name,
+                            initialSelectedEmoji: EmojiModel(
+                                emojiId: backlogViewModel.categoryList[backlogViewModel.selectedCategoryIndex].emojiId,
+                                imageUrl: backlogViewModel.categoryList[backlogViewModel.selectedCategoryIndex].imageUrl
+                            ),
+                            isCategoryEditMode: backlogViewModel.isCategoryEditMode
+                        )
+                    }
+                } else {
+                    LoginView(
+                        onSuccessLogin: { isLogined = true }
+                    )
+                }
+                
+                if isBottomSheetVisible {
+                    Color.black.opacity(0.6)
+                        .edgesIgnoringSafeArea(.all)
+                        .transition(.opacity)
+                        .animation(nil, value: isBottomSheetVisible)
+                        .onTapGesture {
+                            withAnimation {
+                                isBottomSheetVisible = false
+                                backlogViewModel.updateSelectedItem(item: nil)
+                                todayViewModel.selectedTodoItem = nil
+                            }
+                            isDateBottomSheetVisible = false
+                            isCategoryBottomSheetVisible = false
+                        }
+                }
+                
+                if isBottomSheetVisible, let todoItem = backlogViewModel.selectedTodoItem {
+                    BottomSheetView(
+                        isVisible: $isBottomSheetVisible,
+                        todoItem: $backlogViewModel.selectedTodoItem,
+                        showDateBottomSheet: $isDateBottomSheetVisible,
+                        showCategoryBottomSheet: $isCategoryBottomSheetVisible,
+                        deleteTodo: {
                             Task {
-                                await backlogViewModel.getTodoDetail(item: item)
-                                
-                                withTransaction(Transaction(animation: .easeInOut)) {
-                                    isBottomSheetVisible = true
-                                }
+                                await backlogViewModel.deleteBacklog(todoId: todoItem.todoId)
                             }
                         },
-                        isYesterdayTodoViewPresented: $isYesterdayViewPresented,
-                        isCreateCategoryViewPresented: $isCreateCategoryViewPresented
-                    )
-                    .tabItem {
-                        Label("할 일", image: selectedTab == 1 ? "ic_backlog_selected" : "ic_backlog_unselected")
-                            .font(PoptatoTypo.xsMedium)
-                    }
-                    .environmentObject(backlogViewModel)
-                    .tag(1)
-                    
-                    HistoryView(
-                        
-                    )
-                    .tabItem {
-                        Label("기록", image: selectedTab == 2 ? "ic_clock_selected" : "ic_clock_unselected")
-                    }
-                    .tag(2)
-                    
-                    
-                    MyPageView(
-                        goToKaKaoLogin: { isLogined = false },
-                        isPolicyViewPresented: $isPolicyViewPresented
-                    )
-                    .tabItem {
-                        Label("마이", image: "ic_mypage")
-                            .font(PoptatoTypo.xsMedium)
-                    }
-                    .tag(3)
-                }
-                
-                if isPolicyViewPresented {
-                    PolicyView(isPolicyViewPresented: $isPolicyViewPresented)
-                }
-                
-                if isYesterdayViewPresented {
-                    YesterdayTodoView(
-                        isYesterdayTodoViewPresented: $isYesterdayViewPresented,
-                        isMotivationViewPresented: $isMotivationViewPresented
-                    )
-                }
-                
-                if isMotivationViewPresented {
-                    MotivationView()
-                        .onAppear {
-                            DispatchQueue.main.asyncAfter(deadline: .now() + 2) {
-                                isMotivationViewPresented = false
+                        editTodo: {
+                            backlogViewModel.activeItemId = todoItem.todoId
+                        },
+                        updateBookmark: {
+                            Task {
+                                await backlogViewModel.updateBookmark(todoId: todoItem.todoId)
                             }
-                        }
+                        },
+                        updateDeadline: { deadline in
+                            Task {
+                                await backlogViewModel.updateDeadline(
+                                    todoId: todoItem.todoId,
+                                    deadline: deadline
+                                )
+                            }
+                        },
+                        updateTodoRepeat: {
+                            Task {
+                                await backlogViewModel.updateTodoRepeat(todoId: todoItem.todoId)
+                            }
+                        },
+                        updateCategory: { id in
+                            Task {
+                                await backlogViewModel.updateCategory(categoryId: id, todoId: backlogViewModel.selectedTodoItem!.todoId)
+                            }
+                        },
+                        categoryList: backlogViewModel.categoryList
+                    )
+                    .transition(.move(edge: .bottom))
+                    .zIndex(1)
                 }
                 
-                if isCreateCategoryViewPresented {
-                    CreateCategoryView(
-                        isPresented: $isCreateCategoryViewPresented,
-                        initialCategoryId: backlogViewModel.categoryList[backlogViewModel.selectedCategoryIndex].id,
-                        initialCategoryName: backlogViewModel.categoryList[backlogViewModel.selectedCategoryIndex].name,
-                        initialSelectedEmoji: EmojiModel(
-                            emojiId: backlogViewModel.categoryList[backlogViewModel.selectedCategoryIndex].emojiId,
-                            imageUrl: backlogViewModel.categoryList[backlogViewModel.selectedCategoryIndex].imageUrl
-                        ),
-                        isCategoryEditMode: backlogViewModel.isCategoryEditMode
+                if isBottomSheetVisible, let todoItem = todayViewModel.selectedTodoItem {
+                    BottomSheetView(
+                        isVisible: $isBottomSheetVisible,
+                        todoItem: $todayViewModel.selectedTodoItem,
+                        showDateBottomSheet: $isDateBottomSheetVisible,
+                        showCategoryBottomSheet: $isCategoryBottomSheetVisible,
+                        deleteTodo: {
+                            Task {
+                                await todayViewModel.deleteTodo(todoId: todoItem.todoId)
+                            }
+                        },
+                        editTodo: {
+                            todayViewModel.activeItemId = todoItem.todoId
+                        },
+                        updateBookmark: {
+                            Task {
+                                await todayViewModel.updateBookmark(todoId: todoItem.todoId)
+                            }
+                        },
+                        updateDeadline: { deadline in
+                            Task {
+                                await todayViewModel.updateDeadline(
+                                    todoId: todoItem.todoId,
+                                    deadline: deadline
+                                )
+                            }
+                        },
+                        updateTodoRepeat: {
+                            Task {
+                                await todayViewModel.updateTodoRepeat(todoId: todoItem.todoId)
+                            }
+                        },
+                        updateCategory: { id in
+                            Task {
+                                await todayViewModel.updateCategory(categoryId: id, todoId: todayViewModel.selectedTodoItem!.todoId)
+                            }
+                        },
+                        categoryList: backlogViewModel.categoryList
                     )
+                    .transition(.move(edge: .bottom))
+                    .zIndex(1)
                 }
-            } else {
-                LoginView(
-                    onSuccessLogin: { isLogined = true }
-                )
             }
-            
-            if isBottomSheetVisible {
-                Color.black.opacity(0.6)
-                    .edgesIgnoringSafeArea(.all)
-                    .transition(.opacity)
-                    .animation(nil, value: isBottomSheetVisible)
-                    .onTapGesture {
-                        withAnimation {
-                            isBottomSheetVisible = false
-                            backlogViewModel.updateSelectedItem(item: nil)
-                            todayViewModel.selectedTodoItem = nil
-                        }
-                        isDateBottomSheetVisible = false
-                        isCategoryBottomSheetVisible = false
-                    }
-            }
-            
-            if isBottomSheetVisible, let todoItem = backlogViewModel.selectedTodoItem {
-                BottomSheetView(
-                    isVisible: $isBottomSheetVisible,
-                    todoItem: $backlogViewModel.selectedTodoItem,
-                    showDateBottomSheet: $isDateBottomSheetVisible,
-                    showCategoryBottomSheet: $isCategoryBottomSheetVisible,
-                    deleteTodo: {
-                        Task {
-                            await backlogViewModel.deleteBacklog(todoId: todoItem.todoId)
-                        }
-                    },
-                    editTodo: {
-                        backlogViewModel.activeItemId = todoItem.todoId
-                    },
-                    updateBookmark: {
-                        Task {
-                            await backlogViewModel.updateBookmark(todoId: todoItem.todoId)
-                        }
-                    },
-                    updateDeadline: { deadline in
-                        Task {
-                            await backlogViewModel.updateDeadline(
-                                todoId: todoItem.todoId,
-                                deadline: deadline
-                            )
-                        }
-                    },
-                    updateTodoRepeat: {
-                        Task {
-                            await backlogViewModel.updateTodoRepeat(todoId: todoItem.todoId)
-                        }
-                    },
-                    updateCategory: { id in
-                        Task {
-                            await backlogViewModel.updateCategory(categoryId: id, todoId: backlogViewModel.selectedTodoItem!.todoId)
-                        }
-                    },
-                    categoryList: backlogViewModel.categoryList
-                )
-                .transition(.move(edge: .bottom))
-                .zIndex(1)
-            }
-            
-            if isBottomSheetVisible, let todoItem = todayViewModel.selectedTodoItem {
-                BottomSheetView(
-                    isVisible: $isBottomSheetVisible,
-                    todoItem: $todayViewModel.selectedTodoItem,
-                    showDateBottomSheet: $isDateBottomSheetVisible,
-                    showCategoryBottomSheet: $isCategoryBottomSheetVisible,
-                    deleteTodo: {
-                        Task {
-                            await todayViewModel.deleteTodo(todoId: todoItem.todoId)
-                        }
-                    },
-                    editTodo: {
-                        todayViewModel.activeItemId = todoItem.todoId
-                    },
-                    updateBookmark: {
-                        Task {
-                            await todayViewModel.updateBookmark(todoId: todoItem.todoId)
-                        }
-                    },
-                    updateDeadline: { deadline in
-                        Task {
-                            await todayViewModel.updateDeadline(
-                                todoId: todoItem.todoId,
-                                deadline: deadline
-                            )
-                        }
-                    },
-                    updateTodoRepeat: {
-                        Task {
-                            await todayViewModel.updateTodoRepeat(todoId: todoItem.todoId)
-                        }
-                    },
-                    updateCategory: { id in
-                        Task {
-                            await todayViewModel.updateCategory(categoryId: id, todoId: todayViewModel.selectedTodoItem!.todoId)
-                        }
-                    },
-                    categoryList: backlogViewModel.categoryList
-                )
-                .transition(.move(edge: .bottom))
-                .zIndex(1)
+        }
+        .onAppear {
+            Task {
+                await todayViewModel.getTodayList()
+                
+                await MainActor.run {
+                    self.selectedTab = todayViewModel.todayList.isEmpty ? 1 : 0
+                    self.isLoading = false
+                }
             }
         }
     }
