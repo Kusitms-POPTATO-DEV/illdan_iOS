@@ -12,6 +12,7 @@ class MyPageViewModel: ObservableObject {
     private var authRepository: AuthRepository
     @Published var nickname: String = ""
     @Published var email: String = ""
+    @Published var imageUrl: String = ""
     @Published var policyContent: String = ""
     
     init(userRepository: UserRepository = UserRepositoryImpl(), authRepository: AuthRepository = AuthRepositoryImpl()) {
@@ -25,6 +26,7 @@ class MyPageViewModel: ObservableObject {
             await MainActor.run {
                 nickname = response.name
                 email = response.email
+                imageUrl = response.imageUrl
             }
         } catch {
             print("Error getUserInfo: \(error)")

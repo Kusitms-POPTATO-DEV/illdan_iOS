@@ -22,9 +22,13 @@ struct MyPageView: View {
                 
                 VStack(alignment: .leading, spacing: 0) {
                     HStack {
-                        Image("ic_empty_profile_image")
-                            .resizable()
-                            .frame(width: 62, height: 62)
+                        if viewModel.imageUrl.isEmpty {
+                            Image("ic_empty_profile_image")
+                                .resizable()
+                                .frame(width: 62, height: 62)
+                        } else {
+                            AsyncImageView(imageURL: viewModel.imageUrl, width: 62, height: 62)
+                        }
                         VStack(alignment: .leading) {
                             Text(viewModel.nickname)
                                 .font(PoptatoTypo.lgSemiBold)
