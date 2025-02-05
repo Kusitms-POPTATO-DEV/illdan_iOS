@@ -18,56 +18,63 @@ struct TodayView: View {
     
     var body: some View {
         ZStack {
-            Color(.gray100)
-                .ignoresSafeArea()
-            
-            VStack {
-                TopBar(
-                    titleText: viewModel.currentDate,
-                    subText: ""
-                )
+            if isViewActive {
+                Color(.gray100)
+                    .ignoresSafeArea()
                 
-                if isViewActive {
-                    if viewModel.todayList.isEmpty {
-                        EmptyTodayView(
-                            goToBacklog: goToBacklog
-                        )
-                    } else {
-                        TodayListView(
-                            todayList: $viewModel.todayList,
-                            swipeToday: { id in
-                                Task {
-                                    await viewModel.swipeToday(todoId: id)
-                                }
-                            },
-                            updateTodoCompletion: { id in
-                                Task {
-                                    await viewModel.updateTodoCompletion(todoId: id)
-                                    
-                                    if viewModel.checkAllTodoCompleted() {
-                                        performDoubleHapticFeedback()
-                                        viewModel.showToastMessage = true
+                VStack {
+                    TopBar(
+                        titleText: viewModel.currentDate,
+                        subText: ""
+                    )
+                    
+                    if isViewActive {
+                        if viewModel.todayList.isEmpty {
+                            EmptyTodayView(
+                                goToBacklog: goToBacklog
+                            )
+                        } else {
+                            TodayListView(
+                                todayList: $viewModel.todayList,
+                                swipeToday: { id in
+                                    Task {
+                                        await viewModel.swipeToday(todoId: id)
                                     }
+                                },
+                                updateTodoCompletion: { id in
+                                    Task {
+                                        await viewModel.updateTodoCompletion(todoId: id)
+                                        
+                                        if viewModel.checkAllTodoCompleted() {
+                                            performDoubleHapticFeedback()
+                                            viewModel.showToastMessage = true
+                                        }
+                                    }
+                                },
+                                onDragEnd: {
+                                    Task {
+                                        await viewModel.dragAndDrop()
+                                    }
+                                },
+                                onItemSelected: { item in
+                                    onItemSelcted(item)
                                 }
-                            },
-                            onDragEnd: {
-                                Task {
-                                    await viewModel.dragAndDrop()
-                                }
-                            },
-                            onItemSelected: { item in
-                                onItemSelcted(item)
-                            }
-                        )
+                            )
+                        }
                     }
                 }
+            } else {
+                Color(.gray100)
+                    .ignoresSafeArea()
             }
         }
         .onAppear {
             Task {
-                isViewActive = true
                 await viewModel.getCategoryList(page: 0, size: 100)
                 await viewModel.getTodayList()
+                await MainActor.run {
+                    isViewActive = true
+                }
             }
         }
         .onDisappear {
