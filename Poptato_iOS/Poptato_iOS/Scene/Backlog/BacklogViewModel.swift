@@ -33,9 +33,22 @@ class BacklogViewModel: ObservableObject {
         self.todoRepository = todoRepository
         self.categoryRepository = categoryRepository
         Task {
-            if !AppStorageManager.hasSeenYesterday {
+            await getYesterdayFlag()
+        }
+        Task {
+            if isExistYesterdayTodo {
                 await getYesterdayList(page: 0, size: 1)
-            } else { isExistYesterdayTodo = false }
+            }
+        }
+        
+        NotificationCenter.default.addObserver(forName: .yesterdayTodoCompleted, object: nil, queue: .main) { _ in
+            self.isExistYesterdayTodo = false
+        }
+    }
+    
+    func getYesterdayFlag() async {
+        await MainActor.run {
+            self.isExistYesterdayTodo = !AppStorageManager.hasSeenYesterday
         }
     }
     
