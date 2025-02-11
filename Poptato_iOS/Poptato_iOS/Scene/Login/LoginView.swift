@@ -54,16 +54,6 @@ struct LoginView: View {
                         case .success(let authResults):
                             Task {
                                 do {
-                                    guard let credential = authResults.credential as? ASAuthorizationAppleIDCredential else { return }
-                                    
-                                    let email = credential.email
-                                    let fullName = credential.fullName?.givenName
-                                    
-                                    if email == nil || fullName == nil {
-                                        print("이메일, 이름 제공에 동의해야 함.")
-                                        return
-                                    }
-                                    
                                     try await viewModel.handleAppleLogin(result: authResults)
                                     onSuccessLogin()
                                 } catch {
