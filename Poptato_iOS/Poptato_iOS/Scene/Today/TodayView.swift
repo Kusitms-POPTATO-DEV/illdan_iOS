@@ -99,43 +99,32 @@ struct TodayListView: View {
     var onItemSelected: (TodoItemModel) -> Void
     @State private var draggedItem: TodayItemModel?
     @State private var draggedIndex: Int?
+    @State private var isDragging: Bool = false
     @State private var hapticFeedback = UIImpactFeedbackGenerator(style: .medium)
     
     var body: some View {
         ScrollView {
             LazyVStack {
-                ForEach(todayList, id: \.todoId) { item in
-                    let index = todayList.firstIndex(where: { $0.todoId == item.todoId }) ?? 0
+                
+                ForEach(todayList.indices, id: \.self) { index in
+                    let item = todayList[index]
                     
                     TodayItemView(
-                        item: Binding(
-                            get: { item },
-                            set: { updatedItem in
-                                if let index = todayList.firstIndex(where: { $0.todoId == updatedItem.todoId }) {
-                                    todayList[index] = updatedItem
-                                }
-                            }
-                        ),
+                        item: $todayList[index],
                         todayList: $todayList,
                         swipeToday: swipeToday,
                         updateTodoCompletion: updateTodoCompletion,
                         onItemSelected: onItemSelected
                     )
                     .onDrag {
-                        hapticFeedback.impactOccurred()
-                        self.draggedItem = item
-                        self.draggedIndex = index
-                        let provider = NSItemProvider(object: String(item.todoId) as NSString)
-                        provider.suggestedName = ""
-                        return provider
+                        draggedItem = item
+                        isDragging = true
+                        return NSItemProvider(object: "\(item.todoId)" as NSString)
                     }
-                    .onDrop(of: [.text], delegate: TodayDropViewDelegate(
-                        item: item,
-                        todayList: $todayList,
-                        draggedItem: $draggedItem,
-                        draggedIndex: $draggedIndex,
-                        onReorder: { onDragEnd() }
-                    ))
+                    .onDrop(of: [.text], delegate: TodayDragDropDelegate(item: item, todayList: $todayList, draggedItem: $draggedItem, onReorder: {
+                        isDragging = false
+                        onDragEnd()
+                    }))
                 }
             }
         }

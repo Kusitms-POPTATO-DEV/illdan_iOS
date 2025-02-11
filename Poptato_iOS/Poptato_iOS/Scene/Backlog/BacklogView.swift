@@ -82,7 +82,7 @@ struct BacklogView: View {
                 } else {
                     BacklogListView(
                         backlogList: $viewModel.backlogList,
-                        onItemSelcted: onItemSelcted,
+                        onItemSelected: onItemSelcted,
                         editBacklog: { id, content in
                             Task {
                                 await viewModel.editBacklog(todoId: id, content: content)
@@ -268,51 +268,37 @@ struct CategoryItemView: View {
 
 struct BacklogListView: View {
     @Binding var backlogList: [TodoItemModel]
-    var onItemSelcted: (TodoItemModel) -> Void
+    var onItemSelected: (TodoItemModel) -> Void
     var editBacklog: (Int, String) -> Void
     var swipeBacklog: (Int) -> Void
     var onDragEnd: () -> Void
     @Binding var activeItemId: Int?
     @State private var draggedItem: TodoItemModel?
-    @State private var draggedIndex: Int?
-    @State private var hapticFeedback = UIImpactFeedbackGenerator(style: .medium)
+    @State private var isDragging: Bool = false
     
     var body: some View {
         ScrollView {
             LazyVStack {
-                ForEach(backlogList, id: \.todoId) { item in
-                    let index = backlogList.firstIndex(where: { $0.todoId == item.todoId }) ?? 0
+                ForEach(backlogList.indices, id: \.self) { index in
+                    let item = backlogList[index]
                     
                     BacklogItemView(
-                        item: Binding(
-                            get: { item },
-                            set: { newItem in
-                                if let index = backlogList.firstIndex(where: { $0.todoId == newItem.todoId }) {
-                                    backlogList[index] = newItem
-                                }
-                            }
-                        ),
+                        item: $backlogList[index],
                         backlogList: $backlogList,
-                        onItemSelcted: onItemSelcted,
+                        onItemSelected: onItemSelected,
                         editBacklog: editBacklog,
                         swipeBacklog: swipeBacklog,
                         activeItemId: $activeItemId
                     )
                     .onDrag {
-                        hapticFeedback.impactOccurred()
-                        self.draggedItem = item
-                        self.draggedIndex = index
-                        let provider = NSItemProvider(object: String(item.todoId) as NSString)
-                        provider.suggestedName = ""
-                        return provider
+                        draggedItem = item
+                        isDragging = true
+                        return NSItemProvider(object: "\(item.todoId)" as NSString)
                     }
-                    .onDrop(of: [.text], delegate: DropViewDelegate(
-                        item: item,
-                        backlogList: $backlogList,
-                        draggedItem: $draggedItem,
-                        draggedIndex: $draggedIndex,
-                        onReorder: { onDragEnd() }
-                    ))
+                    .onDrop(of: [.text], delegate: DragDropDelegate(item: item, backlogList: $backlogList, draggedItem: $draggedItem, onReorder: {
+                        isDragging = false
+                        onDragEnd()
+                    }))
                 }
             }
             Spacer().frame(height: 45)
@@ -325,13 +311,14 @@ struct BacklogListView: View {
 struct BacklogItemView: View {
     @Binding var item: TodoItemModel
     @Binding var backlogList: [TodoItemModel]
-    var onItemSelcted: (TodoItemModel) -> Void
+    var onItemSelected: (TodoItemModel) -> Void
     var editBacklog: (Int, String) -> Void
     var swipeBacklog: (Int) -> Void
     @Binding var activeItemId: Int?
     @FocusState var isActive: Bool
     @State var content = ""
     @State private var offset: CGFloat = 0
+    private let hapticFeedback = UIImpactFeedbackGenerator(style: .medium)
     
     var body: some View {
         HStack {
@@ -429,7 +416,7 @@ struct BacklogItemView: View {
                     .resizable()
                     .frame(width: 20, height: 20)
                     .onTapGesture {
-                        onItemSelcted(item)
+                        onItemSelected(item)
                     }
             }
         }
@@ -439,7 +426,7 @@ struct BacklogItemView: View {
         .background(RoundedRectangle(cornerRadius: 8))
         .foregroundColor(.gray95)
         .offset(x: offset)
-        .simultaneousGesture(
+        .highPriorityGesture(
             DragGesture(minimumDistance: 20)
                 .onChanged { gesture in
                     if gesture.translation.width < 0 {
@@ -489,19 +476,10 @@ struct CreateBacklogTextField: View {
 
                 TextField("", text: $taskInput, axis: .vertical)
                     .focused($isFocused)
-                    .onChange(of: taskInput) { 
-                        guard let newValueLastChar = taskInput.last else { return }
-                        
-                        if newValueLastChar == "\n" {
+                    .onChange(of: taskInput) {
+                        if taskInput.last == "\n" {
                             taskInput.removeLast()
-                            if !taskInput.isEmpty {
-                                createBacklog(taskInput)
-                                taskInput = ""
-                                isFocused = true
-                            } else {
-                                isFocused = false
-                            }
-                            
+                            handleSubmit()
                         }
                     }
                     .foregroundColor(.white)
@@ -525,6 +503,25 @@ struct CreateBacklogTextField: View {
                         .foregroundColor(.gray95)
                 }
                 .padding(.trailing, 16)
+            }
+        }
+    }
+
+    private func handleSubmit() {
+        if taskInput.isEmpty {
+            Task {
+                await MainActor.run {
+                    isFocused = false
+                }
+            }
+        } else {
+            createBacklog(taskInput)
+            taskInput = ""
+            
+            Task {
+                await MainActor.run {
+                    isFocused = true
+                }
             }
         }
     }
