@@ -63,20 +63,10 @@ final class TodayViewModel: ObservableObject {
     }
     
     func swipeToday(todoId: Int) async {
-        await MainActor.run {
-            self.snapshotList = self.todayList
-        }
-        
         do {
             try await todoRepository.swipeTodo(request: TodoIdModel(todoId: todoId))
-            await MainActor.run {
-                self.snapshotList = self.todayList
-            }
         } catch {
-            await MainActor.run {
-                print("Error swipe today: \(error)")
-                self.todayList = self.snapshotList
-            }
+            print("Error swipe backlog: \(error)")
         }
     }
     
@@ -107,6 +97,17 @@ final class TodayViewModel: ObservableObject {
         }
     }
     
+    func editToday(todoId: Int, content: String) async {
+        do {
+            await MainActor.run {
+                selectedTodoItem = nil
+            }
+            try await backlogRepository.editBacklog(todoId: todoId, content: content)
+        } catch {
+            print("Error edit today: \(error)")
+        }
+    }
+    
     func deleteTodo(todoId: Int) async {
         do {
             await MainActor.run {
@@ -116,9 +117,7 @@ final class TodayViewModel: ObservableObject {
             
             try await backlogRepository.deleteBacklog(todoId: todoId)
         } catch {
-            DispatchQueue.main.async {
-                print("Error delete today: \(error)")
-            }
+            print("Error delete today: \(error)")
         }
     }
     
@@ -134,9 +133,7 @@ final class TodayViewModel: ObservableObject {
                 }
             }
         } catch {
-            DispatchQueue.main.async {
-                print("Error updateBookmark: \(error)")
-            }
+            print("Error updateBookmark: \(error)")
         }
     }
     
