@@ -115,6 +115,9 @@ class BacklogViewModel: ObservableObject {
     
     func editBacklog(todoId: Int, content: String) async {
         do {
+            await MainActor.run {
+                selectedTodoItem = nil
+            }
             try await backlogRepository.editBacklog(todoId: todoId, content: content)
         } catch {
             DispatchQueue.main.async {
