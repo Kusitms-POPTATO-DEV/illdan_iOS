@@ -46,9 +46,12 @@ class MyPageViewModel: ObservableObject {
     
     func logout() async {
         do {
+            await MainActor.run {
+                KeychainManager.shared.deleteToken(for: "accessToken")
+                KeychainManager.shared.deleteToken(for: "refreshToken")
+            }
+            
             try await authRepository.logout()
-            KeychainManager.shared.deleteToken(for: "accessToken")
-            KeychainManager.shared.deleteToken(for: "refreshToken")
         } catch {
             print("Error logout: \(error)")
         }
@@ -56,9 +59,12 @@ class MyPageViewModel: ObservableObject {
     
     func deleteAccount() async {
         do {
+            await MainActor.run {
+                KeychainManager.shared.deleteToken(for: "accessToken")
+                KeychainManager.shared.deleteToken(for: "refreshToken")
+            }
+            
             try await authRepository.deleteAccount()
-            KeychainManager.shared.deleteToken(for: "accessToken")
-            KeychainManager.shared.deleteToken(for: "refreshToken")
         } catch {
             print("Error deleteAccount: \(error)")
         }
