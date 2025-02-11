@@ -10,4 +10,6 @@ struct LoginRequest: Codable {
     let accessToken: String
     let mobileType: String
     let clientId: String
+    let name: String?
+    let email: String?
 }

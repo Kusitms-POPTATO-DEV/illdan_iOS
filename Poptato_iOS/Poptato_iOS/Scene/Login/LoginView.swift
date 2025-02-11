@@ -60,7 +60,6 @@ struct LoginView: View {
                                     let fullName = credential.fullName?.givenName
                                     
                                     if email == nil || fullName == nil {
-                                        // TODO: 토스트 메시지 구현 이후에 정보 제공에 동의해야 함을 알리는 토스트 메시지 렌더링
                                         print("이메일, 이름 제공에 동의해야 함.")
                                         return
                                     }
@@ -113,10 +112,4 @@ struct LoginView: View {
             }
         }
     }
-}
-
-#Preview {
-    LoginView(
-        onSuccessLogin: {}
-    )
 }
