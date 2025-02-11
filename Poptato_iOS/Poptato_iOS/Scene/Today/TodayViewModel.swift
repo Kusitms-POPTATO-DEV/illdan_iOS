@@ -107,6 +107,14 @@ final class TodayViewModel: ObservableObject {
         }
     }
     
+    func editToday(todoId: Int, content: String) async {
+        do {
+            try await backlogRepository.editBacklog(todoId: todoId, content: content)
+        } catch {
+            print("Error edit today: \(error)")
+        }
+    }
+    
     func deleteTodo(todoId: Int) async {
         do {
             await MainActor.run {
@@ -116,9 +124,7 @@ final class TodayViewModel: ObservableObject {
             
             try await backlogRepository.deleteBacklog(todoId: todoId)
         } catch {
-            DispatchQueue.main.async {
-                print("Error delete today: \(error)")
-            }
+            print("Error delete today: \(error)")
         }
     }
     
@@ -134,9 +140,7 @@ final class TodayViewModel: ObservableObject {
                 }
             }
         } catch {
-            DispatchQueue.main.async {
-                print("Error updateBookmark: \(error)")
-            }
+            print("Error updateBookmark: \(error)")
         }
     }
     

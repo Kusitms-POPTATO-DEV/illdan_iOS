@@ -36,6 +36,11 @@ struct TodayView: View {
                         } else {
                             TodayListView(
                                 todayList: $viewModel.todayList,
+                                editToday: { id, content in
+                                    Task {
+                                        await viewModel.editToday(todoId: id, content: content)
+                                    }
+                                },
                                 swipeToday: { id in
                                     Task {
                                         await viewModel.swipeToday(todoId: id)
@@ -58,7 +63,8 @@ struct TodayView: View {
                                 },
                                 onItemSelected: { item in
                                     onItemSelcted(item)
-                                }
+                                },
+                                activeItemId: $viewModel.activeItemId
                             )
                         }
                     }
@@ -93,10 +99,12 @@ struct TodayView: View {
 
 struct TodayListView: View {
     @Binding var todayList: [TodayItemModel]
+    var editToday: (Int, String) -> Void
     var swipeToday: (Int) -> Void
     var updateTodoCompletion: (Int) -> Void
     var onDragEnd: () -> Void
     var onItemSelected: (TodoItemModel) -> Void
+    @Binding var activeItemId: Int?
     @State private var draggedItem: TodayItemModel?
     @State private var draggedIndex: Int?
     @State private var isDragging: Bool = false
@@ -112,6 +120,8 @@ struct TodayListView: View {
                     TodayItemView(
                         item: $todayList[index],
                         todayList: $todayList,
+                        activeItemId: $activeItemId,
+                        editToday: editToday,
                         swipeToday: swipeToday,
                         updateTodoCompletion: updateTodoCompletion,
                         onItemSelected: onItemSelected
@@ -136,11 +146,15 @@ struct TodayListView: View {
 struct TodayItemView: View {
     @Binding var item: TodayItemModel
     @Binding var todayList: [TodayItemModel]
+    @Binding var activeItemId: Int?
+    var editToday: (Int, String) -> Void
     var swipeToday: (Int) -> Void
     var updateTodoCompletion: (Int) -> Void
     var onItemSelected: (TodoItemModel) -> Void
     let hapticFeedback = UIImpactFeedbackGenerator(style: .medium)
     @State private var offset: CGFloat = 0
+    @State var content = ""
+    @FocusState var isActive: Bool
 
     var body: some View {
         HStack {
@@ -217,11 +231,32 @@ struct TodayItemView: View {
                             }
                         }
 
-                    Text(item.content)
-                        .font(PoptatoTypo.mdRegular)
-                        .foregroundColor(.gray00)
-
-                    Spacer()
+                    if activeItemId == item.todoId {
+                        TextField("", text: $content)
+                            .focused($isActive)
+                            .onAppear {
+                                isActive = true
+                                content = item.content
+                            }
+                            .onSubmit {
+                                if !content.isEmpty, let activeItemId {
+                                    item.content = content
+                                    editToday(activeItemId, content)
+                                }
+                                isActive = false
+                                activeItemId = nil
+                            }
+                            .font(PoptatoTypo.mdRegular)
+                            .foregroundColor(.gray00)
+                    } else {
+                        HStack{
+                            Text(item.content)
+                                .font(PoptatoTypo.mdRegular)
+                                .foregroundColor(.gray00)
+                            
+                            Spacer()
+                        }
+                    }
                 }
             }
             
