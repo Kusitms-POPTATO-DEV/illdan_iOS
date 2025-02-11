@@ -26,7 +26,7 @@ class MyPageViewModel: ObservableObject {
             await MainActor.run {
                 nickname = response.name
                 email = response.email
-                imageUrl = response.imageUrl
+                imageUrl = response.imageUrl ?? ""
             }
         } catch {
             print("Error getUserInfo: \(error)")

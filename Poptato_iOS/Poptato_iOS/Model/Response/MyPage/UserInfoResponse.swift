@@ -8,5 +8,5 @@
 struct UserInfoResponse: Codable {
     let name: String
     let email: String
-    let imageUrl: String
+    let imageUrl: String?
 }
