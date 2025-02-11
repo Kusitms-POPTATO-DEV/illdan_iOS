@@ -37,6 +37,10 @@ class YesterdayTodoViewModel: ObservableObject {
                 AppStorageManager.hasSeenYesterday = true
                 completionList.removeAll()
             }
+            
+            await MainActor.run {
+                NotificationCenter.default.post(name: .yesterdayTodoCompleted, object: nil)
+            }
         } catch {
             print("Error CompleteYesterdayTodo: \(error)")
         }

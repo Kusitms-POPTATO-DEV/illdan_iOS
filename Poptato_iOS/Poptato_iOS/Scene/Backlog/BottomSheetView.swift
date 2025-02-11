@@ -45,38 +45,6 @@ struct BottomSheetView: View {
                     .padding(.top, 24)
                     
                     BottomSheetButton(
-                        image: "ic_pen",
-                        buttonText: "수정하기",
-                        buttonColor: .gray30,
-                        subText: "",
-                        onClickBtn: {
-                            isVisible = false
-                            editTodo()
-                        },
-                        isRepeat: Binding(
-                            get: { todoItem?.isRepeat ?? false },
-                            set: { newValue in
-                                todoItem?.isRepeat = newValue
-                            }
-                        )
-                    )
-                    BottomSheetButton(
-                        image: "ic_trash",
-                        buttonText: "삭제하기",
-                        buttonColor: .danger50,
-                        subText: "",
-                        onClickBtn: {
-                            isVisible = false
-                            deleteTodo()
-                        },
-                        isRepeat: Binding(
-                            get: { todoItem?.isRepeat ?? false },
-                            set: { newValue in
-                                todoItem?.isRepeat = newValue
-                            }
-                        )
-                    )
-                    BottomSheetButton(
                         image: "ic_refresh",
                         buttonText: "반복 할 일",
                         buttonColor: .gray30,
@@ -111,6 +79,38 @@ struct BottomSheetView: View {
                         onClickBtn: { showCategoryBottomSheet = true },
                         categoryName: todoItem?.categoryName ?? "",
                         emojiImageUrl: todoItem?.emojiImageUrl ?? "",
+                        isRepeat: Binding(
+                            get: { todoItem?.isRepeat ?? false },
+                            set: { newValue in
+                                todoItem?.isRepeat = newValue
+                            }
+                        )
+                    )
+                    BottomSheetButton(
+                        image: "ic_pen",
+                        buttonText: "수정하기",
+                        buttonColor: .gray30,
+                        subText: "",
+                        onClickBtn: {
+                            isVisible = false
+                            editTodo()
+                        },
+                        isRepeat: Binding(
+                            get: { todoItem?.isRepeat ?? false },
+                            set: { newValue in
+                                todoItem?.isRepeat = newValue
+                            }
+                        )
+                    )
+                    BottomSheetButton(
+                        image: "ic_trash",
+                        buttonText: "삭제하기",
+                        buttonColor: .danger50,
+                        subText: "",
+                        onClickBtn: {
+                            isVisible = false
+                            deleteTodo()
+                        },
                         isRepeat: Binding(
                             get: { todoItem?.isRepeat ?? false },
                             set: { newValue in
@@ -189,8 +189,11 @@ struct BottomSheetButton: View {
                 .cornerRadius(32)
             }
         }
+        .frame(maxWidth: .infinity)
         .padding(.horizontal, 24)
         .padding(.vertical, 12)
+        .background(Color.clear)
+        .contentShape(Rectangle())
         .onTapGesture {
             onClickBtn()
         }

@@ -18,56 +18,63 @@ struct TodayView: View {
     
     var body: some View {
         ZStack {
-            Color(.gray100)
-                .ignoresSafeArea()
-            
-            VStack {
-                TopBar(
-                    titleText: viewModel.currentDate,
-                    subText: ""
-                )
+            if isViewActive {
+                Color(.gray100)
+                    .ignoresSafeArea()
                 
-                if isViewActive {
-                    if viewModel.todayList.isEmpty {
-                        EmptyTodayView(
-                            goToBacklog: goToBacklog
-                        )
-                    } else {
-                        TodayListView(
-                            todayList: $viewModel.todayList,
-                            swipeToday: { id in
-                                Task {
-                                    await viewModel.swipeToday(todoId: id)
-                                }
-                            },
-                            updateTodoCompletion: { id in
-                                Task {
-                                    await viewModel.updateTodoCompletion(todoId: id)
-                                    
-                                    if viewModel.checkAllTodoCompleted() {
-                                        performDoubleHapticFeedback()
-                                        viewModel.showToastMessage = true
+                VStack {
+                    TopBar(
+                        titleText: viewModel.currentDate,
+                        subText: ""
+                    )
+                    
+                    if isViewActive {
+                        if viewModel.todayList.isEmpty {
+                            EmptyTodayView(
+                                goToBacklog: goToBacklog
+                            )
+                        } else {
+                            TodayListView(
+                                todayList: $viewModel.todayList,
+                                swipeToday: { id in
+                                    Task {
+                                        await viewModel.swipeToday(todoId: id)
                                     }
+                                },
+                                updateTodoCompletion: { id in
+                                    Task {
+                                        await viewModel.updateTodoCompletion(todoId: id)
+                                        
+                                        if viewModel.checkAllTodoCompleted() {
+                                            performDoubleHapticFeedback()
+                                            viewModel.showToastMessage = true
+                                        }
+                                    }
+                                },
+                                onDragEnd: {
+                                    Task {
+                                        await viewModel.dragAndDrop()
+                                    }
+                                },
+                                onItemSelected: { item in
+                                    onItemSelcted(item)
                                 }
-                            },
-                            onDragEnd: {
-                                Task {
-                                    await viewModel.dragAndDrop()
-                                }
-                            },
-                            onItemSelected: { item in
-                                onItemSelcted(item)
-                            }
-                        )
+                            )
+                        }
                     }
                 }
+            } else {
+                Color(.gray100)
+                    .ignoresSafeArea()
             }
         }
         .onAppear {
             Task {
-                isViewActive = true
                 await viewModel.getCategoryList(page: 0, size: 100)
                 await viewModel.getTodayList()
+                await MainActor.run {
+                    isViewActive = true
+                }
             }
         }
         .onDisappear {
@@ -92,43 +99,32 @@ struct TodayListView: View {
     var onItemSelected: (TodoItemModel) -> Void
     @State private var draggedItem: TodayItemModel?
     @State private var draggedIndex: Int?
+    @State private var isDragging: Bool = false
     @State private var hapticFeedback = UIImpactFeedbackGenerator(style: .medium)
     
     var body: some View {
         ScrollView {
             LazyVStack {
-                ForEach(todayList, id: \.todoId) { item in
-                    let index = todayList.firstIndex(where: { $0.todoId == item.todoId }) ?? 0
+                
+                ForEach(todayList.indices, id: \.self) { index in
+                    let item = todayList[index]
                     
                     TodayItemView(
-                        item: Binding(
-                            get: { item },
-                            set: { updatedItem in
-                                if let index = todayList.firstIndex(where: { $0.todoId == updatedItem.todoId }) {
-                                    todayList[index] = updatedItem
-                                }
-                            }
-                        ),
+                        item: $todayList[index],
                         todayList: $todayList,
                         swipeToday: swipeToday,
                         updateTodoCompletion: updateTodoCompletion,
                         onItemSelected: onItemSelected
                     )
                     .onDrag {
-                        hapticFeedback.impactOccurred()
-                        self.draggedItem = item
-                        self.draggedIndex = index
-                        let provider = NSItemProvider(object: String(item.todoId) as NSString)
-                        provider.suggestedName = ""
-                        return provider
+                        draggedItem = item
+                        isDragging = true
+                        return NSItemProvider(object: "\(item.todoId)" as NSString)
                     }
-                    .onDrop(of: [.text], delegate: TodayDropViewDelegate(
-                        item: item,
-                        todayList: $todayList,
-                        draggedItem: $draggedItem,
-                        draggedIndex: $draggedIndex,
-                        onReorder: { onDragEnd() }
-                    ))
+                    .onDrop(of: [.text], delegate: TodayDragDropDelegate(item: item, todayList: $todayList, draggedItem: $draggedItem, onReorder: {
+                        isDragging = false
+                        onDragEnd()
+                    }))
                 }
             }
         }
@@ -255,7 +251,7 @@ struct TodayItemView: View {
         .background(RoundedRectangle(cornerRadius: 8))
         .foregroundColor(.gray95)
         .offset(x: offset)
-        .simultaneousGesture(
+        .highPriorityGesture(
             DragGesture(minimumDistance: 20)
                 .onChanged { gesture in
                     if item.todayStatus != "COMPLETED" && gesture.translation.width > 0 {

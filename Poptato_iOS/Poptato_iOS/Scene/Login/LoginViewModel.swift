@@ -25,7 +25,7 @@ final class LoginViewModel: ObservableObject {
                 throw NSError(domain: "FCM", code: -1, userInfo: [NSLocalizedDescriptionKey: "FCM 토큰 발급에 실패했습니다."])
             }
             
-            let response = try await repository.kakaoLogin(request: LoginRequest(socialType: "KAKAO", accessToken: token, mobileType: "IOS", clientId: fcmToken))
+            let response = try await repository.kakaoLogin(request: LoginRequest(socialType: "KAKAO", accessToken: token, mobileType: "IOS", clientId: fcmToken, name: nil, email: nil))
             await MainActor.run {
                 isLoginSuccess = true
                 print("Login successful: \(response)")
@@ -60,7 +60,9 @@ final class LoginViewModel: ObservableObject {
                 socialType: "APPLE",
                 accessToken: token,
                 mobileType: "IOS",
-                clientId: fcmToken
+                clientId: fcmToken,
+                name: appleIDCredential.fullName?.givenName,
+                email: appleIDCredential.email
             )
         )
 
