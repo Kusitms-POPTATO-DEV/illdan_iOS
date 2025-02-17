@@ -22,7 +22,7 @@ final class CreateCategoryViewModel: ObservableObject {
     
     func getEmojiList() async {
         do {
-            let response = try await categoryRepository.getEmojiList()
+            let response = try await categoryRepository.getEmojiList(mobileType: "IOS")
             
             await MainActor.run {
                 emojiList = response.groupEmojis

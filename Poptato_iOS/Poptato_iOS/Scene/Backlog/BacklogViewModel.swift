@@ -35,11 +35,6 @@ class BacklogViewModel: ObservableObject {
         Task {
             await getYesterdayFlag()
         }
-        Task {
-            if isExistYesterdayTodo {
-                await getYesterdayList(page: 0, size: 1)
-            }
-        }
         
         NotificationCenter.default.addObserver(forName: .yesterdayTodoCompleted, object: nil, queue: .main) { _ in
             self.isExistYesterdayTodo = false
@@ -47,8 +42,8 @@ class BacklogViewModel: ObservableObject {
     }
     
     func getYesterdayFlag() async {
-        await MainActor.run {
-            self.isExistYesterdayTodo = !AppStorageManager.hasSeenYesterday
+        if !AppStorageManager.hasSeenYesterday {
+            await getYesterdayList(page: 0, size: 1)
         }
     }
     
@@ -233,7 +228,10 @@ class BacklogViewModel: ObservableObject {
             let response = try await todoRepository.getYesterdayList(page: page, size: size)
             await MainActor.run {
                 if !response.yesterdays.isEmpty { isExistYesterdayTodo = true }
-                else { isExistYesterdayTodo = false }
+                else {
+                    isExistYesterdayTodo = false
+                    AppStorageManager.hasSeenYesterday = true
+                }
             }
         } catch {
             print("Error getYesterdayList: \(error)")
