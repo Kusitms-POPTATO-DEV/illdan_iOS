@@ -7,6 +7,7 @@
 
 import SwiftUI
 import SVGKit
+import PDFKit
 
 struct AsyncImageView: View {
     let imageURL: String
@@ -93,5 +94,77 @@ struct SVGImageView: View {
                 }
             }
         }.resume()
+    }
+}
+
+struct PDFImageView: View {
+    let imageURL: String
+    var width: CGFloat
+    var height: CGFloat
+    @State private var pdfImage: UIImage? = nil
+    @State private var isLoading = true
+
+    var body: some View {
+        Group {
+            if let pdfImage = pdfImage {
+                Image(uiImage: pdfImage)
+                    .resizable()
+                    .aspectRatio(contentMode: .fill)
+                    .frame(width: width, height: height)
+                    .clipShape(Circle())
+                    .overlay(Circle().stroke(Color.gray, lineWidth: 2))
+            } else if isLoading {
+                ProgressView()
+                    .frame(width: width, height: height)
+            } else {
+                Text("PDF 로드 실패")
+                    .frame(width: width, height: height)
+            }
+        }
+        .onAppear {
+            loadPDF(from: imageURL)
+        }
+        .onChange(of: imageURL) {
+            isLoading = true
+            pdfImage = nil
+            loadPDF(from: imageURL)
+        }
+    }
+
+    private func loadPDF(from urlString: String) {
+        guard let url = URL(string: urlString) else {
+            isLoading = false
+            return
+        }
+
+        URLSession.shared.dataTask(with: url) { data, response, error in
+            guard let data = data, error == nil, let document = PDFDocument(data: data) else {
+                DispatchQueue.main.async {
+                    isLoading = false
+                }
+                return
+            }
+
+            if let pdfPage = document.page(at: 0) {
+                let pdfImage = pdfPageToUIImage(pdfPage: pdfPage, size: CGSize(width: width, height: height))
+                DispatchQueue.main.async {
+                    self.pdfImage = pdfImage
+                    self.isLoading = false
+                }
+            } else {
+                DispatchQueue.main.async {
+                    isLoading = false
+                }
+            }
+        }.resume()
+    }
+
+    private func pdfPageToUIImage(pdfPage: PDFPage, size: CGSize) -> UIImage? {
+        let renderer = UIGraphicsImageRenderer(size: size)
+        return renderer.image { ctx in
+            UIColor.white.set()
+            ctx.fill(CGRect(origin: .zero, size: size))
+            pdfPage.draw(with: .mediaBox, to: ctx.cgContext)
+        }
     }
 }
