@@ -47,7 +47,7 @@ enum Router: URLRequestConvertible {
     
     // category
     case getCategoryList(page: Int, size: Int)
-    case getEmojiList
+    case getEmojiList(mobileType: String)
     case createCategory(category: CreateCategoryRequest)
     case deleteCategory(categoryId: Int)
     case editCategory(categoryId: Int, category: CreateCategoryRequest)
@@ -306,8 +306,14 @@ enum Router: URLRequestConvertible {
             if let accessToken = accessToken {
                 request.addValue("Bearer \(accessToken)", forHTTPHeaderField: "Authorization")
             }
-        case .getEmojiList:
-            let endpoint = url.appendingPathComponent("/emojis")
+        case .getEmojiList(let mobileType):
+            var components = URLComponents(url: url.appendingPathComponent("/emojis"), resolvingAgainstBaseURL: false)
+            components?.queryItems = [
+                URLQueryItem(name: "mobileType", value: "\(mobileType)")
+            ]
+            guard let endpoint = components?.url else {
+                throw URLError(.badURL)
+            }
             request = URLRequest(url: endpoint)
             request.httpMethod = "GET"
             request.addValue("application/json", forHTTPHeaderField: "Content-Type")

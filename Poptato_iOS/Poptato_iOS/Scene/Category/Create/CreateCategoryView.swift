@@ -244,7 +244,7 @@ struct EmojiGridView: View {
     var body: some View {
         LazyVGrid(columns: columns, spacing: 16) {
             ForEach(emojiList) { emoji in
-                SVGImageView(imageURL: emoji.imageUrl, width: 32, height: 32)
+                PDFImageView(imageURL: emoji.imageUrl, width: 32, height: 32)
                     .onTapGesture {
                         selectedEmoji = emoji
                         isPresented = false
