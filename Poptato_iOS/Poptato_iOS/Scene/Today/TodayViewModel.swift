@@ -207,7 +207,7 @@ final class TodayViewModel: ObservableObject {
     
     func getCategoryList(page: Int, size: Int) async {
         do {
-            let response = try await categoryRepository.getCategoryList(page: page, size: size)
+            let response = try await categoryRepository.getCategoryList(page: page, size: size, mobileType: "IOS")
             await MainActor.run {
                 categoryList = response.categories
             }
