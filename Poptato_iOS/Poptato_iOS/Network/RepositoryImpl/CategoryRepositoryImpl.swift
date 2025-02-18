@@ -6,8 +6,8 @@
 //
 
 final class CategoryRepositoryImpl: CategoryRepository {
-    func getCategoryList(page: Int, size: Int) async throws -> CategoryListResponse {
-        try await NetworkManager.shared.request(type: CategoryListResponse.self, api: .getCategoryList(page: page, size: size))
+    func getCategoryList(page: Int, size: Int, mobileType: String) async throws -> CategoryListResponse {
+        try await NetworkManager.shared.request(type: CategoryListResponse.self, api: .getCategoryList(page: page, size: size, mobileType: mobileType))
     }
     
     func getEmojiList(mobileType: String) async throws -> EmojiResponse {

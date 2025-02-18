@@ -146,32 +146,6 @@ struct BacklogView: View {
                 .position(x: settingsMenuPosition.x - 30, y: settingsMenuPosition.y + 20)
             }
             
-            if viewModel.isExistYesterdayTodo {
-                ZStack {
-                    Color.primary60.ignoresSafeArea()
-                    HStack(spacing: 0) {
-                        Text("어제 한 일 체크를 깜빡했다면?")
-                            .font(PoptatoTypo.smMedium)
-                            .foregroundColor(.gray100)
-                        Spacer()
-                        Text("확인하기")
-                            .font(PoptatoTypo.smSemiBold)
-                            .foregroundColor(.gray100)
-                            .onTapGesture {
-                                isYesterdayTodoViewPresented = true
-                            }
-                        Spacer().frame(width: 4)
-                        Image("ic_arrow_right")
-                            .resizable()
-                            .frame(width: 12, height: 12)
-                    }
-                    .padding(.horizontal, 16)
-                }
-                .frame(maxWidth: .infinity)
-                .frame(height: 45)
-                .clipShape(RoundedCorner(radius: 8, corners: [.topLeft, .topRight]))
-            }
-            
             if viewModel.showDeleteCategoryDialog {
                 CommonDialog(
                     title: "카테고리를 삭제하시겠어요?",
@@ -253,7 +227,7 @@ struct CategoryItemView: View {
                         .stroke(isSelected ? Color.gray00 : Color.gray95, lineWidth: 1)
                 )
             if image == nil {
-                SVGImageView(imageURL: item.imageUrl, width: 24, height: 24)
+                PDFImageView(imageURL: item.imageUrl, width: 24, height: 24)
             } else {
                 if let image = image {
                     Image(image)

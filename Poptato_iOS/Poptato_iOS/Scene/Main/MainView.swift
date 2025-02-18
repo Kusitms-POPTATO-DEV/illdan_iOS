@@ -118,7 +118,7 @@ struct MainView: View {
                     if isMotivationViewPresented {
                         MotivationView()
                             .onAppear {
-                                DispatchQueue.main.asyncAfter(deadline: .now() + 2) {
+                                DispatchQueue.main.asyncAfter(deadline: .now() + 0.8) {
                                     isMotivationViewPresented = false
                                 }
                             }
@@ -245,13 +245,24 @@ struct MainView: View {
                 }
             }
         }
+        .fullScreenCover(isPresented: $isYesterdayViewPresented, onDismiss: {
+            selectedTab = todayViewModel.todayList.isEmpty ? 1 : 0
+            isLoading = false
+        }) {
+            YesterdayTodoView(
+                isYesterdayTodoViewPresented: $isYesterdayViewPresented,
+                isMotivationViewPresented: $isMotivationViewPresented
+            )
+        }
         .onAppear {
             Task {
                 await todayViewModel.getTodayList()
                 
-                await MainActor.run {
-                    self.selectedTab = todayViewModel.todayList.isEmpty ? 1 : 0
-                    self.isLoading = false
+                if backlogViewModel.isExistYesterdayTodo {
+                    isYesterdayViewPresented = true
+                } else {
+                    selectedTab = todayViewModel.todayList.isEmpty ? 1 : 0
+                    isLoading = false
                 }
             }
         }

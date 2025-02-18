@@ -46,7 +46,7 @@ enum Router: URLRequestConvertible {
     case getMonthlyHistory(year: String, month: Int)
     
     // category
-    case getCategoryList(page: Int, size: Int)
+    case getCategoryList(page: Int, size: Int, mobileType: String)
     case getEmojiList(mobileType: String)
     case createCategory(category: CreateCategoryRequest)
     case deleteCategory(categoryId: Int)
@@ -291,11 +291,12 @@ enum Router: URLRequestConvertible {
             }
             
         // category
-        case .getCategoryList(let page, let size):
+        case .getCategoryList(let page, let size, let mobileType):
             var components = URLComponents(url: url.appendingPathComponent("/category/list"), resolvingAgainstBaseURL: false)
             components?.queryItems = [
                 URLQueryItem(name: "page", value: "\(page)"),
-                URLQueryItem(name: "size", value: "\(size)")
+                URLQueryItem(name: "size", value: "\(size)"),
+                URLQueryItem(name: "mobileType", value: "\(mobileType)")
             ]
             guard let endpoint = components?.url else {
                 throw URLError(.badURL)

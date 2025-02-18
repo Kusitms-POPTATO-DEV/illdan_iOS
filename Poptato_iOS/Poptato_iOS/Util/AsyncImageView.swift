@@ -109,10 +109,9 @@ struct PDFImageView: View {
             if let pdfImage = pdfImage {
                 Image(uiImage: pdfImage)
                     .resizable()
-                    .aspectRatio(contentMode: .fill)
+                    .scaledToFit()
                     .frame(width: width, height: height)
                     .clipShape(Circle())
-                    .overlay(Circle().stroke(Color.gray, lineWidth: 2))
             } else if isLoading {
                 ProgressView()
                     .frame(width: width, height: height)
@@ -162,9 +161,22 @@ struct PDFImageView: View {
     private func pdfPageToUIImage(pdfPage: PDFPage, size: CGSize) -> UIImage? {
         let renderer = UIGraphicsImageRenderer(size: size)
         return renderer.image { ctx in
-            UIColor.white.set()
-            ctx.fill(CGRect(origin: .zero, size: size))
-            pdfPage.draw(with: .mediaBox, to: ctx.cgContext)
+            let context = ctx.cgContext
+            let pdfBounds = pdfPage.bounds(for: .mediaBox)
+            let scaleFactor = min(size.width / pdfBounds.width, size.height / pdfBounds.height)
+            let newWidth = pdfBounds.width * scaleFactor
+            let newHeight = pdfBounds.height * scaleFactor
+            let xOffset = (size.width - newWidth) / 2
+            let yOffset = (size.height - newHeight) / 2
+            
+            context.translateBy(x: 0, y: size.height)
+            context.scaleBy(x: 1.0, y: -1.0)
+            context.saveGState()
+            context.translateBy(x: xOffset, y: yOffset)
+            context.scaleBy(x: scaleFactor, y: scaleFactor)
+            pdfPage.draw(with: .mediaBox, to: context)
+            context.restoreGState()
         }
     }
+
 }
