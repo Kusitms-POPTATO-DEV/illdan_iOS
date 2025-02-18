@@ -185,7 +185,7 @@ struct CreateCategoryTextField: View {
                         }
                     }
             } else {
-                SVGImageView(imageURL: selectedEmoji!.imageUrl, width: 40, height: 40)
+                PDFImageView(imageURL: selectedEmoji!.imageUrl, width: 40, height: 40)
                     .onTapGesture {
                         withAnimation {
                             showEmojiBottomSheet = true

@@ -253,7 +253,7 @@ struct CategoryItemView: View {
                         .stroke(isSelected ? Color.gray00 : Color.gray95, lineWidth: 1)
                 )
             if image == nil {
-                SVGImageView(imageURL: item.imageUrl, width: 24, height: 24)
+                PDFImageView(imageURL: item.imageUrl, width: 24, height: 24)
             } else {
                 if let image = image {
                     Image(image)

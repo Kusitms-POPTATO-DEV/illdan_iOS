@@ -381,7 +381,7 @@ struct CategoryBottomSheet: View {
                                             .resizable()
                                             .frame(width: 24, height: 24)
                                     } else {
-                                        SVGImageView(imageURL: category.imageUrl, width: 24, height: 24)
+                                        PDFImageView(imageURL: category.imageUrl, width: 24, height: 24)
                                     }
                                    
                                     Spacer().frame(width: 8)
