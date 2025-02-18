@@ -44,10 +44,10 @@ struct YesterdayTodoView: View {
                 Spacer()
                 
                 Button(action: {
+                    isMotivationViewPresented = true
                     Task {
                         await viewModel.completeYesterdayTodo()
                     }
-                    isMotivationViewPresented = true
                     isYesterdayTodoViewPresented = false
                 }) {
                     Text("완료")
