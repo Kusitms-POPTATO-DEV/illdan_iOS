@@ -17,6 +17,7 @@ final class TodayViewModel: ObservableObject {
     @Published var activeItemId: Int? = nil
     @Published var showToastMessage: Bool = false
     @Published var showDeleteTodoToastMessage: Bool = false
+    @Published var deadlineDateMode: Bool
     private var snapshotList: [TodayItemModel] = []
     private let todayRepository: TodayRepository
     private let todoRepository: TodoRepository
@@ -33,6 +34,7 @@ final class TodayViewModel: ObservableObject {
         self.todoRepository = todoRepository
         self.backlogRepository = backlogRepository
         self.categoryRepository = categoryRepository
+        self.deadlineDateMode = AppStorageManager.deadlineDateMode
         let formatter = DateFormatter()
         formatter.dateFormat = "MM.dd"
         currentDate = formatter.string(from: Date())
@@ -244,5 +246,9 @@ final class TodayViewModel: ObservableObject {
     
     func updateSelectedItem(item: TodoItemModel?) {
         selectedTodoItem = item
+    }
+    
+    func setDeadlineDateMode() {
+        deadlineDateMode = AppStorageManager.deadlineDateMode
     }
 }
