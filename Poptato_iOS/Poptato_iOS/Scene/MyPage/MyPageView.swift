@@ -91,9 +91,7 @@ struct MyPageView: View {
                             Toggle("", isOn: $viewModel.deadlineDateMode)
                                 .tint(viewModel.deadlineDateMode ? Color.primary60 : Color.gray80)
                                 .onChange(of: viewModel.deadlineDateMode) {
-                                    Task {
-                                        await viewModel.updateDealineMode(viewModel.deadlineDateMode)
-                                    }
+                                    CommonSettingsManager.shared.toggleDeadlineMode()
                                 }
                         }
                         Text("공지사항")
