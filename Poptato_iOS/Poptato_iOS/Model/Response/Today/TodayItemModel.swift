@@ -10,7 +10,7 @@ struct TodayItemModel: Codable {
     var content: String
     var todayStatus: String
     var isBookmark: Bool
-    var dday: Int?
+    var dDay: Int?
     var deadline: String?
     var isRepeat: Bool
 }

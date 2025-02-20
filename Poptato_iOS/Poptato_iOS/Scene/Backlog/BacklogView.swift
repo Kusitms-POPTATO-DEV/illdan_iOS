@@ -15,6 +15,7 @@ struct BacklogView: View {
     @Binding var isYesterdayTodoViewPresented: Bool
     @Binding var isCreateCategoryViewPresented: Bool
     @State private var settingsMenuPosition: CGPoint = .zero
+    @State private var isViewActive = false
     
     var body: some View {
         ZStack(alignment: .bottom) {
@@ -99,7 +100,7 @@ struct BacklogView: View {
                             }
                         },
                         activeItemId: $viewModel.activeItemId,
-                        deadlineDateModel: viewModel.deadlineDateMode
+                        deadlineDateMode: viewModel.deadlineDateMode
                     )
                 }
                 
@@ -168,11 +169,17 @@ struct BacklogView: View {
             isTextFieldFocused = false
         }
         .onAppear {
-            viewModel.setDeadlineDateMode() // 이후에 Combine을 사용하는 방식으로 수정
+            print("deadlineDateMode: \(viewModel.deadlineDateMode)")
             Task {
                 await viewModel.getCategoryList(page: 0, size: 100)
                 await viewModel.fetchBacklogList()
+                await MainActor.run {
+                    isViewActive = true
+                }
             }
+        }
+        .onDisappear {
+            isViewActive = false
         }
         .onChange(of: isCreateCategoryViewPresented) {
             if !isCreateCategoryViewPresented {
@@ -251,7 +258,7 @@ struct BacklogListView: View {
     @Binding var activeItemId: Int?
     @State private var draggedItem: TodoItemModel?
     @State private var isDragging: Bool = false
-    @State var deadlineDateModel: Bool
+    var deadlineDateMode: Bool
     
     var body: some View {
         ScrollView {
@@ -266,7 +273,7 @@ struct BacklogListView: View {
                         editBacklog: editBacklog,
                         swipeBacklog: swipeBacklog,
                         activeItemId: $activeItemId,
-                        deadlineDateModel: deadlineDateModel
+                        deadlineDateMode: deadlineDateMode
                     )
                     .onDrag {
                         draggedItem = item
@@ -296,7 +303,7 @@ struct BacklogItemView: View {
     @FocusState var isActive: Bool
     @State var content = ""
     @State private var offset: CGFloat = 0
-    @State var deadlineDateModel: Bool
+    var deadlineDateMode: Bool
     private let hapticFeedback = UIImpactFeedbackGenerator(style: .medium)
     
     var body: some View {
@@ -335,7 +342,7 @@ struct BacklogItemView: View {
                     
                     if let dDay = item.dDay, let deadline = item.deadline {
                         ZStack {
-                            if deadlineDateModel {
+                            if deadlineDateMode {
                                 Text(deadline)
                                     .font(PoptatoTypo.calMedium)
                                     .foregroundColor(.gray50)

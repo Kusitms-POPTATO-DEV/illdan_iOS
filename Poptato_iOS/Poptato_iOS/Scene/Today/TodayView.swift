@@ -76,7 +76,7 @@ struct TodayView: View {
             }
         }
         .onAppear {
-            viewModel.setDeadlineDateMode()
+            print("deadlineDateMode: \(viewModel.deadlineDateMode)")
             Task {
                 await viewModel.getCategoryList(page: 0, size: 100)
                 await viewModel.getTodayList()
@@ -195,7 +195,7 @@ struct TodayItemView: View {
                         .cornerRadius(4)
                     }
                     
-                    if let dDay = item.dday, let deadline = item.deadline {
+                    if let dDay = item.dDay, let deadline = item.deadline {
                         ZStack {
                             if deadlineDateMode {
                                 Text(deadline)
@@ -227,7 +227,7 @@ struct TodayItemView: View {
                         .background(Color.gray90)
                         .cornerRadius(4)
                     }
-                    if (item.isBookmark || item.dday != nil || item.isRepeat) { Spacer() }
+                    if (item.isBookmark || item.dDay != nil || item.isRepeat) { Spacer() }
                 }
                 
                 HStack {
@@ -275,7 +275,7 @@ struct TodayItemView: View {
             
             Spacer()
             
-            ZStack(alignment: (item.isBookmark || item.dday != nil) ? .top : .center) {
+            ZStack(alignment: (item.isBookmark || item.dDay != nil) ? .top : .center) {
                 Image("ic_dot")
                     .resizable()
                     .frame(width: 20, height: 20)
@@ -286,7 +286,7 @@ struct TodayItemView: View {
                                 content: item.content,
                                 isBookmark: item.isBookmark,
                                 isRepeat: item.isRepeat,
-                                dDay: item.dday,
+                                dDay: item.dDay,
                                 deadline: item.deadline
                             )
                         )

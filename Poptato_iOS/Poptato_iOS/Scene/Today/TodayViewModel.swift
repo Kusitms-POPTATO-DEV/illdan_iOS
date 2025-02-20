@@ -5,6 +5,7 @@
 //  Created by 현수 노트북 on 10/27/24.
 //
 
+import Combine
 import SwiftUI
 import Foundation
 
@@ -23,6 +24,7 @@ final class TodayViewModel: ObservableObject {
     private let todoRepository: TodoRepository
     private let backlogRepository: BacklogRepository
     private let categoryRepository: CategoryRepository
+    private var cancellables = Set<AnyCancellable>()
     
     init(
         todayRepository: TodayRepository = TodayRepositoryImpl(),
@@ -38,6 +40,12 @@ final class TodayViewModel: ObservableObject {
         let formatter = DateFormatter()
         formatter.dateFormat = "MM.dd"
         currentDate = formatter.string(from: Date())
+        
+        CommonSettingsManager.shared.$deadlineDateMode
+                    .sink { [weak self] newValue in
+                        self?.deadlineDateMode = newValue
+                    }
+                    .store(in: &cancellables)
     }
     
     func getTodayList() async {
@@ -50,7 +58,7 @@ final class TodayViewModel: ObservableObject {
                         content: item.content,
                         todayStatus: item.todayStatus,
                         isBookmark: item.isBookmark,
-                        dday: item.dday,
+                        dDay: item.dDay,
                         deadline: item.deadline,
                         isRepeat: item.isRepeat
                     )
@@ -160,11 +168,11 @@ final class TodayViewModel: ObservableObject {
 
                         let components = calendar.dateComponents([.day], from: currentDate, to: deadlineDate)
                         if let daysDifference = components.day {
-                            todayList[index].dday = daysDifference
+                            todayList[index].dDay = daysDifference
                             selectedTodoItem?.dDay = daysDifference
                         }
                     } else {
-                        todayList[index].dday = nil
+                        todayList[index].dDay = nil
                         selectedTodoItem?.dDay = nil
                     }
                 }
@@ -246,9 +254,5 @@ final class TodayViewModel: ObservableObject {
     
     func updateSelectedItem(item: TodoItemModel?) {
         selectedTodoItem = item
-    }
-    
-    func setDeadlineDateMode() {
-        deadlineDateMode = AppStorageManager.deadlineDateMode
     }
 }

@@ -8,11 +8,12 @@
 import SwiftUI
 import Combine
 
-class BacklogViewModel: ObservableObject {
+final class BacklogViewModel: ObservableObject {
     private var tempIdCounter = -1
     private let backlogRepository: BacklogRepository
     private let todoRepository: TodoRepository
     private let categoryRepository: CategoryRepository
+    private var cancellables = Set<AnyCancellable>()
     @Published var isExistYesterdayTodo: Bool = false
     @Published var backlogList: Array<TodoItemModel> = []
     @Published var activeItemId: Int? = nil
@@ -41,6 +42,12 @@ class BacklogViewModel: ObservableObject {
         NotificationCenter.default.addObserver(forName: .yesterdayTodoCompleted, object: nil, queue: .main) { _ in
             self.isExistYesterdayTodo = false
         }
+        
+        CommonSettingsManager.shared.$deadlineDateMode
+                    .sink { [weak self] newValue in
+                        self?.deadlineDateMode = newValue
+                    }
+                    .store(in: &cancellables)
     }
     
     func getYesterdayFlag() async {
@@ -303,9 +310,5 @@ class BacklogViewModel: ObservableObject {
         } catch {
             print("Error updateCategory: \(error)")
         }
-    }
-    
-    func setDeadlineDateMode() {
-        deadlineDateMode = AppStorageManager.deadlineDateMode
     }
 }
