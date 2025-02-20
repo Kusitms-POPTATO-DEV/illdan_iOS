@@ -82,7 +82,7 @@ struct AccountInfoView: View {
                 
                 Spacer().frame(height: 24)
                 
-                AccountInfoItem(title: "카카오 로그인", content: email)
+                AccountInfoItem(title: "로그인 정보", content: email)
                 
                 Spacer().frame(height: 32)
                 
