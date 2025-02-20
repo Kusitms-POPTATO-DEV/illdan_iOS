@@ -14,10 +14,12 @@ class MyPageViewModel: ObservableObject {
     @Published var email: String = ""
     @Published var imageUrl: String = ""
     @Published var policyContent: String = ""
+    @Published var deadlineDateMode: Bool
     
     init(userRepository: UserRepository = UserRepositoryImpl(), authRepository: AuthRepository = AuthRepositoryImpl()) {
         self.userRepository = userRepository
         self.authRepository = authRepository
+        self.deadlineDateMode = AppStorageManager.deadlineDateMode
     }
     
     func getUserInfo() async {
@@ -68,5 +70,9 @@ class MyPageViewModel: ObservableObject {
         } catch {
             print("Error deleteAccount: \(error)")
         }
+    }
+    
+    func updateDealineMode(_ value: Bool) async {
+        AppStorageManager.deadlineDateMode = value
     }
 }

@@ -10,6 +10,7 @@ import SwiftUI
 struct AppStorageManager {
     private static let hasSeenYesterdayKey = "hasSeenYesterdayView"
     private static let lastUpdatedDateKey = "lastUpdatedDate"
+    private static let deadlineDateModeKey = "deadlineDateMode"
     
     static var hasSeenYesterday: Bool {
         get {
@@ -29,6 +30,15 @@ struct AppStorageManager {
         if lastUpdatedDate != today {
             UserDefaults.standard.set(false, forKey: hasSeenYesterdayKey)
             UserDefaults.standard.set(today, forKey: lastUpdatedDateKey)
+        }
+    }
+    
+    static var deadlineDateMode: Bool {
+        get {
+            return UserDefaults.standard.bool(forKey: deadlineDateModeKey)
+        }
+        set {
+            UserDefaults.standard.set(newValue, forKey: deadlineDateModeKey)
         }
     }
 }
