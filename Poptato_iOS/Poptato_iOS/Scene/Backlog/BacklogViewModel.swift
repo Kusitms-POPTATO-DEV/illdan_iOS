@@ -23,6 +23,7 @@ class BacklogViewModel: ObservableObject {
     @Published var showDeleteCategoryDialog: Bool = false
     @Published var isCategoryEditMode: Bool = false
     @Published var showDeleteToaseMessage: Bool = false
+    @Published var deadlineDateMode: Bool
     
     init(
         backlogRepository: BacklogRepository = BacklogRepositoryImpl(),
@@ -32,6 +33,7 @@ class BacklogViewModel: ObservableObject {
         self.backlogRepository = backlogRepository
         self.todoRepository = todoRepository
         self.categoryRepository = categoryRepository
+        self.deadlineDateMode = AppStorageManager.deadlineDateMode
         Task {
             await getYesterdayFlag()
         }
@@ -301,5 +303,9 @@ class BacklogViewModel: ObservableObject {
         } catch {
             print("Error updateCategory: \(error)")
         }
+    }
+    
+    func setDeadlineDateMode() {
+        deadlineDateMode = AppStorageManager.deadlineDateMode
     }
 }

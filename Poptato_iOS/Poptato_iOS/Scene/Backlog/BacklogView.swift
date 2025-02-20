@@ -98,7 +98,8 @@ struct BacklogView: View {
                                 await viewModel.dragAndDrop()
                             }
                         },
-                        activeItemId: $viewModel.activeItemId
+                        activeItemId: $viewModel.activeItemId,
+                        deadlineDateModel: viewModel.deadlineDateMode
                     )
                 }
                 
@@ -167,6 +168,7 @@ struct BacklogView: View {
             isTextFieldFocused = false
         }
         .onAppear {
+            viewModel.setDeadlineDateMode() // 이후에 Combine을 사용하는 방식으로 수정
             Task {
                 await viewModel.getCategoryList(page: 0, size: 100)
                 await viewModel.fetchBacklogList()
@@ -249,6 +251,7 @@ struct BacklogListView: View {
     @Binding var activeItemId: Int?
     @State private var draggedItem: TodoItemModel?
     @State private var isDragging: Bool = false
+    @State var deadlineDateModel: Bool
     
     var body: some View {
         ScrollView {
@@ -262,7 +265,8 @@ struct BacklogListView: View {
                         onItemSelected: onItemSelected,
                         editBacklog: editBacklog,
                         swipeBacklog: swipeBacklog,
-                        activeItemId: $activeItemId
+                        activeItemId: $activeItemId,
+                        deadlineDateModel: deadlineDateModel
                     )
                     .onDrag {
                         draggedItem = item
@@ -292,6 +296,7 @@ struct BacklogItemView: View {
     @FocusState var isActive: Bool
     @State var content = ""
     @State private var offset: CGFloat = 0
+    @State var deadlineDateModel: Bool
     private let hapticFeedback = UIImpactFeedbackGenerator(style: .medium)
     
     var body: some View {
@@ -328,23 +333,30 @@ struct BacklogItemView: View {
                         .cornerRadius(4)
                     }
                     
-                    if let dDay = item.dDay {
+                    if let dDay = item.dDay, let deadline = item.deadline {
                         ZStack {
-                            if dDay == 0 {
-                                Text("D-day")
-                                    .font(PoptatoTypo.calMedium)
-                                    .foregroundColor(.gray50)
-                                    .frame(height: 12)
-                            } else if dDay > 0 {
-                                Text("D-\(dDay)")
+                            if deadlineDateModel {
+                                Text(deadline)
                                     .font(PoptatoTypo.calMedium)
                                     .foregroundColor(.gray50)
                                     .frame(height: 12)
                             } else {
-                                Text("D+\(abs(dDay))")
-                                    .font(PoptatoTypo.calMedium)
-                                    .foregroundColor(.gray50)
-                                    .frame(height: 12)
+                                if dDay == 0 {
+                                    Text("D-day")
+                                        .font(PoptatoTypo.calMedium)
+                                        .foregroundColor(.gray50)
+                                        .frame(height: 12)
+                                } else if dDay > 0 {
+                                    Text("D-\(dDay)")
+                                        .font(PoptatoTypo.calMedium)
+                                        .foregroundColor(.gray50)
+                                        .frame(height: 12)
+                                } else {
+                                    Text("D+\(abs(dDay))")
+                                        .font(PoptatoTypo.calMedium)
+                                        .foregroundColor(.gray50)
+                                        .frame(height: 12)
+                                }
                             }
                         }
                         .padding(.horizontal, 4)
