@@ -171,6 +171,7 @@ struct BottomSheetButton: View {
             Spacer()
             if buttonText == "반복 할 일" {
                 Toggle("", isOn: $isRepeat)
+                    .tint(isRepeat ? Color.primary40 : Color.gray80)
             }
             if !subText.isEmpty {
                 Text(subText)
