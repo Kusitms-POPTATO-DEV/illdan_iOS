@@ -81,6 +81,19 @@ struct MyPageView: View {
                     Spacer().frame(height: 24)
                     
                     VStack(alignment: .leading, spacing: 32) {
+                        HStack {
+                            Text("마감기한 날짜로 보기")
+                                .font(PoptatoTypo.mdMedium)
+                                .foregroundColor(.gray20)
+                            
+                            Spacer()
+                            
+                            Toggle("", isOn: $viewModel.deadlineDateMode)
+                                .tint(viewModel.deadlineDateMode ? Color.primary60 : Color.gray80)
+                                .onChange(of: viewModel.deadlineDateMode) {
+                                    CommonSettingsManager.shared.toggleDeadlineMode()
+                                }
+                        }
                         Text("공지사항")
                             .font(PoptatoTypo.mdMedium)
                             .foregroundColor(.gray20)

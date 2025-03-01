@@ -15,6 +15,7 @@ struct BacklogView: View {
     @Binding var isYesterdayTodoViewPresented: Bool
     @Binding var isCreateCategoryViewPresented: Bool
     @State private var settingsMenuPosition: CGPoint = .zero
+    @State private var isViewActive = false
     
     var body: some View {
         ZStack(alignment: .bottom) {
@@ -98,7 +99,8 @@ struct BacklogView: View {
                                 await viewModel.dragAndDrop()
                             }
                         },
-                        activeItemId: $viewModel.activeItemId
+                        activeItemId: $viewModel.activeItemId,
+                        deadlineDateMode: viewModel.deadlineDateMode
                     )
                 }
                 
@@ -167,10 +169,17 @@ struct BacklogView: View {
             isTextFieldFocused = false
         }
         .onAppear {
+            print("deadlineDateMode: \(viewModel.deadlineDateMode)")
             Task {
                 await viewModel.getCategoryList(page: 0, size: 100)
                 await viewModel.fetchBacklogList()
+                await MainActor.run {
+                    isViewActive = true
+                }
             }
+        }
+        .onDisappear {
+            isViewActive = false
         }
         .onChange(of: isCreateCategoryViewPresented) {
             if !isCreateCategoryViewPresented {
@@ -249,6 +258,7 @@ struct BacklogListView: View {
     @Binding var activeItemId: Int?
     @State private var draggedItem: TodoItemModel?
     @State private var isDragging: Bool = false
+    var deadlineDateMode: Bool
     
     var body: some View {
         ScrollView {
@@ -262,7 +272,8 @@ struct BacklogListView: View {
                         onItemSelected: onItemSelected,
                         editBacklog: editBacklog,
                         swipeBacklog: swipeBacklog,
-                        activeItemId: $activeItemId
+                        activeItemId: $activeItemId,
+                        deadlineDateMode: deadlineDateMode
                     )
                     .onDrag {
                         draggedItem = item
@@ -292,6 +303,7 @@ struct BacklogItemView: View {
     @FocusState var isActive: Bool
     @State var content = ""
     @State private var offset: CGFloat = 0
+    var deadlineDateMode: Bool
     private let hapticFeedback = UIImpactFeedbackGenerator(style: .medium)
     
     var body: some View {
@@ -328,23 +340,30 @@ struct BacklogItemView: View {
                         .cornerRadius(4)
                     }
                     
-                    if let dDay = item.dDay {
+                    if let dDay = item.dDay, let deadline = item.deadline {
                         ZStack {
-                            if dDay == 0 {
-                                Text("D-day")
-                                    .font(PoptatoTypo.calMedium)
-                                    .foregroundColor(.gray50)
-                                    .frame(height: 12)
-                            } else if dDay > 0 {
-                                Text("D-\(dDay)")
+                            if deadlineDateMode {
+                                Text(deadline)
                                     .font(PoptatoTypo.calMedium)
                                     .foregroundColor(.gray50)
                                     .frame(height: 12)
                             } else {
-                                Text("D+\(abs(dDay))")
-                                    .font(PoptatoTypo.calMedium)
-                                    .foregroundColor(.gray50)
-                                    .frame(height: 12)
+                                if dDay == 0 {
+                                    Text("D-day")
+                                        .font(PoptatoTypo.calMedium)
+                                        .foregroundColor(.gray50)
+                                        .frame(height: 12)
+                                } else if dDay > 0 {
+                                    Text("D-\(dDay)")
+                                        .font(PoptatoTypo.calMedium)
+                                        .foregroundColor(.gray50)
+                                        .frame(height: 12)
+                                } else {
+                                    Text("D+\(abs(dDay))")
+                                        .font(PoptatoTypo.calMedium)
+                                        .foregroundColor(.gray50)
+                                        .frame(height: 12)
+                                }
                             }
                         }
                         .padding(.horizontal, 4)

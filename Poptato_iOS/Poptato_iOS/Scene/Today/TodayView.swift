@@ -64,7 +64,8 @@ struct TodayView: View {
                                 onItemSelected: { item in
                                     onItemSelcted(item)
                                 },
-                                activeItemId: $viewModel.activeItemId
+                                activeItemId: $viewModel.activeItemId,
+                                deadlineDateMode: viewModel.deadlineDateMode
                             )
                         }
                     }
@@ -75,6 +76,7 @@ struct TodayView: View {
             }
         }
         .onAppear {
+            print("deadlineDateMode: \(viewModel.deadlineDateMode)")
             Task {
                 await viewModel.getCategoryList(page: 0, size: 100)
                 await viewModel.getTodayList()
@@ -109,6 +111,7 @@ struct TodayListView: View {
     @State private var draggedIndex: Int?
     @State private var isDragging: Bool = false
     @State private var hapticFeedback = UIImpactFeedbackGenerator(style: .medium)
+    @State var deadlineDateMode: Bool
     
     var body: some View {
         ScrollView {
@@ -124,7 +127,8 @@ struct TodayListView: View {
                         editToday: editToday,
                         swipeToday: swipeToday,
                         updateTodoCompletion: updateTodoCompletion,
-                        onItemSelected: onItemSelected
+                        onItemSelected: onItemSelected,
+                        deadlineDateMode: deadlineDateMode
                     )
                     .onDrag {
                         draggedItem = item
@@ -154,6 +158,7 @@ struct TodayItemView: View {
     let hapticFeedback = UIImpactFeedbackGenerator(style: .medium)
     @State private var offset: CGFloat = 0
     @State var content = ""
+    @State var deadlineDateMode: Bool
     @FocusState var isActive: Bool
 
     var body: some View {
@@ -190,31 +195,39 @@ struct TodayItemView: View {
                         .cornerRadius(4)
                     }
                     
-                    if let dDay = item.dday {
+                    if let dDay = item.dDay, let deadline = item.deadline {
                         ZStack {
-                            if dDay == 0 {
-                                Text("D-day")
-                                    .font(PoptatoTypo.calMedium)
-                                    .foregroundColor(.gray50)
-                                    .frame(height: 12)
-                            } else if dDay > 0 {
-                                Text("D-\(dDay)")
+                            if deadlineDateMode {
+                                Text(deadline)
                                     .font(PoptatoTypo.calMedium)
                                     .foregroundColor(.gray50)
                                     .frame(height: 12)
                             } else {
-                                Text("D+\(abs(dDay))")
-                                    .font(PoptatoTypo.calMedium)
-                                    .foregroundColor(.gray50)
-                                    .frame(height: 12)
+                                if dDay == 0 {
+                                    Text("D-day")
+                                        .font(PoptatoTypo.calMedium)
+                                        .foregroundColor(.gray50)
+                                        .frame(height: 12)
+                                } else if dDay > 0 {
+                                    Text("D-\(dDay)")
+                                        .font(PoptatoTypo.calMedium)
+                                        .foregroundColor(.gray50)
+                                        .frame(height: 12)
+                                } else {
+                                    Text("D+\(abs(dDay))")
+                                        .font(PoptatoTypo.calMedium)
+                                        .foregroundColor(.gray50)
+                                        .frame(height: 12)
+                                }
                             }
+                            
                         }
                         .padding(.horizontal, 4)
                         .padding(.vertical, 2)
                         .background(Color.gray90)
                         .cornerRadius(4)
                     }
-                    if (item.isBookmark || item.dday != nil || item.isRepeat) { Spacer() }
+                    if (item.isBookmark || item.dDay != nil || item.isRepeat) { Spacer() }
                 }
                 
                 HStack {
@@ -262,7 +275,7 @@ struct TodayItemView: View {
             
             Spacer()
             
-            ZStack(alignment: (item.isBookmark || item.dday != nil) ? .top : .center) {
+            ZStack(alignment: (item.isBookmark || item.dDay != nil) ? .top : .center) {
                 Image("ic_dot")
                     .resizable()
                     .frame(width: 20, height: 20)
@@ -273,7 +286,7 @@ struct TodayItemView: View {
                                 content: item.content,
                                 isBookmark: item.isBookmark,
                                 isRepeat: item.isRepeat,
-                                dDay: item.dday,
+                                dDay: item.dDay,
                                 deadline: item.deadline
                             )
                         )

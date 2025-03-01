@@ -8,11 +8,12 @@
 import SwiftUI
 import Combine
 
-class BacklogViewModel: ObservableObject {
+final class BacklogViewModel: ObservableObject {
     private var tempIdCounter = -1
     private let backlogRepository: BacklogRepository
     private let todoRepository: TodoRepository
     private let categoryRepository: CategoryRepository
+    private var cancellables = Set<AnyCancellable>()
     @Published var isExistYesterdayTodo: Bool = false
     @Published var backlogList: Array<TodoItemModel> = []
     @Published var activeItemId: Int? = nil
@@ -23,6 +24,7 @@ class BacklogViewModel: ObservableObject {
     @Published var showDeleteCategoryDialog: Bool = false
     @Published var isCategoryEditMode: Bool = false
     @Published var showDeleteToaseMessage: Bool = false
+    @Published var deadlineDateMode: Bool
     
     init(
         backlogRepository: BacklogRepository = BacklogRepositoryImpl(),
@@ -32,6 +34,7 @@ class BacklogViewModel: ObservableObject {
         self.backlogRepository = backlogRepository
         self.todoRepository = todoRepository
         self.categoryRepository = categoryRepository
+        self.deadlineDateMode = AppStorageManager.deadlineDateMode
         Task {
             await getYesterdayFlag()
         }
@@ -39,6 +42,12 @@ class BacklogViewModel: ObservableObject {
         NotificationCenter.default.addObserver(forName: .yesterdayTodoCompleted, object: nil, queue: .main) { _ in
             self.isExistYesterdayTodo = false
         }
+        
+        CommonSettingsManager.shared.$deadlineDateMode
+                    .sink { [weak self] newValue in
+                        self?.deadlineDateMode = newValue
+                    }
+                    .store(in: &cancellables)
     }
     
     func getYesterdayFlag() async {

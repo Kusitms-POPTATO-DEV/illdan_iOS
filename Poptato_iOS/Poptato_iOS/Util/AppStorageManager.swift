@@ -5,11 +5,15 @@
 //  Created by 현수 노트북 on 2/1/25.
 //
 
+import Combine
 import SwiftUI
 
 struct AppStorageManager {
     private static let hasSeenYesterdayKey = "hasSeenYesterdayView"
     private static let lastUpdatedDateKey = "lastUpdatedDate"
+    private static let deadlineDateModeKey = "deadlineDateMode"
+    
+    static let deadlineDateModePublisher = CurrentValueSubject<Bool, Never>(UserDefaults.standard.bool(forKey: deadlineDateModeKey))
     
     static var hasSeenYesterday: Bool {
         get {
@@ -29,6 +33,16 @@ struct AppStorageManager {
         if lastUpdatedDate != today {
             UserDefaults.standard.set(false, forKey: hasSeenYesterdayKey)
             UserDefaults.standard.set(today, forKey: lastUpdatedDateKey)
+        }
+    }
+    
+    static var deadlineDateMode: Bool {
+        get {
+            return deadlineDateModePublisher.value
+        }
+        set {
+            UserDefaults.standard.set(newValue, forKey: deadlineDateModeKey)
+            deadlineDateModePublisher.send(newValue)
         }
     }
 }

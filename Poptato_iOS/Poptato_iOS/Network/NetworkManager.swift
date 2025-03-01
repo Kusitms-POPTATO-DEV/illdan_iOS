@@ -134,9 +134,16 @@ final class NetworkManager {
         guard let refreshToken = KeychainManager.shared.readToken(for: "refreshToken") else { return false }
 
         do {
-            let response = try await AuthRepositoryImpl().refreshToken(request: TokenModel(accessToken: accessToken, refreshToken: refreshToken))
+            guard let fcmToken = try await FCMManager.shared.getFCMToken() else {
+                print("FCM 토큰을 가져오지 못함.")
+                return false
+            }
+            let request = ReissueTokenRequest(accessToken: accessToken, refreshToken: refreshToken, clientId: fcmToken)
+            let response = try await AuthRepositoryImpl().refreshToken(request: request)
+            
             KeychainManager.shared.saveToken(response.accessToken, for: "accessToken")
             KeychainManager.shared.saveToken(response.refreshToken, for: "refreshToken")
+            
             print("토큰 갱신 성공")
             return true
         } catch {
