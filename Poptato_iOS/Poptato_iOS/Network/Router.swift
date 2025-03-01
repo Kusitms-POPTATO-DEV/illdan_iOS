@@ -11,7 +11,7 @@ import Alamofire
 enum Router: URLRequestConvertible {
     // auth
     case kakaoLogin(loginRequest: LoginRequest)
-    case reissueToken(reissueRequest: TokenModel)
+    case reissueToken(reissueRequest: ReissueTokenRequest)
     case logout
     case deleteAccount
     

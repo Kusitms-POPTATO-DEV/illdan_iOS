@@ -10,7 +10,7 @@ final class AuthRepositoryImpl: AuthRepository {
         try await NetworkManager.shared.request(type: LoginResponse.self, api: .kakaoLogin(loginRequest: request))
     }
     
-    func refreshToken(request: TokenModel) async throws -> TokenModel {
+    func refreshToken(request: ReissueTokenRequest) async throws -> TokenModel {
         try await NetworkManager.shared.request(type: TokenModel.self, api: .reissueToken(reissueRequest: request))
     }
     

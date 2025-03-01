@@ -21,7 +21,7 @@ final class LoginViewModel: ObservableObject {
     
     func kakaoLogin(token: String) async {
         do {
-            guard let fcmToken = try await getFCMToken() else {
+            guard let fcmToken = try await FCMManager.shared.getFCMToken() else {
                 throw NSError(domain: "FCM", code: -1, userInfo: [NSLocalizedDescriptionKey: "FCM 토큰 발급에 실패했습니다."])
             }
             
@@ -51,7 +51,7 @@ final class LoginViewModel: ObservableObject {
             throw NSError(domain: "AppleLogin", code: -2, userInfo: [NSLocalizedDescriptionKey: "애플 토큰 발급 실패"])
         }
 
-        guard let fcmToken = try await getFCMToken() else {
+        guard let fcmToken = try await FCMManager.shared.getFCMToken() else {
             throw NSError(domain: "FCM", code: -1, userInfo: [NSLocalizedDescriptionKey: "FCM 토큰 발급 실패"])
         }
 
@@ -72,18 +72,6 @@ final class LoginViewModel: ObservableObject {
 
             KeychainManager.shared.saveToken(response.accessToken, for: "accessToken")
             KeychainManager.shared.saveToken(response.refreshToken, for: "refreshToken")
-        }
-    }
-    
-    private func getFCMToken() async throws -> String? {
-        try await withCheckedThrowingContinuation { continuation in
-            Messaging.messaging().token { token, error in
-                if let error = error {
-                    continuation.resume(throwing: error)
-                } else {
-                    continuation.resume(returning: token)
-                }
-            }
         }
     }
 }
