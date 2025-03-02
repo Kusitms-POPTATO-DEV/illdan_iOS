@@ -29,9 +29,7 @@ class YesterdayTodoViewModel: ObservableObject {
     
     func completeYesterdayTodo() async {
         do {
-            for id in completionList {
-                try await todoRepository.updateTodoCompletion(todoId: id)
-            }
+            try await todoRepository.updateYesterdayCompletion(todoIdsRequest: TodoIdsRequest(todoIds: completionList))
             
             await MainActor.run {
                 AppStorageManager.hasSeenYesterday = true
