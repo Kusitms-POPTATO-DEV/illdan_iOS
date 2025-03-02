@@ -27,6 +27,7 @@ enum Router: URLRequestConvertible {
     
     // yesterday
     case getYesterdayList(page: Int, size: Int)
+    case updateYesterdayCompletion(todoIdsRequest: TodoIdsRequest)
     
     // todo
     case swipeTodo(swipeRequest: TodoIdModel)
@@ -182,6 +183,15 @@ enum Router: URLRequestConvertible {
             if let accessToken = accessToken {
                 request.addValue("Bearer \(accessToken)", forHTTPHeaderField: "Authorization")
             }
+        case .updateYesterdayCompletion(let todoIdsRequest):
+            let endpoint = url.appendingPathComponent("/todo/check/yesterdays")
+            request = URLRequest(url: endpoint)
+            request.httpMethod = "POST"
+            request.addValue("application/json", forHTTPHeaderField: "Content-Type")
+            if let accessToken = accessToken {
+                request.addValue("Bearer \(accessToken)", forHTTPHeaderField: "Authorization")
+            }
+            request.httpBody = try JSONEncoder().encode(todoIdsRequest)
             
         // todo
         case .swipeTodo(let swipeRequest):

@@ -35,4 +35,8 @@ final class TodoRepositoryImpl: TodoRepository {
     func updateCategory(todoId: Int, categoryId: CategoryIdModel) async throws {
         try await NetworkManager.shared.request(api: .updateCategory(todoId: todoId, categoryId: categoryId))
     }
+    
+    func updateYesterdayCompletion(todoIdsRequest: TodoIdsRequest) async throws {
+        try await NetworkManager.shared.request(api: .updateYesterdayCompletion(todoIdsRequest: todoIdsRequest))
+    }
 }
