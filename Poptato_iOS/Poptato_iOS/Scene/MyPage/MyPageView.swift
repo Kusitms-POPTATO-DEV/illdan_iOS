@@ -90,7 +90,7 @@ struct MyPageView: View {
                             
                             Toggle("", isOn: $viewModel.deadlineDateMode)
                                 .tint(viewModel.deadlineDateMode ? Color.primary60 : Color.gray80)
-                                .onChange(of: viewModel.deadlineDateMode) {
+                                .onChange(of: viewModel.deadlineDateMode) { newValue in
                                     CommonSettingsManager.shared.toggleDeadlineMode()
                                 }
                         }

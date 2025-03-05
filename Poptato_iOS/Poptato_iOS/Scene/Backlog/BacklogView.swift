@@ -181,8 +181,8 @@ struct BacklogView: View {
         .onDisappear {
             isViewActive = false
         }
-        .onChange(of: isCreateCategoryViewPresented) {
-            if !isCreateCategoryViewPresented {
+        .onChange(of: isCreateCategoryViewPresented) { newValue in
+            if !newValue {
                 Task {
                     await viewModel.getCategoryList(page: 0, size: 100)
                 }
@@ -469,8 +469,8 @@ struct CreateBacklogTextField: View {
 
                 TextField("", text: $taskInput, axis: .vertical)
                     .focused($isFocused)
-                    .onChange(of: taskInput) {
-                        if taskInput.last == "\n" {
+                    .onChange(of: taskInput) { newValue in
+                        if newValue.last == "\n" {
                             taskInput.removeLast()
                             handleSubmit()
                         }
