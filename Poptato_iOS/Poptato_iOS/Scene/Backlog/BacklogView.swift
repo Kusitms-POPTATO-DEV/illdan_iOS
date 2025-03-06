@@ -164,6 +164,11 @@ struct BacklogView: View {
                 )
             }
         }
+        .simultaneousGesture(
+            TapGesture().onEnded {
+                isTextFieldFocused = false
+            }
+        )
         .onTapGesture {
             viewModel.showCategorySettingMenu = false
             isTextFieldFocused = false
