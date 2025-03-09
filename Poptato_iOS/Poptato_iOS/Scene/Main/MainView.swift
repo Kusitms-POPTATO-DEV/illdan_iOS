@@ -18,6 +18,8 @@ struct MainView: View {
     @State private var isYesterdayViewPresented = false
     @State private var isMotivationViewPresented = false
     @State private var isCreateCategoryViewPresented = false
+    @State private var isToastPresented = false
+    @State private var toastMessage = ""
     @StateObject private var backlogViewModel = BacklogViewModel()
     @StateObject private var todayViewModel = TodayViewModel()
     
@@ -58,6 +60,9 @@ struct MainView: View {
                                              isBottomSheetVisible = true
                                          }
                                      }
+                                 },
+                                 showToast: { message in
+                                     showToast(message: message)
                                  }
                              )
                              .tabItem {
@@ -167,6 +172,7 @@ struct MainView: View {
                         deleteTodo: {
                             Task {
                                 await backlogViewModel.deleteBacklog(todoId: todoItem.todoId)
+                                showToast(message: "할 일이 삭제되었어요.")
                             }
                         },
                         editTodo: {
@@ -210,6 +216,7 @@ struct MainView: View {
                         deleteTodo: {
                             Task {
                                 await todayViewModel.deleteTodo(todoId: todoItem.todoId)
+                                showToast(message: "할 일이 삭제되었어요.")
                             }
                         },
                         editTodo: {
@@ -254,6 +261,7 @@ struct MainView: View {
                 isMotivationViewPresented: $isMotivationViewPresented
             )
         }
+        .toast(isPresented: $isToastPresented, message: toastMessage)
         .onAppear {
             Task {
                 await todayViewModel.getTodayList()
@@ -266,5 +274,10 @@ struct MainView: View {
                 }
             }
         }
+    }
+    
+    private func showToast(message: String) {
+        toastMessage = message
+        isToastPresented = true
     }
 }

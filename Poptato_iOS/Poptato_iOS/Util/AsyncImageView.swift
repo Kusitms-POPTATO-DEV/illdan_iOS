@@ -62,10 +62,10 @@ struct SVGImageView: View {
         .onAppear {
             loadSVGImage(from: imageURL)
         }
-        .onChange(of: imageURL) {
+        .onChange(of: imageURL) { newValue in
             isLoading = true
             svgImage = nil
-            loadSVGImage(from: imageURL)
+            loadSVGImage(from: newValue)
         }
     }
 
@@ -123,10 +123,10 @@ struct PDFImageView: View {
         .onAppear {
             loadPDF(from: imageURL)
         }
-        .onChange(of: imageURL) {
+        .onChange(of: imageURL) { newValue in
             isLoading = true
             pdfImage = nil
-            loadPDF(from: imageURL)
+            loadPDF(from: newValue)
         }
     }
 

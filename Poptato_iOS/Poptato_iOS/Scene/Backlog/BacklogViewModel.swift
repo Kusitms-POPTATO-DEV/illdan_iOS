@@ -23,7 +23,6 @@ final class BacklogViewModel: ObservableObject {
     @Published var showCategorySettingMenu: Bool = false
     @Published var showDeleteCategoryDialog: Bool = false
     @Published var isCategoryEditMode: Bool = false
-    @Published var showDeleteToaseMessage: Bool = false
     @Published var deadlineDateMode: Bool
     
     init(
@@ -106,7 +105,6 @@ final class BacklogViewModel: ObservableObject {
         do {
             await MainActor.run {
                 self.backlogList.removeAll { $0.todoId == todoId }
-                showDeleteToaseMessage = true
             }
             
             try await backlogRepository.deleteBacklog(todoId: todoId)

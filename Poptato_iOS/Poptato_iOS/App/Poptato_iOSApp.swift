@@ -11,12 +11,14 @@ import KakaoSDKAuth
 import FirebaseCore
 import Firebase
 import FirebaseMessaging
+import FirebaseAnalytics
 import UserNotifications
 
 class AppDelegate: NSObject, UIApplicationDelegate, UNUserNotificationCenterDelegate, MessagingDelegate {
     func application(_ application: UIApplication,
                    didFinishLaunchingWithOptions launchOptions: [UIApplication.LaunchOptionsKey : Any]? = nil) -> Bool {
         FirebaseApp.configure()
+        Analytics.setAnalyticsCollectionEnabled(true)
 
         // APNs 등록
         UNUserNotificationCenter.current().delegate = self

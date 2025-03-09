@@ -40,8 +40,11 @@ struct ToastModifier: ViewModifier {
                         RoundedCorner(radius: 8)
                             .fill(Color.toast)
                     )
-                    .transition(.move(edge: .bottom))
-                    .animation(.easeInOut, value: isPresented)
+                    .transition(.opacity)
+                    .transaction { transaction in
+                        transaction.animation = nil
+                    }
+                    .padding(.bottom, 70)
                 }
                 .onAppear {
                     DispatchQueue.main.asyncAfter(deadline: .now() + duration) {

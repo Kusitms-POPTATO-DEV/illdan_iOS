@@ -179,7 +179,7 @@ struct BottomSheetButton: View {
                     .foregroundColor(.gray60)
             } else if !categoryName.isEmpty {
                 HStack(alignment: .center, spacing: 4) {
-                    SVGImageView(imageURL: emojiImageUrl, width: 20, height: 20)
+                    PDFImageView(imageURL: emojiImageUrl, width: 20, height: 20)
                     Text(categoryName)
                         .font(PoptatoTypo.mdMedium)
                         .foregroundColor(.gray00)

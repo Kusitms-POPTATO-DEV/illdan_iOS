@@ -13,6 +13,7 @@ struct TodayView: View {
     @FocusState private var isTextFieldFocused: Bool
     var goToBacklog: () -> Void
     var onItemSelcted: (TodoItemModel) -> Void
+    var showToast: (String) -> Void
     @State private var isViewActive = false
     @State private var hapticFeedback = UIImpactFeedbackGenerator(style: .medium)
     
@@ -52,7 +53,7 @@ struct TodayView: View {
                                         
                                         if viewModel.checkAllTodoCompleted() {
                                             performDoubleHapticFeedback()
-                                            viewModel.showToastMessage = true
+                                            showToast("와우! 수고한 나 자신에게 박수!👏")
                                         }
                                     }
                                 },
@@ -88,8 +89,6 @@ struct TodayView: View {
         .onDisappear {
             isViewActive = false
         }
-        .toast(isPresented: $viewModel.showToastMessage, message: "와우! 수고한 나 자신에게 박수!👏")
-        .toast(isPresented: $viewModel.showDeleteTodoToastMessage, message: "할 일이 삭제되었어요.")
     }
     
     private func performDoubleHapticFeedback() {

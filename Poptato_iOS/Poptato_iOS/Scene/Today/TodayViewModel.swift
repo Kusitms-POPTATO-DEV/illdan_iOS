@@ -16,8 +16,6 @@ final class TodayViewModel: ObservableObject {
     @Published var categoryList: Array<CategoryModel> = []
     @Published var selectedCategoryIndex: Int = 0
     @Published var activeItemId: Int? = nil
-    @Published var showToastMessage: Bool = false
-    @Published var showDeleteTodoToastMessage: Bool = false
     @Published var deadlineDateMode: Bool
     private var snapshotList: [TodayItemModel] = []
     private let todayRepository: TodayRepository
@@ -122,7 +120,6 @@ final class TodayViewModel: ObservableObject {
         do {
             await MainActor.run {
                 self.todayList.removeAll { $0.todoId == todoId }
-                showDeleteTodoToastMessage = true
             }
             
             try await backlogRepository.deleteBacklog(todoId: todoId)

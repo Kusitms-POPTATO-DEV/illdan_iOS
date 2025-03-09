@@ -162,8 +162,8 @@ struct CreateCategoryTextField: View {
                         .padding(.top, 40),
                     alignment: .bottom
                 )
-                .onChange(of: input) {
-                    if input.count > 15 {
+                .onChange(of: input) { newValue in
+                    if newValue.count > 15 {
                         input = String(input.prefix(15))
                     }
                 }
