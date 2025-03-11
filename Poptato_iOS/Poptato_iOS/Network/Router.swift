@@ -12,7 +12,7 @@ enum Router: URLRequestConvertible {
     // auth
     case kakaoLogin(loginRequest: LoginRequest)
     case reissueToken(reissueRequest: ReissueTokenRequest)
-    case logout
+    case logout(logoutRequest: LogoutRequest)
     case deleteAccount
     
     // backlog
@@ -81,7 +81,7 @@ enum Router: URLRequestConvertible {
                 request.addValue("Bearer \(accessToken)", forHTTPHeaderField: "Authorization")
             }
             request.httpBody = try JSONEncoder().encode(reissueRequest)
-        case .logout:
+        case .logout(let logoutRequest):
             let endpoint = url.appendingPathComponent("/auth/logout")
             request = URLRequest(url: endpoint)
             request.httpMethod = "POST"
@@ -89,6 +89,7 @@ enum Router: URLRequestConvertible {
             if let accessToken = accessToken {
                 request.addValue("Bearer \(accessToken)", forHTTPHeaderField: "Authorization")
             }
+            request.httpBody = try JSONEncoder().encode(logoutRequest)
         case .deleteAccount:
             let endpoint = url.appendingPathComponent("/user/delete")
             request = URLRequest(url: endpoint)
