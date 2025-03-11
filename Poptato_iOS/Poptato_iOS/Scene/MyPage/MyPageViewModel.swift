@@ -48,12 +48,14 @@ class MyPageViewModel: ObservableObject {
     
     func logout() async {
         do {
+            let clientId = try await FCMManager.shared.getFCMToken()
+            
+            try await authRepository.logout(request: LogoutRequest(clientId: clientId))
+            
             await MainActor.run {
                 KeychainManager.shared.deleteToken(for: "accessToken")
                 KeychainManager.shared.deleteToken(for: "refreshToken")
             }
-            
-            try await authRepository.logout()
         } catch {
             print("Error logout: \(error)")
         }
