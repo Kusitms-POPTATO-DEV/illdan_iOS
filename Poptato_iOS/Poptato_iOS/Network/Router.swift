@@ -90,13 +90,14 @@ enum Router: URLRequestConvertible {
                 request.addValue("Bearer \(accessToken)", forHTTPHeaderField: "Authorization")
             }
         case .deleteAccount:
-            let endpoint = url.appendingPathComponent("/user")
+            let endpoint = url.appendingPathComponent("/user/delete")
             request = URLRequest(url: endpoint)
-            request.httpMethod = "DELETE"
+            request.httpMethod = "POST"
             request.addValue("application/json", forHTTPHeaderField: "Content-Type")
             if let accessToken = accessToken {
                 request.addValue("Bearer \(accessToken)", forHTTPHeaderField: "Authorization")
             }
+            request.httpBody = try JSONEncoder().encode(DeleteAccountRequest(reasons: nil, userInputReason: nil))
             
         // backlog
         case .createBacklog(let createBacklogRequest):
