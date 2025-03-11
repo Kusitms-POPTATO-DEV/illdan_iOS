@@ -77,9 +77,11 @@ struct Poptato_iOSApp: App {
         KakaoSDK.initSDK(appKey: Secrets.kakaoAppKey)
     }
     
+    @Environment(\.scenePhase) private var scenePhase
     @ObservedObject private var splashViewModel = SplashViewModel()
     @State private var finishSplash = false
     @State private var isLogined = false
+    @State private var isFirstLaunch = true
     
     var body: some Scene {
         WindowGroup {
@@ -94,9 +96,17 @@ struct Poptato_iOSApp: App {
                                 Task{
                                     isLogined = await splashViewModel.checkLogin()
                                     finishSplash = true
+                                    isFirstLaunch = false
                                 }
                             }
                         })
+                }
+            }
+            .onChange(of: scenePhase) { newPhase in
+                if newPhase == .active && !isFirstLaunch {
+                    Task {
+                        await NetworkManager.shared.refreshToken()
+                    }
                 }
             }
         }
