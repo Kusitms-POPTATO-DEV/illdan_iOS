@@ -82,6 +82,7 @@ struct CreateCategoryView: View {
         }
         .frame(maxWidth: .infinity, maxHeight: .infinity)
         .onAppear {
+            isTextFieldFocused = true
             Task {
                 await viewModel.getEmojiList()
             }
