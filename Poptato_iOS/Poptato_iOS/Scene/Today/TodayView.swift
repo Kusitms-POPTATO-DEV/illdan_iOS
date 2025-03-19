@@ -244,19 +244,17 @@ struct TodayItemView: View {
                         }
 
                     if activeItemId == item.todoId {
-                        TextField("", text: $content)
+                        TextField("", text: $content, axis: .vertical)
                             .focused($isActive)
                             .onAppear {
                                 isActive = true
                                 content = item.content
                             }
-                            .onSubmit {
-                                if !content.isEmpty, let activeItemId {
-                                    item.content = content
-                                    editToday(activeItemId, content)
+                            .onChange(of: content) { newValue in
+                                if newValue.contains("\n") {
+                                    content = newValue.replacingOccurrences(of: "\n", with: "")
+                                    handleSubmit()
                                 }
-                                isActive = false
-                                activeItemId = nil
                             }
                             .font(PoptatoTypo.mdRegular)
                             .foregroundColor(.gray00)
@@ -349,6 +347,15 @@ struct TodayItemView: View {
                 todayList.insert(updatedItem, at: 0)
             }
         }
+    }
+    
+    private func handleSubmit() {
+        if !content.isEmpty, let activeItemId {
+            item.content = content
+            editToday(activeItemId, content)
+        }
+        isActive = false
+        activeItemId = nil
     }
 }
 

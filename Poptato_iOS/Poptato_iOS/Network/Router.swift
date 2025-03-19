@@ -239,7 +239,11 @@ enum Router: URLRequestConvertible {
                 request.addValue("Bearer \(accessToken)", forHTTPHeaderField: "Authorization")
             }
         case .getTodoDetail(let todoId):
-            let endpoint = url.appendingPathComponent("/todo/\(todoId)")
+            var components = URLComponents(url: url.appendingPathComponent("/todo/\(todoId)"), resolvingAgainstBaseURL: false)
+            components?.queryItems = [URLQueryItem(name: "mobileType", value: "IOS")]
+            guard let endpoint = components?.url else {
+                throw URLError(.badURL)
+            }
             request = URLRequest(url: endpoint)
             request.httpMethod = "GET"
             request.addValue("application/json", forHTTPHeaderField: "Content-Type")

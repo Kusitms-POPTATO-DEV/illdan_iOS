@@ -379,19 +379,17 @@ struct BacklogItemView: View {
                 }
                 
                 if activeItemId == item.todoId {
-                    TextField("", text: $content)
+                    TextField("", text: $content, axis: .vertical)
                         .focused($isActive)
                         .onAppear {
                             isActive = true
                             content = item.content
                         }
-                        .onSubmit {
-                            if !content.isEmpty, let activeItemId {
-                                item.content = content
-                                editBacklog(activeItemId, content)
+                        .onChange(of: content) { newValue in
+                            if newValue.contains("\n") {
+                                content = newValue.replacingOccurrences(of: "\n", with: "")
+                                handleSubmit()
                             }
-                            isActive = false
-                            activeItemId = nil
                         }
                         .font(PoptatoTypo.mdRegular)
                         .foregroundColor(.gray00)
@@ -448,6 +446,15 @@ struct BacklogItemView: View {
                 }
         )
     }
+    
+    private func handleSubmit() {
+        if !content.isEmpty, let activeItemId {
+            item.content = content
+            editBacklog(activeItemId, content)
+        }
+        isActive = false
+        activeItemId = nil
+    }
 }
 
 struct CreateBacklogTextField: View {
@@ -474,8 +481,8 @@ struct CreateBacklogTextField: View {
                 TextField("", text: $taskInput, axis: .vertical)
                     .focused($isFocused)
                     .onChange(of: taskInput) { newValue in
-                        if newValue.last == "\n" {
-                            taskInput.removeLast()
+                        if newValue.contains("\n") {
+                            taskInput = newValue.replacingOccurrences(of: "\n", with: "")
                             handleSubmit()
                         }
                     }
