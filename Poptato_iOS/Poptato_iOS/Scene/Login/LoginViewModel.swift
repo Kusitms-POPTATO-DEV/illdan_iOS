@@ -20,6 +20,7 @@ final class LoginViewModel: ObservableObject {
     }
     
     func kakaoLogin(token: String) async {
+        AnalyticsManager.shared.logEvent(AnalyticsEvent.login)
         do {
             guard let fcmToken = try await FCMManager.shared.getFCMToken() else {
                 throw NSError(domain: "FCM", code: -1, userInfo: [NSLocalizedDescriptionKey: "FCM 토큰 발급에 실패했습니다."])

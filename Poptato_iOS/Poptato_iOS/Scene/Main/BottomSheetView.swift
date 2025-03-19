@@ -37,6 +37,7 @@ struct BottomSheetView: View {
                                 .resizable()
                                 .frame(width: 24, height: 24)
                                 .onTapGesture {
+                                    AnalyticsManager.shared.logEvent(AnalyticsEvent.set_important, parameters: ["task_id" : todoItem?.todoId ?? -1])
                                     updateBookmark()
                                 }
                         }
@@ -49,7 +50,9 @@ struct BottomSheetView: View {
                         buttonText: "반복 할 일",
                         buttonColor: .gray30,
                         subText: "",
-                        onClickBtn: {},
+                        onClickBtn: {
+                            AnalyticsManager.shared.logEvent(AnalyticsEvent.set_repeat, parameters: ["task_id" : todoItem?.todoId ?? -1])
+                        },
                         isRepeat: Binding(
                             get: { todoItem?.isRepeat ?? false },
                             set: { newValue in
@@ -92,6 +95,7 @@ struct BottomSheetView: View {
                         buttonColor: .gray30,
                         subText: "",
                         onClickBtn: {
+                            AnalyticsManager.shared.logEvent(AnalyticsEvent.edit_task)
                             isVisible = false
                             editTodo()
                         },
@@ -108,6 +112,7 @@ struct BottomSheetView: View {
                         buttonColor: .danger50,
                         subText: "",
                         onClickBtn: {
+                            AnalyticsManager.shared.logEvent(AnalyticsEvent.delete_task, parameters: ["task_id" : todoItem?.todoId ?? -1])
                             isVisible = false
                             deleteTodo()
                         },
@@ -219,11 +224,13 @@ struct DateBottomSheet: View {
                     year: selectedYear,
                     month: selectedMonth,
                     onClickIncreaseMonth: {
+                        AnalyticsManager.shared.logEvent(AnalyticsEvent.check_month)
                         if selectedMonth == 12 { selectedMonth = 1; selectedYear += 1 }
                         else { selectedMonth += 1 }
                         generateCalendarDays()
                     },
                     onClickDecreaseMonth: {
+                        AnalyticsManager.shared.logEvent(AnalyticsEvent.check_month)
                         if selectedMonth == 1 { selectedMonth = 12; selectedYear -= 1 }
                         else { selectedMonth -= 1 }
                         generateCalendarDays()
@@ -240,6 +247,14 @@ struct DateBottomSheet: View {
                             let formattedMonth = String(format: "%02d", selectedMonth)
                             let formattedDay = String(format: "%02d", day)
                             let deadline = "\(String(selectedYear))-\(formattedMonth)-\(formattedDay)"
+                            AnalyticsManager.shared.logEvent(
+                                AnalyticsEvent.set_dday,
+                                parameters: [
+                                    "set_date" : TimeFormatter.currentDateString(),
+                                    "dday" : deadline,
+                                    "task_id" : item?.todoId ?? -1
+                                ]
+                            )
                             updateDeadline(deadline)
                         }
                     },
@@ -318,6 +333,7 @@ struct BottomSheetCalendarView: View {
                                     .cornerRadius(8)
                             )
                             .onTapGesture {
+                                AnalyticsManager.shared.logEvent(AnalyticsEvent.check_date)
                                 selectedDay = date
                             }
                     } else {
@@ -415,6 +431,7 @@ struct CategoryBottomSheet: View {
                         positiveText: "완료",
                         negativeText: "취소",
                         onClickBtnPositive: {
+                            AnalyticsManager.shared.logEvent(AnalyticsEvent.set_category)
                             updateCategory(selectedCategoryId)
                             onDismiss()
                         },

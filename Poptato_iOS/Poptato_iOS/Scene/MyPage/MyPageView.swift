@@ -98,18 +98,21 @@ struct MyPageView: View {
                             .font(PoptatoTypo.mdMedium)
                             .foregroundColor(.gray20)
                             .onTapGesture {
+                                AnalyticsManager.shared.logEvent(AnalyticsEvent.notice)
                                 isNoticeViewPresented = true
                             }
                         Text("문의 & FAQ")
                             .font(PoptatoTypo.mdMedium)
                             .foregroundColor(.gray20)
                             .onTapGesture {
+                                AnalyticsManager.shared.logEvent(AnalyticsEvent.faq)
                                 isFaqViewPresented = true
                             }
                         Text("개인정보처리 방침")
                             .font(PoptatoTypo.mdMedium)
                             .foregroundColor(.gray20)
                             .onTapGesture {
+                                AnalyticsManager.shared.logEvent(AnalyticsEvent.terms)
                                 isPolicyViewPresented = true
                             }
                         Text("버전")

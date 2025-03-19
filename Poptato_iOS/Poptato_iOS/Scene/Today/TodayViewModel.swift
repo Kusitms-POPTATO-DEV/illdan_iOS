@@ -72,6 +72,7 @@ final class TodayViewModel: ObservableObject {
     
     func swipeToday(todoId: Int) async {
         do {
+            AnalyticsManager.shared.logEvent(AnalyticsEvent.back_tasks, parameters: ["task_id" : todoId])
             try await todoRepository.swipeTodo(request: TodoIdModel(todoId: todoId))
         } catch {
             print("Error swipe backlog: \(error)")
@@ -82,6 +83,7 @@ final class TodayViewModel: ObservableObject {
         let previousSnapshot = todayList
         
         do {
+            AnalyticsManager.shared.logEvent(AnalyticsEvent.complete_task, parameters: ["task_id" : todoId])
             try await todoRepository.updateTodoCompletion(todoId: todoId)
             snapshotList = todayList
         } catch {
@@ -93,11 +95,14 @@ final class TodayViewModel: ObservableObject {
     }
     
     func checkAllTodoCompleted() -> Bool {
-        return todayList.allSatisfy { $0.todayStatus == "COMPLETED" }
+        let result = todayList.allSatisfy { $0.todayStatus == "COMPLETED" }
+        if result { AnalyticsManager.shared.logEvent(AnalyticsEvent.complete_all) }
+        return result
     }
     
     func dragAndDrop() async {
         do {
+            AnalyticsManager.shared.logEvent(AnalyticsEvent.drag_today)
             let todoIds = todayList.map{ $0.todoId }
             try await todoRepository.dragAndDrop(type: "TODAY", todoIds: todoIds)
         } catch {
@@ -225,6 +230,7 @@ final class TodayViewModel: ObservableObject {
     
     func getTodoDetail(item: TodoItemModel) async {
         do {
+            AnalyticsManager.shared.logEvent(AnalyticsEvent.today_bottom_sheet)
             let response = try await todoRepository.getTodoDetail(todoId: item.todoId)
             let categoryId = categoryList.first { category in
                 category.name == response.categoryName && category.imageUrl == response.emojiImageUrl

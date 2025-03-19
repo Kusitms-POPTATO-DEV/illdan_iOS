@@ -34,6 +34,12 @@ final class CreateCategoryViewModel: ObservableObject {
     
     func createCategory(name: String, emojiId: Int) async {
         do {
+            AnalyticsManager.shared.logEvent(
+                AnalyticsEvent.make_category,
+                parameters: [
+                    "emoji_id" : selectedEmoji?.id ?? -1
+                ]
+            )
             try await categoryRepository.createCategory(request: CreateCategoryRequest(name: name, emojiId: emojiId))
         } catch {
             print("Error createCategory: \(error)")
