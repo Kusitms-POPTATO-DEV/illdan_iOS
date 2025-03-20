@@ -63,6 +63,7 @@ class MyPageViewModel: ObservableObject {
     
     func deleteAccount() async {
         do {
+            AnalyticsManager.shared.logEvent(AnalyticsEvent.delete_account)
             try await authRepository.deleteAccount()
             
             await MainActor.run {

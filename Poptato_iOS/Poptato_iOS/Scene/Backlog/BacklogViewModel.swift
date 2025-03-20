@@ -71,6 +71,14 @@ final class BacklogViewModel: ObservableObject {
                     backlogList[index].todoId = response.todoId
                 }
             }
+            AnalyticsManager.shared.logEvent(
+                AnalyticsEvent.make_task,
+                parameters: [
+                    "add_date" : TimeFormatter.currentDateString(),
+                    "task_ID" : response.todoId,
+                    "category_name" : categoryList[selectedCategoryIndex].name
+                ]
+            )
         } catch {
             await MainActor.run {
                 backlogList.removeAll { $0.todoId == temporaryId }
@@ -81,6 +89,13 @@ final class BacklogViewModel: ObservableObject {
     
     func fetchBacklogList() async {
         do {
+            AnalyticsManager.shared.logEvent(AnalyticsEvent.get_backlog_list)
+            AnalyticsManager.shared.logEvent(
+                AnalyticsEvent.view_category,
+                parameters: [
+                    "category_name" : categoryList[selectedCategoryIndex].name
+                ]
+            )
             let response = try await backlogRepository.getBacklogList(page: 0, size: 100, categoryId: categoryList[selectedCategoryIndex].id)
             await MainActor.run {
                 backlogList = response.backlogs.map { item in
@@ -131,6 +146,14 @@ final class BacklogViewModel: ObservableObject {
     func swipeBacklog(todoId: Int) async {
         do {
             try await todoRepository.swipeTodo(request: TodoIdModel(todoId: todoId))
+            
+            AnalyticsManager.shared.logEvent(
+                AnalyticsEvent.add_today,
+                parameters: [
+                    "add_date" : TimeFormatter.currentDateString(),
+                    "task_ID" : todoId
+                ]
+            )
         } catch {
             DispatchQueue.main.async {
                 print("Error swipe backlog: \(error)")
@@ -223,6 +246,7 @@ final class BacklogViewModel: ObservableObject {
     
     func dragAndDrop() async {
         do {
+            AnalyticsManager.shared.logEvent(AnalyticsEvent.drag_tasks)
             let todoIds = backlogList.map { $0.todoId }
             try await todoRepository.dragAndDrop(type: "BACKLOG", todoIds: todoIds)
         } catch {
@@ -272,6 +296,10 @@ final class BacklogViewModel: ObservableObject {
     
     func deleteCategory() async {
         do {
+            AnalyticsManager.shared.logEvent(
+                AnalyticsEvent.delete_category,
+                parameters: ["category_name" : categoryList[selectedCategoryIndex].name]
+            )
             let categoryId = categoryList[selectedCategoryIndex].id
             
             await MainActor.run {

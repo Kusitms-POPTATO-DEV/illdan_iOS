@@ -98,23 +98,35 @@ struct MyPageView: View {
                             .font(PoptatoTypo.mdMedium)
                             .foregroundColor(.gray20)
                             .onTapGesture {
+                                AnalyticsManager.shared.logEvent(AnalyticsEvent.notice)
                                 isNoticeViewPresented = true
                             }
                         Text("문의 & FAQ")
                             .font(PoptatoTypo.mdMedium)
                             .foregroundColor(.gray20)
                             .onTapGesture {
+                                AnalyticsManager.shared.logEvent(AnalyticsEvent.faq)
                                 isFaqViewPresented = true
                             }
                         Text("개인정보처리 방침")
                             .font(PoptatoTypo.mdMedium)
                             .foregroundColor(.gray20)
                             .onTapGesture {
+                                AnalyticsManager.shared.logEvent(AnalyticsEvent.terms)
                                 isPolicyViewPresented = true
                             }
-                        Text("버전")
-                            .font(PoptatoTypo.mdMedium)
-                            .foregroundColor(.gray20)
+                        HStack {
+                            Text("버전")
+                                .font(PoptatoTypo.mdMedium)
+                                .foregroundColor(.gray20)
+                            
+                            Spacer()
+                            
+                            Text(Bundle.main.infoDictionary?["CFBundleShortVersionString"] as? String ?? "1.0.0")
+                                .font(PoptatoTypo.mdMedium)
+                                .foregroundColor(.primary60)
+                        }
+                        
                     }
                     .padding(.horizontal, 8)
                     
