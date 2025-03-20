@@ -115,9 +115,18 @@ struct MyPageView: View {
                                 AnalyticsManager.shared.logEvent(AnalyticsEvent.terms)
                                 isPolicyViewPresented = true
                             }
-                        Text("버전")
-                            .font(PoptatoTypo.mdMedium)
-                            .foregroundColor(.gray20)
+                        HStack {
+                            Text("버전")
+                                .font(PoptatoTypo.mdMedium)
+                                .foregroundColor(.gray20)
+                            
+                            Spacer()
+                            
+                            Text(Bundle.main.infoDictionary?["CFBundleShortVersionString"] as? String ?? "1.0.0")
+                                .font(PoptatoTypo.mdMedium)
+                                .foregroundColor(.primary60)
+                        }
+                        
                     }
                     .padding(.horizontal, 8)
                     
