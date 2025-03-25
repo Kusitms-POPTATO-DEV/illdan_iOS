@@ -17,6 +17,7 @@ final class BacklogViewModel: ObservableObject {
     @Published var isExistYesterdayTodo: Bool = false
     @Published var backlogList: Array<TodoItemModel> = []
     @Published var activeItemId: Int? = nil
+    @Published var editingContent: String = ""
     @Published var selectedTodoItem: TodoItemModel? = nil
     @Published var categoryList: Array<CategoryModel> = []
     @Published var selectedCategoryIndex: Int = 0
@@ -131,15 +132,22 @@ final class BacklogViewModel: ObservableObject {
     }
     
     func editBacklog(todoId: Int, content: String) async {
+        guard let index = backlogList.firstIndex(where: { $0.todoId == todoId }) else { return }
+        let originalData = backlogList[index]
+        
         do {
             await MainActor.run {
+                backlogList[index].content = content
                 selectedTodoItem = nil
             }
+            
             try await backlogRepository.editBacklog(todoId: todoId, content: content)
         } catch {
-            DispatchQueue.main.async {
-                print("Error edit backlog: \(error)")
+            await MainActor.run {
+                backlogList[index] = originalData
             }
+            
+            print("Error edit backlog: \(error)")
         }
     }
     
