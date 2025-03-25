@@ -54,7 +54,7 @@ struct BacklogView: View {
                             Image("ic_settings")
                                 .onTapGesture {
                                     settingsMenuPosition = geometry.frame(in: .global).origin
-                                    viewModel.showCategorySettingMenu = true
+                                    viewModel.showCategorySettingMenu = !viewModel.showCategorySettingMenu
                                 }
                         }
                         .frame(width: 20, height: 20)
@@ -167,12 +167,13 @@ struct BacklogView: View {
         .simultaneousGesture(
             TapGesture().onEnded {
                 isTextFieldFocused = false
+                viewModel.showCategorySettingMenu = false
             }
         )
-        .onTapGesture {
-            viewModel.showCategorySettingMenu = false
-            isTextFieldFocused = false
-        }
+//        .onTapGesture {
+//            viewModel.showCategorySettingMenu = false
+//            isTextFieldFocused = false
+//        }
         .onAppear {
             print("deadlineDateMode: \(viewModel.deadlineDateMode)")
             Task {
