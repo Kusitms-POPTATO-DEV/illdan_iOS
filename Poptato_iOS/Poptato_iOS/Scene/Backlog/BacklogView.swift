@@ -11,6 +11,7 @@ import Combine
 struct BacklogView: View {
     @EnvironmentObject var viewModel: BacklogViewModel
     @FocusState private var isTextFieldFocused: Bool
+    @FocusState private var isEditingActive: Bool
     var onItemSelcted: (TodoItemModel) -> Void
     @Binding var isYesterdayTodoViewPresented: Bool
     @Binding var isCreateCategoryViewPresented: Bool
@@ -54,7 +55,7 @@ struct BacklogView: View {
                             Image("ic_settings")
                                 .onTapGesture {
                                     settingsMenuPosition = geometry.frame(in: .global).origin
-                                    viewModel.showCategorySettingMenu = true
+                                    viewModel.showCategorySettingMenu = !viewModel.showCategorySettingMenu
                                 }
                         }
                         .frame(width: 20, height: 20)
@@ -100,6 +101,8 @@ struct BacklogView: View {
                             }
                         },
                         activeItemId: $viewModel.activeItemId,
+                        content: $viewModel.editingContent,
+                        isActive: $isEditingActive,
                         deadlineDateMode: viewModel.deadlineDateMode
                     )
                 }
@@ -167,12 +170,12 @@ struct BacklogView: View {
         .simultaneousGesture(
             TapGesture().onEnded {
                 isTextFieldFocused = false
+                viewModel.showCategorySettingMenu = false
+                if isEditingActive {
+                    submitEditing()
+                }
             }
         )
-        .onTapGesture {
-            viewModel.showCategorySettingMenu = false
-            isTextFieldFocused = false
-        }
         .onAppear {
             print("deadlineDateMode: \(viewModel.deadlineDateMode)")
             Task {
@@ -191,6 +194,22 @@ struct BacklogView: View {
                 Task {
                     await viewModel.getCategoryList(page: 0, size: 100)
                 }
+            }
+        }
+    }
+    
+    private func submitEditing() {
+        if viewModel.editingContent.isEmpty {
+            isEditingActive = false
+            viewModel.activeItemId = nil
+        }
+        guard let itemId = viewModel.activeItemId, !viewModel.editingContent.isEmpty else { return }
+        Task {
+            await viewModel.editBacklog(todoId: itemId, content: viewModel.editingContent)
+            await MainActor.run {
+                isEditingActive = false
+                viewModel.activeItemId = nil
+                viewModel.editingContent = ""
             }
         }
     }
@@ -260,6 +279,8 @@ struct BacklogListView: View {
     var swipeBacklog: (Int) -> Void
     var onDragEnd: () -> Void
     @Binding var activeItemId: Int?
+    @Binding var content: String
+    @FocusState.Binding var isActive: Bool
     @State private var draggedItem: TodoItemModel?
     @State private var isDragging: Bool = false
     var deadlineDateMode: Bool
@@ -277,6 +298,8 @@ struct BacklogListView: View {
                         editBacklog: editBacklog,
                         swipeBacklog: swipeBacklog,
                         activeItemId: $activeItemId,
+                        content: $content,
+                        isActive: $isActive,
                         deadlineDateMode: deadlineDateMode
                     )
                     .onDrag {
@@ -304,8 +327,8 @@ struct BacklogItemView: View {
     var editBacklog: (Int, String) -> Void
     var swipeBacklog: (Int) -> Void
     @Binding var activeItemId: Int?
-    @FocusState var isActive: Bool
-    @State var content = ""
+    @Binding var content: String
+    @FocusState.Binding var isActive: Bool
     @State private var offset: CGFloat = 0
     var deadlineDateMode: Bool
     private let hapticFeedback = UIImpactFeedbackGenerator(style: .medium)
@@ -449,11 +472,11 @@ struct BacklogItemView: View {
     
     private func handleSubmit() {
         if !content.isEmpty, let activeItemId {
-            item.content = content
             editBacklog(activeItemId, content)
         }
         isActive = false
         activeItemId = nil
+        content = ""
     }
 }
 

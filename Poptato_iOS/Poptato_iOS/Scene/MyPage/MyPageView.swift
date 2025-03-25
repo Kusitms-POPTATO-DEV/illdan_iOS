@@ -94,27 +94,22 @@ struct MyPageView: View {
                                     CommonSettingsManager.shared.toggleDeadlineMode()
                                 }
                         }
-                        Text("공지사항")
-                            .font(PoptatoTypo.mdMedium)
-                            .foregroundColor(.gray20)
-                            .onTapGesture {
-                                AnalyticsManager.shared.logEvent(AnalyticsEvent.notice)
-                                isNoticeViewPresented = true
-                            }
-                        Text("문의 & FAQ")
-                            .font(PoptatoTypo.mdMedium)
-                            .foregroundColor(.gray20)
-                            .onTapGesture {
-                                AnalyticsManager.shared.logEvent(AnalyticsEvent.faq)
-                                isFaqViewPresented = true
-                            }
-                        Text("개인정보처리 방침")
-                            .font(PoptatoTypo.mdMedium)
-                            .foregroundColor(.gray20)
-                            .onTapGesture {
-                                AnalyticsManager.shared.logEvent(AnalyticsEvent.terms)
-                                isPolicyViewPresented = true
-                            }
+                        
+                        MyPageButton(text: "공지사항", onClickBtn: {
+                            AnalyticsManager.shared.logEvent(AnalyticsEvent.notice)
+                            isNoticeViewPresented = true
+                        })
+                        
+                        MyPageButton(text: "문의 & FAQ", onClickBtn: {
+                            AnalyticsManager.shared.logEvent(AnalyticsEvent.faq)
+                            isFaqViewPresented = true
+                        })
+                        
+                        MyPageButton(text: "개인정보처리 방침", onClickBtn: {
+                            AnalyticsManager.shared.logEvent(AnalyticsEvent.terms)
+                            isPolicyViewPresented = true
+                        })
+                        
                         HStack {
                             Text("버전")
                                 .font(PoptatoTypo.mdMedium)
@@ -149,5 +144,23 @@ struct MyPageView: View {
             }
         }
         
+    }
+}
+
+struct MyPageButton: View {
+    let text: String
+    let onClickBtn: () -> Void
+    
+    var body: some View {
+        HStack {
+            Text(text)
+                .font(PoptatoTypo.mdMedium)
+                .foregroundColor(.gray20)
+            Spacer()
+        }
+        .contentShape(Rectangle())
+        .onTapGesture {
+            onClickBtn()
+        }
     }
 }

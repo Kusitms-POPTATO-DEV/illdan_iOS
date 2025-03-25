@@ -9,7 +9,7 @@ import SwiftUI
 
 struct MainView: View {
     @Binding var isLogined: Bool
-    @State private var selectedTab: Int? = nil
+    @State private var selectedTab: Int = 0
     @State private var isLoading: Bool = true
     @State private var isBottomSheetVisible = false
     @State private var isDateBottomSheetVisible = false
@@ -46,68 +46,66 @@ struct MainView: View {
                 Color.gray100.edgesIgnoringSafeArea(.all)  
             } else {
                 if isLogined {
-                     if let selectedTab = selectedTab {
-                         TabView(selection: Binding(
-                             get: { selectedTab },
-                             set: { newValue in self.selectedTab = newValue }
-                         )) {
-                             TodayView(
-                                 goToBacklog: { self.selectedTab = 1 },
-                                 onItemSelcted: { item in
-                                     Task {
-                                         await todayViewModel.getTodoDetail(item: item)
-                                         withTransaction(Transaction(animation: .easeInOut)) {
-                                             isBottomSheetVisible = true
-                                         }
-                                     }
-                                 },
-                                 showToast: { message in
-                                     showToast(message: message)
-                                 }
-                             )
-                             .tabItem {
-                                 Label("오늘", image: selectedTab == 0 ? "ic_today_selected" : "ic_today_unselected")
-                                     .font(PoptatoTypo.xsMedium)
-                             }
-                             .environmentObject(todayViewModel)
-                             .tag(0)
-                             
-                             BacklogView(
-                                 onItemSelcted: { item in
-                                     Task {
-                                         await backlogViewModel.getTodoDetail(item: item)
-                                         withTransaction(Transaction(animation: .easeInOut)) {
-                                             isBottomSheetVisible = true
-                                         }
-                                     }
-                                 },
-                                 isYesterdayTodoViewPresented: $isYesterdayViewPresented,
-                                 isCreateCategoryViewPresented: $isCreateCategoryViewPresented
-                             )
-                             .tabItem {
-                                 Label("할 일", image: selectedTab == 1 ? "ic_backlog_selected" : "ic_backlog_unselected")
-                                     .font(PoptatoTypo.xsMedium)
-                             }
-                             .environmentObject(backlogViewModel)
-                             .tag(1)
-                             
-                             HistoryView()
-                                 .tabItem {
-                                     Label("기록", image: selectedTab == 2 ? "ic_clock_selected" : "ic_clock_unselected")
-                                 }
-                                 .tag(2)
-                             
-                             MyPageView(
-                                 goToKaKaoLogin: { isLogined = false },
-                                 isPolicyViewPresented: $isPolicyViewPresented
-                             )
-                             .tabItem {
-                                 Label("마이", image: "ic_mypage")
-                                     .font(PoptatoTypo.xsMedium)
-                             }
-                             .tag(3)
-                         }
-                     }
+                    TabView(selection: Binding(
+                        get: { selectedTab },
+                        set: { newValue in self.selectedTab = newValue }
+                    )) {
+                        TodayView(
+                            goToBacklog: { self.selectedTab = 1 },
+                            onItemSelcted: { item in
+                                Task {
+                                    await todayViewModel.getTodoDetail(item: item)
+                                    withTransaction(Transaction(animation: .easeInOut)) {
+                                        isBottomSheetVisible = true
+                                    }
+                                }
+                            },
+                            showToast: { message in
+                                showToast(message: message)
+                            }
+                        )
+                        .tabItem {
+                            Label("오늘", image: selectedTab == 0 ? "ic_today_selected" : "ic_today_unselected")
+                                .font(PoptatoTypo.xsMedium)
+                        }
+                        .environmentObject(todayViewModel)
+                        .tag(0)
+                        
+                        BacklogView(
+                            onItemSelcted: { item in
+                                Task {
+                                    await backlogViewModel.getTodoDetail(item: item)
+                                    withTransaction(Transaction(animation: .easeInOut)) {
+                                        isBottomSheetVisible = true
+                                    }
+                                }
+                            },
+                            isYesterdayTodoViewPresented: $isYesterdayViewPresented,
+                            isCreateCategoryViewPresented: $isCreateCategoryViewPresented
+                        )
+                        .tabItem {
+                            Label("할 일", image: selectedTab == 1 ? "ic_backlog_selected" : "ic_backlog_unselected")
+                                .font(PoptatoTypo.xsMedium)
+                        }
+                        .environmentObject(backlogViewModel)
+                        .tag(1)
+                        
+                        HistoryView()
+                            .tabItem {
+                                Label("기록", image: selectedTab == 2 ? "ic_clock_selected" : "ic_clock_unselected")
+                            }
+                            .tag(2)
+                        
+                        MyPageView(
+                            goToKaKaoLogin: { isLogined = false },
+                            isPolicyViewPresented: $isPolicyViewPresented
+                        )
+                        .tabItem {
+                            Label("마이", image: "ic_mypage")
+                                .font(PoptatoTypo.xsMedium)
+                        }
+                        .tag(3)
+                    }
                     
                     if isPolicyViewPresented {
                         PolicyView(isPolicyViewPresented: $isPolicyViewPresented)
@@ -269,7 +267,6 @@ struct MainView: View {
                 if backlogViewModel.isExistYesterdayTodo {
                     isYesterdayViewPresented = true
                 } else {
-                    selectedTab = todayViewModel.todayList.isEmpty ? 1 : 0
                     isLoading = false
                 }
             }
