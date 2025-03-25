@@ -36,11 +36,7 @@ final class BacklogViewModel: ObservableObject {
         self.categoryRepository = categoryRepository
         self.deadlineDateMode = AppStorageManager.deadlineDateMode
         Task {
-            await getYesterdayFlag()
-        }
-        
-        NotificationCenter.default.addObserver(forName: .yesterdayTodoCompleted, object: nil, queue: .main) { _ in
-            self.isExistYesterdayTodo = false
+            await getYesterdayList(page: 0, size: 1)
         }
         
         CommonSettingsManager.shared.$deadlineDateMode
@@ -48,12 +44,6 @@ final class BacklogViewModel: ObservableObject {
                         self?.deadlineDateMode = newValue
                     }
                     .store(in: &cancellables)
-    }
-    
-    func getYesterdayFlag() async {
-        if !AppStorageManager.hasSeenYesterday {
-            await getYesterdayList(page: 0, size: 1)
-        }
     }
     
     func createBacklog(_ item: String) async {
@@ -269,7 +259,6 @@ final class BacklogViewModel: ObservableObject {
                 if !response.yesterdays.isEmpty { isExistYesterdayTodo = true }
                 else {
                     isExistYesterdayTodo = false
-                    AppStorageManager.hasSeenYesterday = true
                 }
             }
         } catch {
