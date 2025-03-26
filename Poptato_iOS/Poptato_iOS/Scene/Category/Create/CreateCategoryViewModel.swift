@@ -13,6 +13,8 @@ final class CreateCategoryViewModel: ObservableObject {
     @Published var categoryId: Int = 0
     @Published var categoryInput: String = ""
     @Published var selectedEmoji: EmojiModel?
+    @Published var showEmptyCategoryNameDialog: Bool = false
+    @Published var showEmptyCategoryEmojiDialog: Bool = false
     
     init(
         categoryRepository: CategoryRepository = CategoryRepositoryImpl()
