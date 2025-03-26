@@ -32,7 +32,8 @@ struct CreateCategoryView: View {
                                 await viewModel.createCategory(name: viewModel.categoryInput, emojiId: viewModel.selectedEmoji!.emojiId)
                                 isPresented = false
                             }
-                        }
+                        } else if viewModel.categoryInput.isEmpty { viewModel.showEmptyCategoryNameDialog = true }
+                        else if viewModel.selectedEmoji == nil { viewModel.showEmptyCategoryEmojiDialog = true }
                     },
                     editCategory: {
                         if !viewModel.categoryInput.isEmpty && viewModel.selectedEmoji != nil {
@@ -40,7 +41,8 @@ struct CreateCategoryView: View {
                                 await viewModel.editCategory(name: viewModel.categoryInput, emojiId: viewModel.selectedEmoji!.emojiId)
                                 isPresented = false
                             }
-                        }
+                        } else if viewModel.categoryInput.isEmpty { viewModel.showEmptyCategoryNameDialog = true }
+                        else if viewModel.selectedEmoji == nil { viewModel.showEmptyCategoryEmojiDialog = true }
                     },
                     isCategoryEditMode: isCategoryEditMode
                 )
@@ -79,7 +81,40 @@ struct CreateCategoryView: View {
                 .transition(.move(edge: .bottom))
                 .zIndex(1)
             }
+            
+            if viewModel.showEmptyCategoryNameDialog {
+                Color.gray100.opacity(0.7)
+                    .ignoresSafeArea()
+                
+                CommonDialog(
+                    content: "카테고리 이름을 작성해 주세요",
+                    negativeButtonText: "확인",
+                    buttonType: DialogButtonType.single,
+                    onClickBtnPositive: {},
+                    onClickBtnNegative: { viewModel.showEmptyCategoryNameDialog = false },
+                    onDismissRequest: { viewModel.showEmptyCategoryNameDialog = false }
+                )
+            }
+            
+            if viewModel.showEmptyCategoryEmojiDialog {
+                Color.gray100.opacity(0.7)
+                    .ignoresSafeArea()
+                
+                CommonDialog(
+                    content: "카테고리 이모티콘을 선택해 주세요",
+                    negativeButtonText: "확인",
+                    buttonType: DialogButtonType.single,
+                    onClickBtnPositive: {},
+                    onClickBtnNegative: { viewModel.showEmptyCategoryEmojiDialog = false },
+                    onDismissRequest: { viewModel.showEmptyCategoryEmojiDialog = false }
+                )
+            }
         }
+        .simultaneousGesture(
+            TapGesture().onEnded{
+                isTextFieldFocused = false
+            }
+        )
         .frame(maxWidth: .infinity, maxHeight: .infinity)
         .onAppear {
             isTextFieldFocused = true
@@ -91,9 +126,6 @@ struct CreateCategoryView: View {
                 viewModel.categoryInput = initialCategoryName
                 viewModel.selectedEmoji = initialSelectedEmoji
             }
-        }
-        .onTapGesture {
-            isTextFieldFocused = false
         }
     }
 }

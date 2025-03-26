@@ -177,7 +177,6 @@ struct BacklogView: View {
             }
         )
         .onAppear {
-            print("deadlineDateMode: \(viewModel.deadlineDateMode)")
             Task {
                 await viewModel.getCategoryList(page: 0, size: 100)
                 await viewModel.fetchBacklogList()
@@ -193,6 +192,8 @@ struct BacklogView: View {
             if !newValue {
                 Task {
                     await viewModel.getCategoryList(page: 0, size: 100)
+                    viewModel.selectedCategoryIndex = viewModel.categoryList.count - 1
+                    await viewModel.fetchBacklogList()
                 }
             }
         }
