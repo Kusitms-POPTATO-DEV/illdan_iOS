@@ -12,6 +12,8 @@ struct CommonDialog: View {
     var content: String = ""
     var positiveButtonText: String = ""
     var negativeButtonText: String = ""
+    var buttonType: DialogButtonType = DialogButtonType.double
+    
     var onClickBtnPositive: () -> Void
     var onClickBtnNegative: () -> Void
     var onDismissRequest: () -> Void
@@ -47,15 +49,17 @@ struct CommonDialog: View {
                         .frame(height: 56)
                         .onTapGesture { onClickBtnNegative() }
                         
-                        ZStack {
-                            Color.danger50
-                            
-                            Text(positiveButtonText)
-                                .font(PoptatoTypo.mdSemiBold)
-                                .foregroundColor(.gray100)
+                        if buttonType == DialogButtonType.double {
+                            ZStack {
+                                Color.danger50
+                                
+                                Text(positiveButtonText)
+                                    .font(PoptatoTypo.mdSemiBold)
+                                    .foregroundColor(.gray100)
+                            }
+                            .frame(height: 56)
+                            .onTapGesture { onClickBtnPositive() }
                         }
-                        .frame(height: 56)
-                        .onTapGesture { onClickBtnPositive() }
                     }
                     .frame(maxWidth: .infinity)
                     .frame(height: 56)
