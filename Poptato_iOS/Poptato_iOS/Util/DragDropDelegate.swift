@@ -33,6 +33,40 @@ struct DragDropDelegate: DropDelegate {
     }
 }
 
+struct CategoryDragDropDelegate: DropDelegate {
+    let item: CategoryModel
+    @Binding var categoryList: [CategoryModel]
+    @Binding var draggedItem: CategoryModel?
+    var onReorder: () -> Void
+    
+    func dropEntered(info: DropInfo) {
+        guard let draggedItem = draggedItem, draggedItem.id != item.id else {
+            return
+        }
+        
+        if item.id == -1 || item.id == 0 {
+            self.draggedItem = nil
+            return
+        }
+        
+        if let fromIndex = categoryList.firstIndex(where: { $0.id == draggedItem.id }),
+           let toIndex = categoryList.firstIndex(where: { $0.id == item.id }) {
+            if fromIndex == 0 || fromIndex == 1 || toIndex == 0 || toIndex == 1 {
+                return
+            }
+            withAnimation {
+                categoryList.move(fromOffsets: IndexSet(integer: fromIndex), toOffset: toIndex > fromIndex ? toIndex + 1 : toIndex)
+            }
+        }
+    }
+    
+    func performDrop(info: DropInfo) -> Bool {
+        draggedItem = nil
+        onReorder()
+        return true
+    }
+}
+
 struct TodayDragDropDelegate: DropDelegate {
     let item: TodayItemModel
     @Binding var todayList: [TodayItemModel]
