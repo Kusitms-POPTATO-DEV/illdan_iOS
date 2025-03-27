@@ -365,9 +365,10 @@ enum Router: URLRequestConvertible {
             }
             request.httpBody = try JSONEncoder().encode(category)
         case .categoryDragAndDrop(let categoryIds):
-            let endpoint = url.appendingPathComponent("/category")
+            let endpoint = url.appendingPathComponent("/category/dragAndDrop")
             request = URLRequest(url: endpoint)
-            request.httpMethod = "POST"
+            request.httpMethod = "PATCH"
+            request.addValue("application/json", forHTTPHeaderField: "Content-Type")
             if let accessToken = accessToken {
                 request.addValue("Bearer \(accessToken)", forHTTPHeaderField: "Authorization")
             }
