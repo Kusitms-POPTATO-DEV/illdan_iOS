@@ -25,4 +25,8 @@ final class CategoryRepositoryImpl: CategoryRepository {
     func editCategory(categoryId: Int, category: CreateCategoryRequest) async throws {
         try await NetworkManager.shared.request(api: .editCategory(categoryId: categoryId, category: category))
     }
+    
+    func categoryDragAndDrop(categoryIds: [Int]) async throws {
+        try await NetworkManager.shared.request(api: .categoryDragAndDrop(categoryIds: categoryIds))
+    }
 }

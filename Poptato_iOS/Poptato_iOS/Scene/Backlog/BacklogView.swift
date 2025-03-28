@@ -26,9 +26,10 @@ struct BacklogView: View {
             VStack(spacing: 0) {
                 HStack(spacing: 12) {
                     CategoryListView(
-                        categoryList: viewModel.categoryList,
-                        onClickCategory: { Task{ await viewModel.fetchBacklogList() } },
-                        selectedIndex: $viewModel.selectedCategoryIndex
+                        categoryList: $viewModel.categoryList,
+                        selectedIndex: $viewModel.selectedCategoryIndex,
+                        onClickCategory: { Task { await viewModel.fetchBacklogList() } },
+                        onDragEnd: { Task { await viewModel.categoryDragAndDrop() } }
                     )
                     HStack {
                         Image("ic_create_category")
@@ -217,9 +218,12 @@ struct BacklogView: View {
 }
 
 struct CategoryListView: View {
-    var categoryList: [CategoryModel]
-    var onClickCategory: () -> Void
+    @Binding var categoryList: [CategoryModel]
     @Binding var selectedIndex: Int
+    @State private var draggedCategory: CategoryModel?
+    @State private var isDragging: Bool = false
+    var onClickCategory: () -> Void
+    var onDragEnd: () -> Void
     
     var body: some View {
         ScrollView(.horizontal) {
@@ -231,6 +235,21 @@ struct CategoryListView: View {
                             selectedIndex = index
                             onClickCategory()
                         }
+                        .if(item.id != -1 && item.id != 0) { view in
+                            view.onDrag {
+                                draggedCategory = item
+                                isDragging = true
+                                return NSItemProvider(object: "\(item.id)" as NSString)
+                            }
+                        }
+                        .onDrop(of: [.text],
+                                delegate: CategoryDragDropDelegate(item: item,
+                                                                   categoryList: $categoryList,
+                                                                   draggedItem: $draggedCategory,
+                                                                   onReorder: {
+                            isDragging = false
+                            onDragEnd()
+                        }))
                 }
             }
         }

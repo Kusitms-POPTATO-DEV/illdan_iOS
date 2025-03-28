@@ -52,6 +52,7 @@ enum Router: URLRequestConvertible {
     case createCategory(category: CreateCategoryRequest)
     case deleteCategory(categoryId: Int)
     case editCategory(categoryId: Int, category: CreateCategoryRequest)
+    case categoryDragAndDrop(categoryIds: [Int])
     
     var accessToken: String? {
         KeychainManager.shared.readToken(for: "accessToken")
@@ -363,6 +364,15 @@ enum Router: URLRequestConvertible {
                 request.addValue("Bearer \(accessToken)", forHTTPHeaderField: "Authorization")
             }
             request.httpBody = try JSONEncoder().encode(category)
+        case .categoryDragAndDrop(let categoryIds):
+            let endpoint = url.appendingPathComponent("/category/dragAndDrop")
+            request = URLRequest(url: endpoint)
+            request.httpMethod = "PATCH"
+            request.addValue("application/json", forHTTPHeaderField: "Content-Type")
+            if let accessToken = accessToken {
+                request.addValue("Bearer \(accessToken)", forHTTPHeaderField: "Authorization")
+            }
+            request.httpBody = try JSONEncoder().encode(CategoryDragDropRequest(categoryIds: categoryIds))
         }
     
         return request
