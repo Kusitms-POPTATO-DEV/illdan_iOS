@@ -266,6 +266,8 @@ final class BacklogViewModel: ObservableObject {
         }
     }
     
+    // Category
+    
     func getCategoryList(page: Int, size: Int) async {
         do {
             let response = try await categoryRepository.getCategoryList(page: page, size: size, mobileType: "IOS")
@@ -274,6 +276,15 @@ final class BacklogViewModel: ObservableObject {
             }
         } catch {
             print("Error getCategoryList: \(error)")
+        }
+    }
+    
+    func categoryDragAndDrop() async {
+        do {
+            let categoryIds = categoryList.dropFirst(2).map { $0.id }
+            try await categoryRepository.categoryDragAndDrop(categoryIds: categoryIds)
+        } catch {
+            print("Error categoryDragAndDrop: \(error)")
         }
     }
 
