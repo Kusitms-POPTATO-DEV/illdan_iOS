@@ -51,18 +51,20 @@ struct CategoryDragDropDelegate: DropDelegate {
         
         if let fromIndex = categoryList.firstIndex(where: { $0.id == draggedItem.id }),
            let toIndex = categoryList.firstIndex(where: { $0.id == item.id }) {
-            if fromIndex == 0 || fromIndex == 1 || toIndex == 0 || toIndex == 1 {
+            if toIndex == 0 || toIndex == 1 {
+                self.draggedItem = nil
+                onReorder()
                 return
             }
             withAnimation {
                 categoryList.move(fromOffsets: IndexSet(integer: fromIndex), toOffset: toIndex > fromIndex ? toIndex + 1 : toIndex)
+                onReorder()
             }
         }
     }
     
     func performDrop(info: DropInfo) -> Bool {
         draggedItem = nil
-        onReorder()
         return true
     }
 }
