@@ -125,6 +125,7 @@ final class TodayViewModel: ObservableObject {
         do {
             await MainActor.run {
                 self.todayList.removeAll { $0.todoId == todoId }
+                selectedTodoItem = nil
             }
             
             try await backlogRepository.deleteBacklog(todoId: todoId)
