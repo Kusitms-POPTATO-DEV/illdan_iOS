@@ -361,10 +361,16 @@ struct EmptyTodayView: View {
     
     var body: some View {
         ZStack(alignment: .center) {
-            VStack {
+            VStack(spacing: 0) {
+                Image("ic_fire_today")
+                
+                Spacer().frame(height: 8)
+                
                 Text("오늘 할 일은 무엇인가요?")
-                    .font(PoptatoTypo.lgMedium)
-                    .foregroundColor(.gray40)
+                    .font(PoptatoTypo.mdMedium)
+                    .foregroundColor(.gray70)
+                
+                Spacer().frame(height: 24)
                 
                 Button(
                     action: { goToBacklog() }
@@ -376,14 +382,13 @@ struct EmptyTodayView: View {
                             .foregroundColor(.primary100)
                         
                         Text("할 일 가져오기")
-                            .font(PoptatoTypo.smSemiBold)
-                            .foregroundColor(.primary100)
+                            .font(PoptatoTypo.mdSemiBold)
+                            .foregroundColor(.gray95)
                     }
                     .frame(width: 132, height: 37)
-                    .background(Color(.primary60))
-                    .cornerRadius(32)
+                    .background(Color(.primary40))
+                    .cornerRadius(12)
                     .padding(.horizontal, 16)
-                    .padding(.vertical, 8)
                 }
             }
         }
