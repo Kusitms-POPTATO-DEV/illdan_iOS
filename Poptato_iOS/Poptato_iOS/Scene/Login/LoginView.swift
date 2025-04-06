@@ -16,30 +16,11 @@ struct LoginView: View {
     var onSuccessLogin: () -> Void
     
     var body: some View {
-        ZStack(alignment: .top) {
+        ZStack(alignment: .center) {
             Color.gray100
-                .edgesIgnoringSafeArea(.all)
-            Color.splash
-                .edgesIgnoringSafeArea(.all)
-            
-            VStack {
-                Spacer()
-                
-                Image("ic_stairs")
-                    .resizable()
-                    .ignoresSafeArea()
-                    .aspectRatio(contentMode: .fit)
-                    .frame(maxWidth: .infinity)
-            }
-            
-            Color.kakaoLogin
                 .edgesIgnoringSafeArea(.all)
             
             Image("ic_login")
-                .resizable()
-                .scaledToFit()
-                .frame(width: 200, height: 137)
-                .offset(y: 80)
             
             VStack(spacing: 0) {
                 Spacer()
