@@ -265,13 +265,6 @@ struct CategoryItemView: View {
     
     var body: some View {
         ZStack(alignment: .center) {
-            Circle()
-                .frame(width: 40, height: 40)
-                .foregroundColor(.gray100)
-                .overlay(
-                    Circle()
-                        .stroke(isSelected ? Color.gray00 : Color.gray95, lineWidth: 1)
-                )
             if image == nil {
                 PDFImageView(imageURL: item.imageUrl, width: 24, height: 24)
             } else {
@@ -283,6 +276,9 @@ struct CategoryItemView: View {
             }
             
         }
+        .frame(width: 40, height: 40)
+        .background(isSelected ? Color.gray90 : Color.gray100)
+        .clipShape(RoundedRectangle(cornerRadius: 12))
     }
 }
 
