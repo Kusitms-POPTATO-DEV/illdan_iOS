@@ -40,6 +40,39 @@ struct TopBar: View {
     }
 }
 
+struct TodayTopBar: View {
+    let todayDate: String
+    
+    var body: some View {
+        ZStack {
+            Color.primary40
+                .ignoresSafeArea(.all)
+            
+            HStack {
+                VStack(alignment: .leading, spacing: 8) {
+                    Text(todayDate)
+                        .font(PoptatoTypo.xxxLSemiBold)
+                        .foregroundColor(.gray100)
+                    
+                    Text("오늘도 일단 해보는 거야!")
+                        .font(PoptatoTypo.mdMedium)
+                        .foregroundColor(.gray100)
+                }
+                
+                Spacer()
+                
+                VStack {
+                    Spacer()
+                    Image("ic_today_top_bar")
+                }
+            }
+            .padding(.leading, 20)
+        }
+        .frame(maxWidth: .infinity)
+        .frame(height: 76)
+    }
+}
+
 #Preview {
     TopBar()
 }

@@ -24,10 +24,7 @@ struct TodayView: View {
                     .ignoresSafeArea()
                 
                 VStack {
-                    TopBar(
-                        titleText: viewModel.currentDate,
-                        subText: ""
-                    )
+                    TodayTopBar(todayDate: viewModel.currentDate)
                     
                     if isViewActive {
                         if viewModel.todayList.isEmpty {
