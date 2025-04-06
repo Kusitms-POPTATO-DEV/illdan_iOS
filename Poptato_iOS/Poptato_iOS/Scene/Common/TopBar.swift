@@ -26,7 +26,7 @@ struct TopBar: View {
                 if (!subText.isEmpty) {
                     Text(subText)
                         .font(PoptatoTypo.xLSemiBold)
-                        .foregroundColor(.primary60)
+                        .foregroundColor(.primary40)
                 } else {
                     Image("ic_today_msg_bubble")
                 }

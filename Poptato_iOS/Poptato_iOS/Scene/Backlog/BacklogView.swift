@@ -345,72 +345,7 @@ struct BacklogItemView: View {
     
     var body: some View {
         HStack {
-            VStack {
-                HStack(spacing: 6) {
-                    if (item.isBookmark) {
-                        HStack(spacing: 2) {
-                            Image("ic_star_filled")
-                                .resizable()
-                                .frame(width: 12, height: 12)
-                            Text("중요")
-                                .font(PoptatoTypo.calSemiBold)
-                                .foregroundColor(.primary60)
-                        }
-                        .padding(.horizontal, 4)
-                        .padding(.vertical, 2)
-                        .background(Color.gray90)
-                        .cornerRadius(4)
-                    }
-                    
-                    if item.isRepeat {
-                        HStack(spacing: 2) {
-                            Image("ic_refresh")
-                                .resizable()
-                                .frame(width: 12, height: 12)
-                            Text("반복")
-                                .font(PoptatoTypo.calSemiBold)
-                                .foregroundColor(.gray50)
-                        }
-                        .padding(.horizontal, 4)
-                        .padding(.vertical, 2)
-                        .background(Color.gray90)
-                        .cornerRadius(4)
-                    }
-                    
-                    if let dDay = item.dDay, let deadline = item.deadline {
-                        ZStack {
-                            if deadlineDateMode {
-                                Text(deadline)
-                                    .font(PoptatoTypo.calMedium)
-                                    .foregroundColor(.gray50)
-                                    .frame(height: 12)
-                            } else {
-                                if dDay == 0 {
-                                    Text("D-day")
-                                        .font(PoptatoTypo.calMedium)
-                                        .foregroundColor(.gray50)
-                                        .frame(height: 12)
-                                } else if dDay > 0 {
-                                    Text("D-\(dDay)")
-                                        .font(PoptatoTypo.calMedium)
-                                        .foregroundColor(.gray50)
-                                        .frame(height: 12)
-                                } else {
-                                    Text("D+\(abs(dDay))")
-                                        .font(PoptatoTypo.calMedium)
-                                        .foregroundColor(.gray50)
-                                        .frame(height: 12)
-                                }
-                            }
-                        }
-                        .padding(.horizontal, 4)
-                        .padding(.vertical, 2)
-                        .background(Color.gray90)
-                        .cornerRadius(4)
-                    }
-                    if (item.isBookmark || item.dDay != nil || item.isRepeat) { Spacer() }
-                }
-                
+            VStack(spacing: 0) {
                 if activeItemId == item.todoId {
                     TextField("", text: $content, axis: .vertical)
                         .focused($isActive)
@@ -434,6 +369,16 @@ struct BacklogItemView: View {
                         
                         Spacer()
                     }
+                }
+                
+                if item.isRepeat || item.dDay != nil {
+                    Spacer().frame(height: 8)
+                    BacklogRepeatDeadlineText(deadlineDateMode: deadlineDateMode, item: item)
+                }
+                
+                if item.isBookmark {
+                    Spacer().frame(height: 8)
+                    BacklogBookmarkCategoryChip(item: item)
                 }
             }
             
@@ -560,6 +505,79 @@ struct CreateBacklogTextField: View {
                     isFocused = true
                 }
             }
+        }
+    }
+}
+
+struct BacklogRepeatDeadlineText: View {
+    @State var deadlineDateMode: Bool
+    let item: TodoItemModel
+    
+    var body: some View {
+        HStack(alignment: .center, spacing: 3) {
+            if item.isRepeat {
+                Text("반복 할 일")
+                    .font(PoptatoTypo.xsRegular)
+                    .foregroundStyle(Color.gray50)
+            }
+            
+            if item.isRepeat && item.dDay != nil {
+                Text("·")
+                    .font(PoptatoTypo.xsRegular)
+                    .foregroundStyle(Color.gray50)
+            }
+            
+            if let dDay = item.dDay, let deadline = item.deadline {
+                ZStack {
+                    if deadlineDateMode {
+                        Text(deadline)
+                            .font(PoptatoTypo.xsRegular)
+                            .foregroundColor(.gray50)
+                    } else {
+                        if dDay == 0 {
+                            Text("D-day")
+                                .font(PoptatoTypo.xsRegular)
+                                .foregroundColor(.gray50)
+                        } else if dDay > 0 {
+                            Text("D-\(dDay)")
+                                .font(PoptatoTypo.xsRegular)
+                                .foregroundColor(.gray50)
+                        } else {
+                            Text("D+\(abs(dDay))")
+                                .font(PoptatoTypo.xsRegular)
+                                .foregroundColor(.gray50)
+                        }
+                    }
+                    
+                }
+            }
+            
+            if item.isRepeat || item.dDay != nil { Spacer().frame(height: 0) }
+        }
+    }
+}
+
+struct BacklogBookmarkCategoryChip: View {
+    let item: TodoItemModel
+    
+    var body: some View {
+        HStack(alignment: .center, spacing: 6) {
+            if (item.isBookmark) {
+                HStack(spacing: 2) {
+                    Image("ic_star_filled")
+                        .resizable()
+                        .frame(width: 12, height: 12)
+                    Text("중요")
+                        .font(PoptatoTypo.calSemiBold)
+                        .foregroundColor(.primary40)
+                }
+                .padding(.horizontal, 4)
+                .padding(.vertical, 2)
+                .background(Color.gray90)
+                .cornerRadius(4)
+            }
+            
+            if (item.isBookmark) { Spacer().frame(height: 0) }
         }
     }
 }
