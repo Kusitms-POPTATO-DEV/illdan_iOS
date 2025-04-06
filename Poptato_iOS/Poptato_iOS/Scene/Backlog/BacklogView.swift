@@ -75,14 +75,8 @@ struct BacklogView: View {
                 
                 Spacer().frame(height: 16)
                 
-                if viewModel.backlogList.isEmpty {
-                    Spacer()
-                    
-                    Text("일단, 할 일을\n모두 추가해 보세요.")
-                        .font(PoptatoTypo.lgMedium)
-                        .foregroundColor(.gray80)
-                        .multilineTextAlignment(.center)
-                } else {
+                if viewModel.backlogList.isEmpty { EmptyBacklogView() }
+                else {
                     BacklogListView(
                         backlogList: $viewModel.backlogList,
                         onItemSelected: onItemSelcted,
@@ -570,6 +564,30 @@ struct CreateBacklogTextField: View {
                     isFocused = true
                 }
             }
+        }
+    }
+}
+
+struct EmptyBacklogView: View {
+    var body: some View {
+        ZStack(alignment: .topLeading) {
+            HStack {
+                Image("ic_arrow_curved")
+                Spacer()
+            }
+            .padding(.horizontal, 37)
+            .padding(.top, 37)
+            
+            VStack(alignment: .center) {
+                Image("ic_fire_today")
+                
+                Text("일단, 할 일을\n모두 추가해 보세요")
+                    .font(PoptatoTypo.mdMedium)
+                    .foregroundColor(.gray70)
+                    .multilineTextAlignment(.center)
+            }
+            .frame(maxHeight: .infinity)
+            .frame(maxWidth: .infinity)
         }
     }
 }
