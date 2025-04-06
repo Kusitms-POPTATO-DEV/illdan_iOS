@@ -37,30 +37,32 @@ extension Color {
 // Gray Scale
 extension UIColor {
     static let gray00 = UIColor(hex: 0xFFFFFFFF)
-    static let gray05 = UIColor(hex: 0xFFFAFAFA)
-    static let gray10 = UIColor(hex: 0xFFF4F4F5)
-    static let gray20 = UIColor(hex: 0xFFDDDDDF)
-    static let gray30 = UIColor(hex: 0xFFC5C5C9)
-    static let gray40 = UIColor(hex: 0xFFADADB3)
-    static let gray50 = UIColor(hex: 0xFF95959D)
-    static let gray60 = UIColor(hex: 0xFF7D7D87)
-    static let gray70 = UIColor(hex: 0xFF67676F)
-    static let gray80 = UIColor(hex: 0xFF515157)
-    static let gray90 = UIColor(hex: 0xFF3B3B40)
-    static let gray95 = UIColor(hex: 0xFF2C2C30)
-    static let gray100 = UIColor(hex: 0xFF1E1E20)
+    static let gray05 = UIColor(hex: 0xFFF4F4F6)
+    static let gray10 = UIColor(hex: 0xFFE6E6EA)
+    static let gray20 = UIColor(hex: 0xFFDBDBE1)
+    static let gray30 = UIColor(hex: 0xFFC2C2CC)
+    static let gray40 = UIColor(hex: 0xFFA9A9B7)
+    static let gray50 = UIColor(hex: 0xFF9090A2)
+    static let gray60 = UIColor(hex: 0xFF77778D)
+    static let gray70 = UIColor(hex: 0xFF616175)
+    static let gray80 = UIColor(hex: 0xFF4D4D5C)
+    static let gray90 = UIColor(hex: 0xFF383843)
+    static let gray95 = UIColor(hex: 0xFF2E2E38)
+    static let gray100 = UIColor(hex: 0xFF23232A)
 }
 
 // Primary Colors
 extension UIColor {
-    static let primary10 = UIColor(hex: 0xFFEDFCFA)
-    static let primary20 = UIColor(hex: 0xFFD7F9F3)
-    static let primary30 = UIColor(hex: 0xFFABF2E6)
-    static let primary40 = UIColor(hex: 0xFF7FEBD9)
-    static let primary50 = UIColor(hex: 0xFF52E5CC)
-    static let primary60 = UIColor(hex: 0xFF27DEBF)
-    static let primary70 = UIColor(hex: 0xFF1CB59C)
-    static let primary80 = UIColor(hex: 0xFF158976)
+    static let primary0 = UIColor(hex: 0xFFE0FAFA)
+    static let primary10 = UIColor(hex: 0xFFB4F3F3)
+    static let primary20 = UIColor(hex: 0xFF88ECEC)
+    static let primary30 = UIColor(hex: 0xFF5DE5E5)
+    static let primary40 = UIColor(hex: 0xFF30DEDE)
+    static let primary50 = UIColor(hex: 0xFF1EBDBD)
+    static let primary60 = UIColor(hex: 0xFF179191)
+    static let primary70 = UIColor(hex: 0xFF106565)
+    static let primary80 = UIColor(hex: 0xFF093939)
+    
     static let primary90 = UIColor(hex: 0xFF0E5D50)
     static let primary100 = UIColor(hex: 0xFF07312A)
 }
@@ -78,13 +80,13 @@ extension UIColor {
 
 // Warning Colors
 extension UIColor {
-    static let warning10 = UIColor(hex: 0xFFFFFBEB)
-    static let warning20 = UIColor(hex: 0xFFFFF4C7)
-    static let warning30 = UIColor(hex: 0xFFFFEA94)
-    static let warning40 = UIColor(hex: 0xFFFFDF61)
-    static let warning50 = UIColor(hex: 0xFFFFD52F)
-    static let warning60 = UIColor(hex: 0xFFFAC800)
-    static let warning70 = UIColor(hex: 0xFFC79F00)
+    static let warning10 = UIColor(hex: 0xFFFDDEE9)
+    static let warning20 = UIColor(hex: 0xFFF9AECA)
+    static let warning30 = UIColor(hex: 0xFFF67FAA)
+    static let warning40 = UIColor(hex: 0xFFF24D8A)
+    static let warning50 = UIColor(hex: 0xFFEF206C)
+    static let warning60 = UIColor(hex: 0xFFC61556)
+    static let warning70 = UIColor(hex: 0xFF941443)
 }
 
 // KaKao
@@ -123,6 +125,7 @@ extension Color {
     static let gray95 = Color(uiColor: .gray95)
     static let gray100 = Color(uiColor: .gray100)
 
+    static let primary0 = Color(uiColor: .primary0)
     static let primary10 = Color(uiColor: .primary10)
     static let primary20 = Color(uiColor: .primary20)
     static let primary30 = Color(uiColor: .primary30)
