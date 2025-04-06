@@ -300,7 +300,7 @@ struct TodayRepeatDeadlineText: View {
     let item: TodayItemModel
     
     var body: some View {
-        HStack(spacing: 6) {
+        HStack(spacing: 3) {
             if item.isRepeat {
                 Text("반복 할 일")
                     .font(PoptatoTypo.xsRegular)
