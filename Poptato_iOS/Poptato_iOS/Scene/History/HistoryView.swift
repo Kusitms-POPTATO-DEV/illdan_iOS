@@ -14,7 +14,7 @@ struct HistoryView: View {
         ZStack {
             Color.gray100.ignoresSafeArea()
             
-            VStack {
+            VStack(spacing: 0) {
                 Spacer().frame(height: 8)
                 
                 DateNavigatorView(
@@ -23,6 +23,8 @@ struct HistoryView: View {
                     onClickIncreaseMonth: viewModel.onClickIncreaseMonth,
                     onClickDecreaseMonth: viewModel.onClickDecreaseMonth
                 )
+                
+                Spacer().frame(height: 12)
                 
                 CalendarView(
                     days: viewModel.days,
@@ -37,7 +39,7 @@ struct HistoryView: View {
                     currentMonth: viewModel.month
                 )
                 
-                Spacer().frame(height: 36)
+                Spacer().frame(height: 16)
                 
                 HistoryListView(historyList: viewModel.historyList)
                 
@@ -64,9 +66,6 @@ struct CalendarView: View {
     var currentMonth: Int
     
     var body: some View {
-        let today = Date()
-        let calendar = Calendar.current
-
         VStack {
             HStack {
                 ForEach(["일", "월", "화", "수", "목", "금", "토"], id: \.self) { day in
@@ -133,13 +132,17 @@ struct HistoryListView: View {
                     HStack(spacing: 8) {
                         Image("ic_history_checkbox")
                         Text(item.content)
-                            .font(PoptatoTypo.smMedium)
-                            .foregroundColor(.gray00)
+                            .font(PoptatoTypo.smRegular)
+                            .foregroundColor(.gray10)
                     }
                 }
             }
+            .padding(.horizontal, 16)
+            .padding(.vertical, 20)
             .frame(maxWidth: .infinity)
-            .padding(.horizontal, 24)
+            .background(historyList.isEmpty ? Color.gray100 : Color.gray95)
+            .clipShape(RoundedCorner(radius: 12))
+            .padding(.horizontal, 20)
         }
     }
 }
@@ -152,20 +155,23 @@ struct DateNavigatorView: View {
     
     var body: some View {
         HStack(spacing: 0) {
+            Text("\(String(format: "%d", year))년 \(String(format: "%2d", month))월")
+                .font(PoptatoTypo.xLSemiBold)
+                .foregroundColor(.gray00)
+            
+            Spacer()
+            
             Button(action: {
                 onClickDecreaseMonth()
             }) {
                 Image("ic_arrow_left")
                     .renderingMode(.template)
                     .resizable()
-                    .frame(width: 20, height: 20)
-                    .foregroundColor(.gray40)
+                    .frame(width: 24, height: 24)
+                    .foregroundColor(.gray00)
             }
             
-            Text("\(String(format: "%d", year))년 \(String(format: "%2d", month))월")
-                .font(PoptatoTypo.mdMedium)
-                .foregroundColor(.gray00)
-                .frame(maxWidth: .infinity)
+            Spacer().frame(width: 12)
             
             Button(action: {
                 onClickIncreaseMonth()
@@ -173,11 +179,11 @@ struct DateNavigatorView: View {
                 Image("ic_arrow_right")
                     .renderingMode(.template)
                     .resizable()
-                    .frame(width: 20, height: 20)
-                    .foregroundColor(.gray40)
+                    .frame(width: 24, height: 24)
+                    .foregroundColor(.gray00)
             }
         }
         .frame(maxWidth: .infinity)
-        .padding(.horizontal, 46)
+        .padding(.horizontal, 20)
     }
 }
