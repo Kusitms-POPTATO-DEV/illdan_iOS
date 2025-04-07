@@ -66,15 +66,14 @@ struct CalendarView: View {
     var body: some View {
         let today = Date()
         let calendar = Calendar.current
-        let todayComponents = calendar.dateComponents([.year, .month, .day], from: today)
 
         VStack {
             HStack {
                 ForEach(["일", "월", "화", "수", "목", "금", "토"], id: \.self) { day in
                     Text(day)
-                        .font(.system(size: 14, weight: .bold))
+                        .font(PoptatoTypo.xsMedium)
                         .frame(maxWidth: .infinity)
-                        .foregroundColor(.gray70)
+                        .foregroundColor(.gray00)
                 }
             }
             .padding(.vertical, 8)
@@ -84,28 +83,25 @@ struct CalendarView: View {
                 ForEach(Array(days.enumerated()), id: \.offset) { index, date in
                     if let date = date {
                         let formattedDate = String(format: "%04d-%02d-%02d", currentYear, currentMonth, date)
-                        let isPast = todayComponents.year! > currentYear ||
-                            (todayComponents.year == currentYear && todayComponents.month! > currentMonth) ||
-                            (todayComponents.year == currentYear && todayComponents.month == currentMonth && todayComponents.day! > date)
                         
                         VStack(spacing: 0) {
-                            
-                            Image(
-                                monthlyHistory.contains(formattedDate) ? "ic_history_star" :
-                                                                    isPast ? "ic_history_moon" : "ic_empty_emoji"
-                            )
-                            .resizable()
-                            .frame(width: 32, height: 32)
+                            ZStack {
+                                Image(
+                                    monthlyHistory.contains(formattedDate) ? "ic_fire_calendar" : "ic_empty_fire_calendar"
+                                )
+                                .resizable()
+                                .frame(width: 32, height: 32)
+                            }
                             
                             Spacer().frame(height: 4)
                             
                             Text("\(date)")
-                                .font(PoptatoTypo.calRegular)
-                                .foregroundColor(.gray70)
+                                .font(PoptatoTypo.xsMedium)
+                                .foregroundColor(selectedDay == date ? Color.gray90 : Color.gray10)
                                 .padding(4)
                                 .background(
                                     Circle()
-                                        .fill(selectedDay == date ? Color.gray00 : Color.gray100)
+                                        .fill(selectedDay == date ? Color.gray00 : Color.gray95)
                                 )
                         }
                         .onTapGesture {
@@ -120,6 +116,10 @@ struct CalendarView: View {
             }
             .padding(.horizontal, 24)
         }
+        .padding(.vertical, 16)
+        .background(Color.gray95)
+        .clipShape(RoundedRectangle(cornerRadius: 12))
+        .padding(.horizontal, 20)
     }
 }
 
