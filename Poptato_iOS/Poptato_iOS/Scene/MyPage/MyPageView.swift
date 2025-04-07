@@ -21,58 +21,51 @@ struct MyPageView: View {
                     .ignoresSafeArea()
                 
                 VStack(alignment: .leading, spacing: 0) {
-                    HStack {
+                    HStack(spacing: 0) {
                         if viewModel.imageUrl.isEmpty {
                             Image("ic_empty_profile_image")
                                 .resizable()
-                                .frame(width: 62, height: 62)
+                                .frame(width: 48, height: 48)
                         } else {
-                            AsyncImageView(imageURL: viewModel.imageUrl, width: 62, height: 62)
+                            AsyncImageView(imageURL: viewModel.imageUrl, width: 48, height: 48)
                         }
-                        VStack(alignment: .leading) {
-                            Text(viewModel.nickname)
-                                .font(PoptatoTypo.lgSemiBold)
-                                .foregroundColor(.gray00)
-                            
-                            Text(viewModel.email)
-                                .font(PoptatoTypo.smRegular)
-                                .foregroundColor(.gray40)
+                        
+                        Spacer().frame(width: 16)
+                        
+                        Text(viewModel.nickname)
+                            .font(PoptatoTypo.lgMedium)
+                            .foregroundColor(.gray00)
+                            .frame(maxWidth: .infinity, alignment: .leading)
+                            .lineLimit(1)
+                            .truncationMode(.tail)
+                        
+                        Spacer().frame(width: 16)
+                        
+                        NavigationLink(
+                            destination: AccountInfoView(
+                                onClickBtnLogout: {
+                                    Task {
+                                        await viewModel.logout()
+                                        goToKaKaoLogin()
+                                    }
+                                },
+                                onClickBtnDeleteAccount: {
+                                    Task {
+                                        await viewModel.deleteAccount()
+                                        goToKaKaoLogin()
+                                    }
+                                },
+                                nickname: viewModel.nickname,
+                                email: viewModel.email
+                            )) {
+                            Image("ic_settings")
+                                    .resizable()
+                                    .frame(width: 24, height: 24)
                         }
-                        Spacer()
                     }
                     .frame(maxWidth: .infinity)
                     
-                    Spacer().frame(height: 16)
-                    
-                    NavigationLink(
-                        destination: AccountInfoView(
-                            onClickBtnLogout: {
-                                Task {
-                                    await viewModel.logout()
-                                    goToKaKaoLogin()
-                                }
-                            },
-                            onClickBtnDeleteAccount: {
-                                Task {
-                                    await viewModel.deleteAccount()
-                                    goToKaKaoLogin()
-                                }
-                            },
-                            nickname: viewModel.nickname,
-                            email: viewModel.email
-                        )) {
-                        ZStack(alignment: .center) {
-                            Color(.gray95)
-                            Text("계정 정보")
-                                .font(PoptatoTypo.smSemiBold)
-                                .foregroundColor(.gray00)
-                        }
-                        .frame(maxWidth: .infinity)
-                        .frame(height: 40)
-                        .cornerRadius(8)
-                    }
-                    
-                    Spacer().frame(height: 40)
+                    Spacer().frame(height: 32)
                     
                     Text("설정")
                         .font(PoptatoTypo.lgSemiBold)
@@ -89,7 +82,7 @@ struct MyPageView: View {
                             Spacer()
                             
                             Toggle("", isOn: $viewModel.deadlineDateMode)
-                                .tint(viewModel.deadlineDateMode ? Color.primary60 : Color.gray80)
+                                .tint(viewModel.deadlineDateMode ? Color.primary40 : Color.gray80)
                                 .onChange(of: viewModel.deadlineDateMode) { newValue in
                                     CommonSettingsManager.shared.toggleDeadlineMode()
                                 }
@@ -119,7 +112,7 @@ struct MyPageView: View {
                             
                             Text(Bundle.main.infoDictionary?["CFBundleShortVersionString"] as? String ?? "1.0.0")
                                 .font(PoptatoTypo.mdMedium)
-                                .foregroundColor(.primary60)
+                                .foregroundColor(.primary40)
                         }
                         
                     }
