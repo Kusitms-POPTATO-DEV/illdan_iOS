@@ -60,6 +60,17 @@ enum Router: URLRequestConvertible {
     var refreshToken: String? {
         KeychainManager.shared.readToken(for: "refreshToken")
     }
+    var headers: HTTPHeaders {
+        var headers: HTTPHeaders = [
+            "Content-Type": "application/json",
+            "X-Mobile-Type": "IOS"
+        ]
+        if let token = accessToken {
+            headers.add(name: "Authorization", value: "Bearer \(token)")
+        }
+        return headers
+    }
+
     
     func asURLRequest() throws -> URLRequest {
         let url = URL(string: BASE_URL)!
@@ -71,34 +82,25 @@ enum Router: URLRequestConvertible {
             let endPoint = url.appendingPathComponent("/auth/login")
             request = URLRequest(url: endPoint)
             request.httpMethod = "POST"
-            request.addValue("application/json", forHTTPHeaderField: "Content-Type")
+            request.headers = headers
             request.httpBody = try JSONEncoder().encode(loginRequest)
         case .reissueToken(let reissueRequest):
             let endPoint = url.appendingPathComponent("/auth/refresh")
             request = URLRequest(url: endPoint)
             request.httpMethod = "POST"
-            request.addValue("application/json", forHTTPHeaderField: "Content-Type")
-            if let accessToken = accessToken {
-                request.addValue("Bearer \(accessToken)", forHTTPHeaderField: "Authorization")
-            }
+            request.headers = headers
             request.httpBody = try JSONEncoder().encode(reissueRequest)
         case .logout(let logoutRequest):
             let endpoint = url.appendingPathComponent("/auth/logout")
             request = URLRequest(url: endpoint)
             request.httpMethod = "POST"
-            request.addValue("application/json", forHTTPHeaderField: "Content-Type")
-            if let accessToken = accessToken {
-                request.addValue("Bearer \(accessToken)", forHTTPHeaderField: "Authorization")
-            }
+            request.headers = headers
             request.httpBody = try JSONEncoder().encode(logoutRequest)
         case .deleteAccount:
             let endpoint = url.appendingPathComponent("/user/delete")
             request = URLRequest(url: endpoint)
             request.httpMethod = "POST"
-            request.addValue("application/json", forHTTPHeaderField: "Content-Type")
-            if let accessToken = accessToken {
-                request.addValue("Bearer \(accessToken)", forHTTPHeaderField: "Authorization")
-            }
+            request.headers = headers
             request.httpBody = try JSONEncoder().encode(DeleteAccountRequest(reasons: nil, userInputReason: nil))
             
         // backlog
@@ -106,10 +108,7 @@ enum Router: URLRequestConvertible {
             let endpoint = url.appendingPathComponent("/backlog")
             request = URLRequest(url: endpoint)
             request.httpMethod = "POST"
-            request.addValue("application/json", forHTTPHeaderField: "Content-Type")
-            if let accessToken = accessToken {
-                request.addValue("Bearer \(accessToken)", forHTTPHeaderField: "Authorization")
-            }
+            request.headers = headers
             request.httpBody = try JSONEncoder().encode(createBacklogRequest)
         case .getBacklogList(let page, let size, let categoryId):
             var components = URLComponents(url: url.appendingPathComponent("/backlogs"), resolvingAgainstBaseURL: false)
@@ -123,34 +122,23 @@ enum Router: URLRequestConvertible {
             }
             request = URLRequest(url: endpoint)
             request.httpMethod = "GET"
-            request.addValue("application/json", forHTTPHeaderField: "Content-Type")
-            if let accessToken = accessToken {
-                request.addValue("Bearer \(accessToken)", forHTTPHeaderField: "Authorization")
-            }
+            request.headers = headers
         case .deleteBacklog(let todoId):
             let endpoint = url.appendingPathComponent("/todo/\(todoId)")
             request = URLRequest(url: endpoint)
             request.httpMethod = "DELETE"
-            if let accessToken = accessToken {
-                request.addValue("Bearer \(accessToken)", forHTTPHeaderField: "Authorization")
-            }
+            request.headers = headers
         case .editBacklog(let todoId, let content):
             let endpoint = url.appendingPathComponent("/todo/\(todoId)/content")
             request = URLRequest(url: endpoint)
             request.httpMethod = "PATCH"
-            request.addValue("application/json", forHTTPHeaderField: "Content-Type")
-            if let accessToken = accessToken {
-                request.addValue("Bearer \(accessToken)", forHTTPHeaderField: "Authorization")
-            }
+            request.headers = headers
             request.httpBody = try JSONEncoder().encode(TodoContentModel(content: content))
         case .updateDeadline(let updateRequest, let todoId):
             let endpoint = url.appendingPathComponent("/todo/\(todoId)/deadline")
             request = URLRequest(url: endpoint)
             request.httpMethod = "PATCH"
-            request.addValue("application/json", forHTTPHeaderField: "Content-Type")
-            if let accessToken = accessToken {
-                request.addValue("Bearer \(accessToken)", forHTTPHeaderField: "Authorization")
-            }
+            request.headers = headers
             request.httpBody = try JSONEncoder().encode(updateRequest)
             
         // today
@@ -165,10 +153,7 @@ enum Router: URLRequestConvertible {
             }
             request = URLRequest(url: endpoint)
             request.httpMethod = "GET"
-            request.addValue("application/json", forHTTPHeaderField: "Content-Type")
-            if let accessToken = accessToken {
-                request.addValue("Bearer \(accessToken)", forHTTPHeaderField: "Authorization")
-            }
+            request.headers = headers
             
         // yesterday
         case .getYesterdayList(let page, let size):
@@ -182,18 +167,12 @@ enum Router: URLRequestConvertible {
             }
             request = URLRequest(url: endpoint)
             request.httpMethod = "GET"
-            request.addValue("application/json", forHTTPHeaderField: "Content-Type")
-            if let accessToken = accessToken {
-                request.addValue("Bearer \(accessToken)", forHTTPHeaderField: "Authorization")
-            }
+            request.headers = headers
         case .updateYesterdayCompletion(let todoIdsRequest):
             let endpoint = url.appendingPathComponent("/todo/check/yesterdays")
             request = URLRequest(url: endpoint)
             request.httpMethod = "POST"
-            request.addValue("application/json", forHTTPHeaderField: "Content-Type")
-            if let accessToken = accessToken {
-                request.addValue("Bearer \(accessToken)", forHTTPHeaderField: "Authorization")
-            }
+            request.headers = headers
             request.httpBody = try JSONEncoder().encode(todoIdsRequest)
             
         // todo
@@ -201,44 +180,29 @@ enum Router: URLRequestConvertible {
             let endpoint = url.appendingPathComponent("/swipe")
             request = URLRequest(url: endpoint)
             request.httpMethod = "PATCH"
-            request.addValue("application/json", forHTTPHeaderField: "Content-Type")
-            if let accessToken = accessToken {
-                request.addValue("Bearer \(accessToken)", forHTTPHeaderField: "Authorization")
-            }
+            request.headers = headers
             request.httpBody = try JSONEncoder().encode(swipeRequest)
         case .updateTodoCompletion(let todoId):
             let endpoint = url.appendingPathComponent("/todo/\(todoId)/achieve")
             request = URLRequest(url: endpoint)
             request.httpMethod = "PATCH"
-            request.addValue("application/json", forHTTPHeaderField: "Content-Type")
-            if let accessToken = accessToken {
-                request.addValue("Bearer \(accessToken)", forHTTPHeaderField: "Authorization")
-            }
+            request.headers = headers
         case .updateBookmark(let todoId):
             let endpoint = url.appendingPathComponent("/todo/\(todoId)/bookmark")
             request = URLRequest(url: endpoint)
             request.httpMethod = "PATCH"
-            request.addValue("application/json", forHTTPHeaderField: "Content-Type")
-            if let accessToken = accessToken {
-                request.addValue("Bearer \(accessToken)", forHTTPHeaderField: "Authorization")
-            }
+            request.headers = headers
         case .dragAndDrop(let type, let todoIds):
             let endpoint = url.appendingPathComponent("todo/dragAndDrop")
             request = URLRequest(url: endpoint)
             request.httpMethod = "PATCH"
-            request.addValue("application/json", forHTTPHeaderField: "Content-Type")
-            if let accessToken = accessToken {
-                request.addValue("Bearer \(accessToken)", forHTTPHeaderField: "Authorization")
-            }
+            request.headers = headers
             request.httpBody = try JSONEncoder().encode(DragAndDropRequest(type: type, todoIds: todoIds))
         case .updateTodoRepeat(let todoId):
             let endpoint = url.appendingPathComponent("/todo/\(todoId)/repeat")
             request = URLRequest(url: endpoint)
             request.httpMethod = "PATCH"
-            request.addValue("application/json", forHTTPHeaderField: "Content-Type")
-            if let accessToken = accessToken {
-                request.addValue("Bearer \(accessToken)", forHTTPHeaderField: "Authorization")
-            }
+            request.headers = headers
         case .getTodoDetail(let todoId):
             var components = URLComponents(url: url.appendingPathComponent("/todo/\(todoId)"), resolvingAgainstBaseURL: false)
             components?.queryItems = [URLQueryItem(name: "mobileType", value: "IOS")]
@@ -247,18 +211,12 @@ enum Router: URLRequestConvertible {
             }
             request = URLRequest(url: endpoint)
             request.httpMethod = "GET"
-            request.addValue("application/json", forHTTPHeaderField: "Content-Type")
-            if let accessToken = accessToken {
-                request.addValue("Bearer \(accessToken)", forHTTPHeaderField: "Authorization")
-            }
+            request.headers = headers
         case .updateCategory(let todoId, let categoryId):
             let endpoint = url.appendingPathComponent("/todo/\(todoId)/category")
             request = URLRequest(url: endpoint)
             request.httpMethod = "PATCH"
-            request.addValue("application/json", forHTTPHeaderField: "Content-Type")
-            if let accessToken = accessToken {
-                request.addValue("Bearer \(accessToken)", forHTTPHeaderField: "Authorization")
-            }
+            request.headers = headers
             request.httpBody = try JSONEncoder().encode(categoryId)
             
         // mypage
@@ -266,15 +224,12 @@ enum Router: URLRequestConvertible {
             let endpoint = url.appendingPathComponent("/user/mypage")
             request = URLRequest(url: endpoint)
             request.httpMethod = "GET"
-            request.addValue("application/json", forHTTPHeaderField: "Content-Type")
-            if let accessToken = accessToken {
-                request.addValue("Bearer \(accessToken)", forHTTPHeaderField: "Authorization")
-            }
+            request.headers = headers
         case .getPolicy:
             let endpoint = url.appendingPathComponent("/policy")
             request = URLRequest(url: endpoint)
             request.httpMethod = "GET"
-            request.addValue("application/json", forHTTPHeaderField: "Content-Type")
+            request.headers = headers
             
         // history
         case .getHistory(let date):
@@ -287,10 +242,7 @@ enum Router: URLRequestConvertible {
             }
             request = URLRequest(url: endpoint)
             request.httpMethod = "GET"
-            request.addValue("application/json", forHTTPHeaderField: "Content-Type")
-            if let accessToken = accessToken {
-                request.addValue("Bearer \(accessToken)", forHTTPHeaderField: "Authorization")
-            }
+            request.headers = headers
         case .getMonthlyHistory(let year, let month):
             var components = URLComponents(url: url.appendingPathComponent("/calendar"), resolvingAgainstBaseURL: false)
             components?.queryItems = [
@@ -302,10 +254,7 @@ enum Router: URLRequestConvertible {
             }
             request = URLRequest(url: endpoint)
             request.httpMethod = "GET"
-            request.addValue("application/json", forHTTPHeaderField: "Content-Type")
-            if let accessToken = accessToken {
-                request.addValue("Bearer \(accessToken)", forHTTPHeaderField: "Authorization")
-            }
+            request.headers = headers
             
         // category
         case .getCategoryList(let page, let size, let mobileType):
@@ -320,10 +269,7 @@ enum Router: URLRequestConvertible {
             }
             request = URLRequest(url: endpoint)
             request.httpMethod = "GET"
-            request.addValue("application/json", forHTTPHeaderField: "Content-Type")
-            if let accessToken = accessToken {
-                request.addValue("Bearer \(accessToken)", forHTTPHeaderField: "Authorization")
-            }
+            request.headers = headers
         case .getEmojiList(let mobileType):
             var components = URLComponents(url: url.appendingPathComponent("/emojis"), resolvingAgainstBaseURL: false)
             components?.queryItems = [
@@ -334,44 +280,29 @@ enum Router: URLRequestConvertible {
             }
             request = URLRequest(url: endpoint)
             request.httpMethod = "GET"
-            request.addValue("application/json", forHTTPHeaderField: "Content-Type")
-            if let accessToken = accessToken {
-                request.addValue("Bearer \(accessToken)", forHTTPHeaderField: "Authorization")
-            }
+            request.headers = headers
         case .createCategory(let category):
             let endpoint = url.appendingPathComponent("/category")
             request = URLRequest(url: endpoint)
             request.httpMethod = "POST"
-            request.addValue("application/json", forHTTPHeaderField: "Content-Type")
-            if let accessToken = accessToken {
-                request.addValue("Bearer \(accessToken)", forHTTPHeaderField: "Authorization")
-            }
+            request.headers = headers
             request.httpBody = try JSONEncoder().encode(category)
         case .deleteCategory(let categoryId):
             let endpoint = url.appendingPathComponent("/category/\(categoryId)")
             request = URLRequest(url: endpoint)
             request.httpMethod = "DELETE"
-            request.addValue("application/json", forHTTPHeaderField: "Content-Type")
-            if let accessToken = accessToken {
-                request.addValue("Bearer \(accessToken)", forHTTPHeaderField: "Authorization")
-            }
+            request.headers = headers
         case .editCategory(let categoryId, let category):
             let endpoint = url.appendingPathComponent("/category/\(categoryId)")
             request = URLRequest(url: endpoint)
             request.httpMethod = "PUT"
-            request.addValue("application/json", forHTTPHeaderField: "Content-Type")
-            if let accessToken = accessToken {
-                request.addValue("Bearer \(accessToken)", forHTTPHeaderField: "Authorization")
-            }
+            request.headers = headers
             request.httpBody = try JSONEncoder().encode(category)
         case .categoryDragAndDrop(let categoryIds):
             let endpoint = url.appendingPathComponent("/category/dragAndDrop")
             request = URLRequest(url: endpoint)
             request.httpMethod = "PATCH"
-            request.addValue("application/json", forHTTPHeaderField: "Content-Type")
-            if let accessToken = accessToken {
-                request.addValue("Bearer \(accessToken)", forHTTPHeaderField: "Authorization")
-            }
+            request.headers = headers
             request.httpBody = try JSONEncoder().encode(CategoryDragDropRequest(categoryIds: categoryIds))
         }
     
