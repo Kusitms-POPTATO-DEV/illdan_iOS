@@ -63,7 +63,8 @@ enum Router: URLRequestConvertible {
     var headers: HTTPHeaders {
         var headers: HTTPHeaders = [
             "Content-Type": "application/json",
-            "X-Mobile-Type": "IOS"
+            "X-Mobile-Type": "IOS",
+            "X-App-Version": "1.0"
         ]
         if let token = accessToken {
             headers.add(name: "Authorization", value: "Bearer \(token)")
