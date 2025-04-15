@@ -21,12 +21,17 @@ struct YesterdayTodoView: View {
                     Text("어제 한 일을 모두 체크하세요!")
                         .font(PoptatoTypo.mdMedium)
                         .foregroundColor(.gray00)
+                    
                     HStack {
                         Spacer()
+                        
                         Image("ic_close")
                             .resizable()
                             .frame(width: 24, height: 24)
                             .onTapGesture {
+                                Task {
+                                    await viewModel.completeYesterdayTodo()
+                                }
                                 isYesterdayTodoViewPresented = false
                             }
                     }
@@ -95,7 +100,7 @@ struct YesterdayItemView: View {
     var addCompletionList: (Int) -> Void
     
     var body: some View {
-        HStack {
+        HStack(alignment: .top) {
             Image(isClicked ? "ic_checked" : "ic_unchecked")
                 .resizable()
                 .frame(width: 20, height: 20)
@@ -103,10 +108,12 @@ struct YesterdayItemView: View {
                     isClicked.toggle()
                     addCompletionList(item.todoId)
                 }
-
-            Text(item.content)
-                .font(PoptatoTypo.mdRegular)
-                .foregroundColor(.gray00)
+            
+            VStack {
+                Text(item.content)
+                    .font(PoptatoTypo.mdRegular)
+                    .foregroundColor(.gray00)
+            }
 
             Spacer()
         }
