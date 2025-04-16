@@ -111,8 +111,7 @@ struct TodayListView: View {
     
     var body: some View {
         ScrollView {
-            LazyVStack {
-                
+            LazyVStack(spacing: 16) {
                 ForEach(todayList.indices, id: \.self) { index in
                     let item = todayList[index]
                     
@@ -139,7 +138,7 @@ struct TodayListView: View {
             }
         }
         .frame(maxWidth: .infinity)
-        .padding(.horizontal, 16)
+        .padding(.horizontal, 20)
         .padding(.top, 20)
     }
 }
@@ -159,8 +158,8 @@ struct TodayItemView: View {
     @FocusState var isActive: Bool
 
     var body: some View {
-        HStack {
-            HStack(alignment: .top) {
+        HStack(spacing: 0) {
+            HStack(alignment: .top, spacing: 12) {
                 Image(item.todayStatus == "COMPLETED" ? "ic_checked" : "ic_unchecked")
                     .resizable()
                     .frame(width: 20, height: 20)
@@ -174,7 +173,7 @@ struct TodayItemView: View {
                         }
                     }
                 
-                VStack {
+                VStack(spacing: 8) {
                     if activeItemId == item.todoId {
                         TextField("", text: $content, axis: .vertical)
                             .focused($isActive)
@@ -200,17 +199,19 @@ struct TodayItemView: View {
                         }
                     }
                     
-                    TodayRepeatDeadlineText(deadlineDateMode: deadlineDateMode, item: item)
+                    if item.isRepeat || item.deadline != nil { TodayRepeatDeadlineText(deadlineDateMode: deadlineDateMode, item: item) }
                     
-                    TodayBookmarkCategoryChip(item: item)
+                    if item.isBookmark || item.categoryName != nil { TodayBookmarkCategoryChip(item: item) }
                 }
             }
             
             Spacer()
             
-            ZStack(alignment: .center) {
+            VStack(spacing: 0) {
                 Image("ic_dot")
                     .resizable()
+                    .renderingMode(.template)
+                    .foregroundStyle(Color.gray80)
                     .frame(width: 20, height: 20)
                     .onTapGesture {
                         onItemSelected(
@@ -224,12 +225,14 @@ struct TodayItemView: View {
                             )
                         )
                     }
+                
+                if item.isRepeat || item.isBookmark || item.dDay != nil || item.categoryName != nil { Spacer() }
             }
         }
         .frame(maxWidth: .infinity)
         .padding(.vertical, 12)
         .padding(.horizontal, 16)
-        .background(RoundedRectangle(cornerRadius: 8))
+        .background(RoundedRectangle(cornerRadius: 12))
         .foregroundColor(.gray95)
         .offset(x: offset)
         .highPriorityGesture(
@@ -358,16 +361,32 @@ struct TodayBookmarkCategoryChip: View {
                         .resizable()
                         .frame(width: 12, height: 12)
                     Text("중요")
-                        .font(PoptatoTypo.calSemiBold)
+                        .font(PoptatoTypo.xsRegular)
                         .foregroundColor(.primary40)
                 }
                 .padding(.horizontal, 4)
                 .padding(.vertical, 2)
                 .background(Color.gray90)
-                .cornerRadius(4)
+                .cornerRadius(6)
+            }
+            
+            if let categoryName = item.categoryName, let imageUrl = item.imageUrl {
+                HStack(spacing: 2) {
+                    PDFImageView(imageURL: imageUrl, width: 12, height: 12)
+                    Text(categoryName)
+                        .font(PoptatoTypo.xsRegular)
+                        .foregroundColor(.gray50)
+                }
+                .padding(.horizontal, 4)
+                .padding(.vertical, 2)
+                .background(Color.gray90)
+                .cornerRadius(6)
             }
             
             if (item.isBookmark || item.dDay != nil || item.isRepeat) { Spacer() }
+        }
+        .onAppear {
+            print("\(item)")
         }
     }
 }

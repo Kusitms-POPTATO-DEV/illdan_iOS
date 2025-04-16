@@ -58,7 +58,9 @@ final class TodayViewModel: ObservableObject {
                         isBookmark: item.isBookmark,
                         dDay: item.dDay,
                         deadline: item.deadline,
-                        isRepeat: item.isRepeat
+                        isRepeat: item.isRepeat,
+                        imageUrl: item.imageUrl,
+                        categoryName: item.categoryName
                     )
                 }
                 self.snapshotList = self.todayList
