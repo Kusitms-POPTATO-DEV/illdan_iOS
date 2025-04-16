@@ -497,7 +497,7 @@ struct BottomSheetActionButton: View {
                     .frame(height: 48)
                     .foregroundColor(.gray50)
                     .background(Color(.gray95))
-                    .cornerRadius(8)
+                    .cornerRadius(12)
             }
             
             Button(
@@ -511,7 +511,7 @@ struct BottomSheetActionButton: View {
                     .frame(height: 48)
                     .foregroundColor(.gray90)
                     .background(Color(.primary40))
-                    .cornerRadius(8)
+                    .cornerRadius(12)
             }
         }
         .frame(maxWidth: .infinity)
