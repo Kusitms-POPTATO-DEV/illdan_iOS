@@ -247,6 +247,7 @@ struct CategoryListView: View {
                 }
             }
         }
+        .scrollIndicators(.hidden)
     }
     
     private func imageName(for index: Int) -> String? {
