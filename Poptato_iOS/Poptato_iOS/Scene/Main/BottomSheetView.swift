@@ -42,8 +42,33 @@ struct BottomSheetView: View {
                                 }
                         }
                     }
-                    .padding(.horizontal, 24)
-                    .padding(.top, 24)
+                    .padding(.horizontal, 20)
+                    
+                    HStack(spacing: 16) {
+                        EditDeleteButtonView(
+                            image: "ic_pen",
+                            title: "수정하기",
+                            onClickButton: {
+                                AnalyticsManager.shared.logEvent(AnalyticsEvent.edit_task)
+                                isVisible = false
+                                editTodo()
+                            }
+                        )
+                        
+                        EditDeleteButtonView(
+                            image: "ic_trash",
+                            title: "삭제하기",
+                            onClickButton: {
+                                AnalyticsManager.shared.logEvent(AnalyticsEvent.delete_task, parameters: ["task_id" : todoItem?.todoId ?? -1])
+                                isVisible = false
+                                deleteTodo()
+                            }
+                        )
+                    }
+                    .frame(maxWidth: .infinity)
+                    .padding(.horizontal, 20)
+                    
+                    Spacer().frame(height: 20)
                     
                     BottomSheetButton(
                         image: "ic_refresh",
@@ -89,47 +114,48 @@ struct BottomSheetView: View {
                             }
                         )
                     )
-                    BottomSheetButton(
-                        image: "ic_pen",
-                        buttonText: "수정하기",
-                        buttonColor: .gray30,
-                        subText: "",
-                        onClickBtn: {
-                            AnalyticsManager.shared.logEvent(AnalyticsEvent.edit_task)
-                            isVisible = false
-                            editTodo()
-                        },
-                        isRepeat: Binding(
-                            get: { todoItem?.isRepeat ?? false },
-                            set: { newValue in
-                                todoItem?.isRepeat = newValue
-                            }
-                        )
-                    )
-                    BottomSheetButton(
-                        image: "ic_trash",
-                        buttonText: "삭제하기",
-                        buttonColor: .danger50,
-                        subText: "",
-                        onClickBtn: {
-                            AnalyticsManager.shared.logEvent(AnalyticsEvent.delete_task, parameters: ["task_id" : todoItem?.todoId ?? -1])
-                            isVisible = false
-                            deleteTodo()
-                        },
-                        isRepeat: Binding(
-                            get: { todoItem?.isRepeat ?? false },
-                            set: { newValue in
-                                todoItem?.isRepeat = newValue
-                            }
-                        )
-                    )
+//                    BottomSheetButton(
+//                        image: "ic_pen",
+//                        buttonText: "수정하기",
+//                        buttonColor: .gray30,
+//                        subText: "",
+//                        onClickBtn: {
+//                            AnalyticsManager.shared.logEvent(AnalyticsEvent.edit_task)
+//                            isVisible = false
+//                            editTodo()
+//                        },
+//                        isRepeat: Binding(
+//                            get: { todoItem?.isRepeat ?? false },
+//                            set: { newValue in
+//                                todoItem?.isRepeat = newValue
+//                            }
+//                        )
+//                    )
+//                    BottomSheetButton(
+//                        image: "ic_trash",
+//                        buttonText: "삭제하기",
+//                        buttonColor: .danger50,
+//                        subText: "",
+//                        onClickBtn: {
+//                            AnalyticsManager.shared.logEvent(AnalyticsEvent.delete_task, parameters: ["task_id" : todoItem?.todoId ?? -1])
+//                            isVisible = false
+//                            deleteTodo()
+//                        },
+//                        isRepeat: Binding(
+//                            get: { todoItem?.isRepeat ?? false },
+//                            set: { newValue in
+//                                todoItem?.isRepeat = newValue
+//                            }
+//                        )
+//                    )
                     
-                    Spacer()
+//                    Spacer()
                 }
                 .frame(maxWidth: .infinity)
-                .frame(height: 350)
+                .padding(.vertical, 20)
+//                .frame(height: 350)
                 .background(Color(UIColor.gray100))
-                .clipShape(RoundedCorner(radius: 16, corners: [.topLeft, .topRight]))
+                .clipShape(RoundedCorner(radius: 24))
             }
             
             if showDateBottomSheet {
@@ -151,6 +177,7 @@ struct BottomSheetView: View {
                 )
             }
         }
+        .padding(.horizontal, 16)
     }
 }
 
@@ -176,7 +203,7 @@ struct BottomSheetButton: View {
             Spacer()
             if buttonText == "반복 할 일" {
                 Toggle("", isOn: $isRepeat)
-                    .tint(isRepeat ? Color.primary60 : Color.gray80)
+                    .tint(isRepeat ? Color.primary40 : Color.gray80)
             }
             if !subText.isEmpty {
                 Text(subText)
@@ -196,7 +223,7 @@ struct BottomSheetButton: View {
             }
         }
         .frame(maxWidth: .infinity)
-        .padding(.horizontal, 24)
+        .padding(.horizontal, 20)
         .padding(.vertical, 12)
         .background(Color.clear)
         .contentShape(Rectangle())
@@ -464,7 +491,7 @@ struct BottomSheetActionButton: View {
                     .font(PoptatoTypo.mdMedium)
                     .frame(maxWidth: .infinity)
                     .frame(height: 48)
-                    .foregroundColor(.gray40)
+                    .foregroundColor(.gray50)
                     .background(Color(.gray95))
                     .cornerRadius(8)
             }
@@ -478,15 +505,39 @@ struct BottomSheetActionButton: View {
                     .font(PoptatoTypo.mdSemiBold)
                     .frame(maxWidth: .infinity)
                     .frame(height: 48)
-                    .foregroundColor(.gray100)
-                    .background(Color(.primary60))
+                    .foregroundColor(.gray90)
+                    .background(Color(.primary40))
                     .cornerRadius(8)
             }
-            
         }
         .frame(maxWidth: .infinity)
         .padding(.horizontal, 24)
         .padding(.vertical, 8)
+    }
+}
+
+struct EditDeleteButtonView: View {
+    let image: String
+    let title: String
+    
+    var onClickButton: () -> Void
+    
+    var body: some View {
+        Button(action: onClickButton) {
+            HStack(spacing: 4) {
+                Image(image)
+                    .resizable()
+                    .frame(width: 20, height: 20)
+                
+                Text(title)
+                    .font(PoptatoTypo.mdMedium)
+                    .foregroundStyle(Color.gray30)
+            }
+            .padding(.vertical, 12)
+            .frame(maxWidth: .infinity)
+            .background(Color.gray95)
+            .clipShape(RoundedCorner(radius: 12))
+        }
     }
 }
 
