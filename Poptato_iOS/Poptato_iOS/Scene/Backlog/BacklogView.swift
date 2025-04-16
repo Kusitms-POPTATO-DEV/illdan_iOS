@@ -59,10 +59,10 @@ struct BacklogView: View {
                                     viewModel.showCategorySettingMenu = !viewModel.showCategorySettingMenu
                                 }
                         }
-                        .frame(width: 20, height: 20)
+                        .frame(width: 24, height: 24)
                     }
                 }
-                .padding(.trailing, 14)
+                .padding(.trailing, 20)
                 
                 CreateBacklogTextField(
                     isFocused: $isTextFieldFocused,
@@ -298,7 +298,7 @@ struct BacklogListView: View {
     
     var body: some View {
         ScrollView {
-            LazyVStack {
+            LazyVStack(spacing: 16) {
                 ForEach(backlogList.indices, id: \.self) { index in
                     let item = backlogList[index]
                     
@@ -327,7 +327,7 @@ struct BacklogListView: View {
             Spacer().frame(height: 45)
         }
         .frame(maxWidth: .infinity)
-        .padding(.horizontal, 16)
+        .padding(.horizontal, 20)
     }
 }
 
@@ -377,7 +377,7 @@ struct BacklogItemView: View {
                     BacklogRepeatDeadlineText(deadlineDateMode: deadlineDateMode, item: item)
                 }
                 
-                if item.isBookmark {
+                if item.isBookmark || item.categoryName != nil {
                     Spacer().frame(height: 8)
                     BacklogBookmarkCategoryChip(item: item)
                 }
@@ -385,19 +385,32 @@ struct BacklogItemView: View {
             
             Spacer()
             
-            ZStack(alignment: (item.isBookmark || item.dDay != nil) ? .top : .center) {
+            VStack(spacing: 0) {
                 Image("ic_dot")
                     .resizable()
+                    .renderingMode(.template)
+                    .foregroundStyle(Color.gray80)
                     .frame(width: 20, height: 20)
                     .onTapGesture {
-                        onItemSelected(item)
+                        onItemSelected(
+                            TodoItemModel(
+                                todoId: item.todoId,
+                                content: item.content,
+                                isBookmark: item.isBookmark,
+                                isRepeat: item.isRepeat,
+                                dDay: item.dDay,
+                                deadline: item.deadline
+                            )
+                        )
                     }
+                
+                if item.isRepeat || item.isBookmark || item.dDay != nil || item.categoryName != nil { Spacer() }
             }
         }
         .frame(maxWidth: .infinity)
         .padding(.horizontal, 16)
         .padding(.vertical, 12)
-        .background(RoundedRectangle(cornerRadius: 8))
+        .background(RoundedRectangle(cornerRadius: 12))
         .foregroundColor(.gray95)
         .offset(x: offset)
         .highPriorityGesture(
@@ -449,10 +462,10 @@ struct CreateBacklogTextField: View {
                 if taskInput.isEmpty && !isFocused {
                     HStack {
                         Image(systemName: "plus")
-                            .foregroundColor(.gray)
+                            .foregroundColor(Color.gray80)
 
-                        Text("할 일을 입력하세요")
-                            .foregroundColor(.gray)
+                        Text("할 일 추가하기...")
+                            .foregroundColor(Color.gray80)
                     }
                     .padding(.leading, 16)
                 }
@@ -469,8 +482,8 @@ struct CreateBacklogTextField: View {
                     .padding(.vertical, 16)
                     .padding(.horizontal, 16)
             }
-            .background(RoundedRectangle(cornerRadius: 8).stroke(isFocused ? Color.white : Color.gray, lineWidth: 1))
-            .padding(.horizontal, 16)
+            .background(RoundedRectangle(cornerRadius: 8).stroke(isFocused ? Color.white : Color.gray80, lineWidth: 1))
+            .padding(.horizontal, 20)
             .onTapGesture {
                 isFocused = true
             }
@@ -576,6 +589,19 @@ struct BacklogBookmarkCategoryChip: View {
                 .padding(.vertical, 2)
                 .background(Color.gray90)
                 .cornerRadius(4)
+            }
+            
+            if let categoryName = item.categoryName, let imageUrl = item.emojiImageUrl {
+                HStack(spacing: 2) {
+                    PDFImageView(imageURL: imageUrl, width: 12, height: 12)
+                    Text(categoryName)
+                        .font(PoptatoTypo.xsRegular)
+                        .foregroundColor(.gray50)
+                }
+                .padding(.horizontal, 4)
+                .padding(.vertical, 2)
+                .background(Color.gray90)
+                .cornerRadius(6)
             }
             
             if (item.isBookmark) { Spacer().frame(height: 0) }
