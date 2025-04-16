@@ -56,7 +56,8 @@ struct MyPageView: View {
                                     }
                                 },
                                 nickname: viewModel.nickname,
-                                email: viewModel.email
+                                email: viewModel.email,
+                                imageUrl: viewModel.imageUrl
                             )) {
                             Image("ic_settings")
                                     .resizable()
