@@ -36,7 +36,8 @@ struct HistoryView: View {
                     },
                     monthlyHistory: viewModel.monthlyHistory,
                     currentYear: viewModel.year,
-                    currentMonth: viewModel.month
+                    currentMonth: viewModel.month,
+                    getHistoryItem: { date in viewModel.historyItem(for: date) }
                 )
                 
                 Spacer().frame(height: 16)
@@ -61,9 +62,10 @@ struct CalendarView: View {
     var days: [Int?]
     @Binding var selectedDay: Int?
     var getHistory: () -> Void
-    var monthlyHistory: [String]
+    var monthlyHistory: [HistoryCalendarItem]
     var currentYear: Int
     var currentMonth: Int
+    var getHistoryItem: (String) -> HistoryCalendarItem?
     
     var body: some View {
         VStack {
@@ -82,14 +84,32 @@ struct CalendarView: View {
                 ForEach(Array(days.enumerated()), id: \.offset) { index, date in
                     if let date = date {
                         let formattedDate = String(format: "%04d-%02d-%02d", currentYear, currentMonth, date)
+                        let item = getHistoryItem(formattedDate)
                         
                         VStack(spacing: 0) {
                             ZStack {
-                                Image(
-                                    monthlyHistory.contains(formattedDate) ? "ic_fire_calendar" : "ic_empty_fire_calendar"
-                                )
-                                .resizable()
-                                .frame(width: 32, height: 32)
+                                if let item = item {
+                                    if item.count == -1 {
+                                        Image("ic_fire_calendar")
+                                            .resizable()
+                                            .frame(width: 32, height: 32)
+                                    } else {
+                                        ZStack(alignment: .center) {
+                                            Image("ic_empty_fire_calendar")
+                                                .resizable()
+                                                .frame(width: 32, height: 32)
+                                            
+                                            Text("\(item.count)")
+                                                .font(PoptatoTypo.xsMedium)
+                                                .foregroundStyle(Color.gray00)
+                                                .padding(.top, 2)
+                                        }
+                                    }
+                                } else {
+                                    Image("ic_empty_fire_calendar")
+                                        .resizable()
+                                        .frame(width: 32, height: 32)
+                                }
                             }
                             
                             Spacer().frame(height: 4)
@@ -130,7 +150,7 @@ struct HistoryListView: View {
             LazyVStack(alignment: .leading, spacing: 16) {
                 ForEach(historyList, id: \.todoId) { item in
                     HStack(spacing: 8) {
-                        Image("ic_history_checkbox")
+                        Image(item.isCompleted ? "ic_checked" : "ic_unchecked")
                         Text(item.content)
                             .font(PoptatoTypo.smRegular)
                             .foregroundColor(.gray10)

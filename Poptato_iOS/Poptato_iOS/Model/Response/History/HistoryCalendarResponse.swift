@@ -6,5 +6,5 @@
 //
 
 struct HistoryCalendarResponse: Codable {
-    let dates: [String]
+    let historyCalendarList: [HistoryCalendarItem]
 }

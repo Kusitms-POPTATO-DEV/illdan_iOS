@@ -8,4 +8,5 @@
 struct HistoryListItemModel: Codable {
     let todoId: Int
     let content: String
+    let isCompleted: Bool
 }
