@@ -37,6 +37,7 @@ final class BacklogViewModel: ObservableObject {
         self.deadlineDateMode = AppStorageManager.deadlineDateMode
         Task {
             await getYesterdayList(page: 0, size: 1)
+            await getCategoryList(page: 0, size: 100)
         }
         
         CommonSettingsManager.shared.$deadlineDateMode
