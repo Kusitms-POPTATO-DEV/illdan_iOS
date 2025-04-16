@@ -66,7 +66,8 @@ struct MainView: View {
                         )
                         .tabItem {
                             Label("오늘", image: selectedTab == 0 ? "ic_today_selected" : "ic_today_unselected")
-                                .font(PoptatoTypo.xsMedium)
+                                .font(PoptatoTypo.xsSemiBold)
+                                .foregroundStyle(Color.primary40)
                         }
                         .environmentObject(todayViewModel)
                         .tag(0)
@@ -85,14 +86,17 @@ struct MainView: View {
                         )
                         .tabItem {
                             Label("할 일", image: selectedTab == 1 ? "ic_backlog_selected" : "ic_backlog_unselected")
-                                .font(PoptatoTypo.xsMedium)
+                                .font(PoptatoTypo.xsSemiBold)
+                                .foregroundStyle(Color.primary40)
                         }
                         .environmentObject(backlogViewModel)
                         .tag(1)
                         
                         HistoryView()
                             .tabItem {
-                                Label("기록", image: selectedTab == 2 ? "ic_clock_selected" : "ic_clock_unselected")
+                                Label("달력", image: selectedTab == 2 ? "ic_calendar_nav_selected" : "ic_calendar_nav_unselected")
+                                    .font(PoptatoTypo.xsSemiBold)
+                                    .foregroundStyle(Color.primary40)
                             }
                             .tag(2)
                         
@@ -101,8 +105,9 @@ struct MainView: View {
                             isPolicyViewPresented: $isPolicyViewPresented
                         )
                         .tabItem {
-                            Label("마이", image: "ic_mypage")
-                                .font(PoptatoTypo.xsMedium)
+                            Label("MY", image: selectedTab == 3 ? "ic_my_selected" : "ic_mypage")
+                                .font(PoptatoTypo.xsSemiBold)
+                                .foregroundStyle(Color.primary40)
                         }
                         .tag(3)
                     }
