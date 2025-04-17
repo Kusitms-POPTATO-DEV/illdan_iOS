@@ -126,14 +126,14 @@ struct BacklogView: View {
                     Divider().background(Color.gray90)
                     HStack(spacing: 0) {
                         Spacer().frame(width: 12)
-                        Image("ic_trash")
+                        Image("ic_trash_warning")
                             .resizable()
                             .frame(width: 16, height: 16)
                         Spacer().frame(width: 4)
                         Text("삭제하기")
                             .padding(.vertical, 10)
                             .font(PoptatoTypo.smMedium)
-                            .foregroundColor(.danger50)
+                            .foregroundColor(.warning40)
                         Spacer().frame(width: 16)
                     }
                     .onTapGesture {
