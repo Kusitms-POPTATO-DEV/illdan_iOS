@@ -190,7 +190,7 @@ struct CreateCategoryTextField: View {
                 .padding(.bottom, 8)
                 .overlay(
                     Rectangle()
-                        .frame(height: 2)
+                        .frame(height: 1)
                         .foregroundColor(isFocused ? .gray20 : .gray90)
                         .padding(.top, 40),
                     alignment: .bottom
@@ -209,7 +209,7 @@ struct CreateCategoryTextField: View {
             Spacer().frame(width: 16)
             
             if selectedEmoji == nil {
-                Image("ic_add_emoji")
+                Image("ic_add_category")
                     .resizable()
                     .frame(width: 40, height: 40)
                     .onTapGesture {
