@@ -101,7 +101,7 @@ struct BottomSheetView: View {
                     )
                     
                     BottomSheetButton(
-                        image: "ic_add_emoji",
+                        image: "ic_add_category",
                         buttonText: "카테고리",
                         buttonColor: .gray30,
                         onClickBtn: { showCategoryBottomSheet = true },
