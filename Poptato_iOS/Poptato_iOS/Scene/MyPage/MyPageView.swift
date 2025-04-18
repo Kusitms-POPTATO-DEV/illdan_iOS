@@ -71,39 +71,19 @@ struct MyPageView: View {
                           }
                         },
                         onClickBtnDeleteAccount: {
-                          Task {
-                              await viewModel.deleteAccount()
-                              goToKaKaoLogin()
-                          }
+                            Task {
+                                await viewModel.deleteAccount()
+                            }
                         },
                         onClickBtnBack: {
                             path.removeLast()
                         },
+                        goToKaKaoLogin: goToKaKaoLogin,
                         nickname: viewModel.nickname,
                         email: viewModel.email,
-                        imageUrl: viewModel.imageUrl
-                    )
-                    .navigationBarBackButtonHidden(true)
-                case .deleteAccount:
-                    AccountInfoView(
-                        onClickBtnLogout: {
-                          Task {
-                              await viewModel.logout()
-                              goToKaKaoLogin()
-                          }
-                        },
-                        onClickBtnDeleteAccount: {
-                          Task {
-                              await viewModel.deleteAccount()
-                              goToKaKaoLogin()
-                          }
-                        },
-                        onClickBtnBack: {
-                            path.removeLast()
-                        },
-                        nickname: viewModel.nickname,
-                        email: viewModel.email,
-                        imageUrl: viewModel.imageUrl
+                        imageUrl: viewModel.imageUrl,
+                        selectedReasons: $viewModel.selectedReasons,
+                        userInputReason: $viewModel.userInputReason
                     )
                     .navigationBarBackButtonHidden(true)
                 }

@@ -13,7 +13,7 @@ enum Router: URLRequestConvertible {
     case kakaoLogin(loginRequest: LoginRequest)
     case reissueToken(reissueRequest: ReissueTokenRequest)
     case logout(logoutRequest: LogoutRequest)
-    case deleteAccount
+    case deleteAccount(deleteRequest: DeleteAccountRequest)
     
     // backlog
     case createBacklog(createBacklogRequest: CreateBacklogRequest)
@@ -97,12 +97,12 @@ enum Router: URLRequestConvertible {
             request.httpMethod = "POST"
             request.headers = headers
             request.httpBody = try JSONEncoder().encode(logoutRequest)
-        case .deleteAccount:
+        case .deleteAccount(let deleteRequest):
             let endpoint = url.appendingPathComponent("/user/delete")
             request = URLRequest(url: endpoint)
             request.httpMethod = "POST"
             request.headers = headers
-            request.httpBody = try JSONEncoder().encode(DeleteAccountRequest(reasons: nil, userInputReason: nil))
+            request.httpBody = try JSONEncoder().encode(deleteRequest)
             
         // backlog
         case .createBacklog(let createBacklogRequest):

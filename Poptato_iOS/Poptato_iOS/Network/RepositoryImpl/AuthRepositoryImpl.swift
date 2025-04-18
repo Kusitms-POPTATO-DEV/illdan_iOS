@@ -18,7 +18,7 @@ final class AuthRepositoryImpl: AuthRepository {
         try await NetworkManager.shared.request(api: .logout(logoutRequest: request))
     }
     
-    func deleteAccount() async throws {
-        try await NetworkManager.shared.request(api: .deleteAccount)
+    func deleteAccount(request: DeleteAccountRequest) async throws {
+        try await NetworkManager.shared.request(api: .deleteAccount(deleteRequest: request))
     }
 }
