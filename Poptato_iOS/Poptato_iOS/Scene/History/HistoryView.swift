@@ -152,8 +152,7 @@ struct HistoryListView: View {
                     HStack(alignment: .top, spacing: 8) {
                         Image(item.isCompleted ? "ic_checked" : "ic_unchecked")
                             .resizable()
-                            .frame(width: item.isCompleted ? 20 : 16, height: item.isCompleted ? 20 : 16)
-                            .padding(.leading, item.isCompleted ? 0 : 2)
+                            .frame(width: 16, height: 16)
                         Text(item.content)
                             .font(PoptatoTypo.smRegular)
                             .foregroundColor(.gray10)
