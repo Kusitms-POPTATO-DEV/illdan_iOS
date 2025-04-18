@@ -8,6 +8,5 @@
 enum NavRoutes {
     enum Settings {
         case info
-        case deleteAccount
     }
 }
