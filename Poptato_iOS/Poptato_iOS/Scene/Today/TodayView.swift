@@ -411,9 +411,9 @@ struct EmptyTodayView: View {
                     action: { goToBacklog() }
                 ) {
                     HStack {
-                        Image("ic_backlog_unselected")
+                        Image("ic_backlog_nav")
                             .resizable()
-                            .frame(width: 16, height: 16)
+                            .frame(width: 20, height: 20)
                             .foregroundColor(.primary100)
                         
                         Text("할 일 가져오기")
