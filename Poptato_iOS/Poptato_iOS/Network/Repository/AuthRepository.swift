@@ -9,5 +9,5 @@ protocol AuthRepository {
     func kakaoLogin(request: LoginRequest) async throws -> LoginResponse
     func refreshToken(request: ReissueTokenRequest) async throws -> TokenModel
     func logout(request: LogoutRequest) async throws -> Void
-    func deleteAccount() async throws -> Void
+    func deleteAccount(request: DeleteAccountRequest) async throws -> Void
 }
