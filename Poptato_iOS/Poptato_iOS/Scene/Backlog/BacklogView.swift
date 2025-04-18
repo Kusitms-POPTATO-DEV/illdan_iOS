@@ -391,6 +391,7 @@ struct BacklogItemView: View {
                     .renderingMode(.template)
                     .foregroundStyle(Color.gray80)
                     .frame(width: 20, height: 20)
+                    .padding(.top, !item.isRepeat && !item.isBookmark && item.dDay == nil && item.categoryName == nil ? 2.5 : 0)
                     .onTapGesture {
                         onItemSelected(
                             TodoItemModel(
@@ -403,8 +404,7 @@ struct BacklogItemView: View {
                             )
                         )
                     }
-                
-                if item.isRepeat || item.isBookmark || item.dDay != nil || item.categoryName != nil { Spacer() }
+                Spacer()
             }
         }
         .frame(maxWidth: .infinity)
