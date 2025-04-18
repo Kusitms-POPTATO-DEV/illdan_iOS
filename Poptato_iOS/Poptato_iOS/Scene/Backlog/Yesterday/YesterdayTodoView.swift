@@ -60,7 +60,7 @@ struct YesterdayTodoView: View {
                         .foregroundColor(.gray100)
                         .frame(maxWidth: .infinity)
                         .frame(height: 56)
-                        .background(Color.primary60)
+                        .background(Color.primary40)
                         .cornerRadius(12)
                 }
             }
