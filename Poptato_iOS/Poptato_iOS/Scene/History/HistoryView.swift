@@ -14,7 +14,7 @@ struct HistoryView: View {
         ZStack {
             Color.gray100.ignoresSafeArea()
             
-            VStack {
+            VStack(spacing: 0) {
                 Spacer().frame(height: 8)
                 
                 DateNavigatorView(
@@ -23,6 +23,8 @@ struct HistoryView: View {
                     onClickIncreaseMonth: viewModel.onClickIncreaseMonth,
                     onClickDecreaseMonth: viewModel.onClickDecreaseMonth
                 )
+                
+                Spacer().frame(height: 12)
                 
                 CalendarView(
                     days: viewModel.days,
@@ -34,10 +36,11 @@ struct HistoryView: View {
                     },
                     monthlyHistory: viewModel.monthlyHistory,
                     currentYear: viewModel.year,
-                    currentMonth: viewModel.month
+                    currentMonth: viewModel.month,
+                    getHistoryItem: { date in viewModel.historyItem(for: date) }
                 )
                 
-                Spacer().frame(height: 36)
+                Spacer().frame(height: 16)
                 
                 HistoryListView(historyList: viewModel.historyList)
                 
@@ -59,22 +62,19 @@ struct CalendarView: View {
     var days: [Int?]
     @Binding var selectedDay: Int?
     var getHistory: () -> Void
-    var monthlyHistory: [String]
+    var monthlyHistory: [HistoryCalendarItem]
     var currentYear: Int
     var currentMonth: Int
+    var getHistoryItem: (String) -> HistoryCalendarItem?
     
     var body: some View {
-        let today = Date()
-        let calendar = Calendar.current
-        let todayComponents = calendar.dateComponents([.year, .month, .day], from: today)
-
         VStack {
             HStack {
                 ForEach(["일", "월", "화", "수", "목", "금", "토"], id: \.self) { day in
                     Text(day)
-                        .font(.system(size: 14, weight: .bold))
+                        .font(PoptatoTypo.xsMedium)
                         .frame(maxWidth: .infinity)
-                        .foregroundColor(.gray70)
+                        .foregroundColor(.gray00)
                 }
             }
             .padding(.vertical, 8)
@@ -84,28 +84,43 @@ struct CalendarView: View {
                 ForEach(Array(days.enumerated()), id: \.offset) { index, date in
                     if let date = date {
                         let formattedDate = String(format: "%04d-%02d-%02d", currentYear, currentMonth, date)
-                        let isPast = todayComponents.year! > currentYear ||
-                            (todayComponents.year == currentYear && todayComponents.month! > currentMonth) ||
-                            (todayComponents.year == currentYear && todayComponents.month == currentMonth && todayComponents.day! > date)
+                        let item = getHistoryItem(formattedDate)
                         
                         VStack(spacing: 0) {
-                            
-                            Image(
-                                monthlyHistory.contains(formattedDate) ? "ic_history_star" :
-                                                                    isPast ? "ic_history_moon" : "ic_empty_emoji"
-                            )
-                            .resizable()
-                            .frame(width: 32, height: 32)
+                            ZStack {
+                                if let item = item {
+                                    if item.count == -1 {
+                                        Image("ic_fire_calendar")
+                                            .resizable()
+                                            .frame(width: 32, height: 32)
+                                    } else {
+                                        ZStack(alignment: .center) {
+                                            Image("ic_empty_fire_calendar")
+                                                .resizable()
+                                                .frame(width: 32, height: 32)
+                                            
+                                            Text("\(item.count)")
+                                                .font(PoptatoTypo.xsMedium)
+                                                .foregroundStyle(Color.gray00)
+                                                .padding(.top, 2)
+                                        }
+                                    }
+                                } else {
+                                    Image("ic_empty_fire_calendar")
+                                        .resizable()
+                                        .frame(width: 32, height: 32)
+                                }
+                            }
                             
                             Spacer().frame(height: 4)
                             
                             Text("\(date)")
-                                .font(PoptatoTypo.calRegular)
-                                .foregroundColor(.gray70)
+                                .font(PoptatoTypo.xsMedium)
+                                .foregroundColor(selectedDay == date ? Color.gray90 : Color.gray10)
                                 .padding(4)
                                 .background(
                                     Circle()
-                                        .fill(selectedDay == date ? Color.gray00 : Color.gray100)
+                                        .fill(selectedDay == date ? Color.gray00 : Color.gray95)
                                 )
                         }
                         .onTapGesture {
@@ -120,6 +135,10 @@ struct CalendarView: View {
             }
             .padding(.horizontal, 24)
         }
+        .padding(.vertical, 16)
+        .background(Color.gray95)
+        .clipShape(RoundedRectangle(cornerRadius: 12))
+        .padding(.horizontal, 20)
     }
 }
 
@@ -130,16 +149,22 @@ struct HistoryListView: View {
         ScrollView {
             LazyVStack(alignment: .leading, spacing: 16) {
                 ForEach(historyList, id: \.todoId) { item in
-                    HStack(spacing: 8) {
-                        Image("ic_history_checkbox")
+                    HStack(alignment: .top, spacing: 8) {
+                        Image(item.isCompleted ? "ic_checked" : "ic_unchecked")
+                            .resizable()
+                            .frame(width: 16, height: 16)
                         Text(item.content)
-                            .font(PoptatoTypo.smMedium)
-                            .foregroundColor(.gray00)
+                            .font(PoptatoTypo.smRegular)
+                            .foregroundColor(.gray10)
                     }
                 }
             }
+            .padding(.horizontal, 16)
+            .padding(.vertical, 20)
             .frame(maxWidth: .infinity)
-            .padding(.horizontal, 24)
+            .background(historyList.isEmpty ? Color.gray100 : Color.gray95)
+            .clipShape(RoundedCorner(radius: 12))
+            .padding(.horizontal, 20)
         }
     }
 }
@@ -152,20 +177,23 @@ struct DateNavigatorView: View {
     
     var body: some View {
         HStack(spacing: 0) {
+            Text("\(String(format: "%d", year))년 \(String(format: "%2d", month))월")
+                .font(PoptatoTypo.xLSemiBold)
+                .foregroundColor(.gray00)
+            
+            Spacer()
+            
             Button(action: {
                 onClickDecreaseMonth()
             }) {
                 Image("ic_arrow_left")
                     .renderingMode(.template)
                     .resizable()
-                    .frame(width: 20, height: 20)
-                    .foregroundColor(.gray40)
+                    .frame(width: 24, height: 24)
+                    .foregroundColor(.gray00)
             }
             
-            Text("\(String(format: "%d", year))년 \(String(format: "%2d", month))월")
-                .font(PoptatoTypo.mdMedium)
-                .foregroundColor(.gray00)
-                .frame(maxWidth: .infinity)
+            Spacer().frame(width: 12)
             
             Button(action: {
                 onClickIncreaseMonth()
@@ -173,11 +201,11 @@ struct DateNavigatorView: View {
                 Image("ic_arrow_right")
                     .renderingMode(.template)
                     .resizable()
-                    .frame(width: 20, height: 20)
-                    .foregroundColor(.gray40)
+                    .frame(width: 24, height: 24)
+                    .foregroundColor(.gray00)
             }
         }
         .frame(maxWidth: .infinity)
-        .padding(.horizontal, 46)
+        .padding(.horizontal, 20)
     }
 }

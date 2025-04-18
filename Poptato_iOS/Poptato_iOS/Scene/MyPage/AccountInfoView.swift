@@ -8,11 +8,13 @@
 import SwiftUI
 
 struct AccountInfoView: View {
-    @Environment(\.presentationMode) var presentationMode
     var onClickBtnLogout: () -> Void
     var onClickBtnDeleteAccount: () -> Void
-    var nickname: String
-    var email: String
+    var onClickBtnBack: () -> Void
+    
+    let nickname: String
+    let email: String
+    let imageUrl: String
     @State private var isLogoutDialogPresented = false
     @State private var showAccountDeletionDialog = false
     
@@ -29,7 +31,7 @@ struct AccountInfoView: View {
                     
                     HStack(alignment: .center) {
                         Button(action: {
-                            presentationMode.wrappedValue.dismiss()
+                            onClickBtnBack()
                         }) {
                             Image("ic_arrow_left")
                                 .resizable()
@@ -44,9 +46,14 @@ struct AccountInfoView: View {
                 Spacer().frame(height: 16)
                 
                 HStack {
-                    Image("ic_empty_profile_image")
-                        .resizable()
-                        .frame(width: 62, height: 62)
+                    if imageUrl.isEmpty {
+                        Image("ic_empty_profile_image")
+                            .resizable()
+                            .frame(width: 48, height: 48)
+                    } else {
+                        AsyncImageView(imageURL: imageUrl, width: 48, height: 48)
+                    }
+                    
                     VStack(alignment: .leading) {
                         Text(nickname)
                             .font(PoptatoTypo.lgSemiBold)
@@ -66,10 +73,10 @@ struct AccountInfoView: View {
                     isLogoutDialogPresented = true
                 }) {
                     ZStack(alignment: .center) {
-                        Color(.danger50).opacity(0.1)
+                        Color(.gray95)
                         Text("로그아웃")
                             .font(PoptatoTypo.smSemiBold)
-                            .foregroundColor(.danger40)
+                            .foregroundColor(.gray40)
                     }
                 }
                 .frame(maxWidth: .infinity)

@@ -13,4 +13,6 @@ struct TodayItemModel: Codable {
     var dDay: Int?
     var deadline: String?
     var isRepeat: Bool
+    var imageUrl: String?
+    var categoryName: String?
 }

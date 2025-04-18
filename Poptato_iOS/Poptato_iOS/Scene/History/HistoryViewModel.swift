@@ -14,7 +14,10 @@ final class HistoryViewModel: ObservableObject {
     @Published var days: [Int?] = []
     @Published var selectedDay: Int? = nil
     @Published var historyList: [HistoryListItemModel] = []
-    @Published var monthlyHistory: [String] = []
+    @Published var monthlyHistory: [HistoryCalendarItem] = []
+    
+    private var historyMap: [String: HistoryCalendarItem] = [:]
+    
     private var historyRepository: HistoryRepository
     
     init(historyRepository: HistoryRepository = HistoryRepositoryImpl()) {
@@ -93,10 +96,15 @@ final class HistoryViewModel: ObservableObject {
         do {
             let response = try await historyRepository.getMonthlyHistory(year: String(year), month: month)
             await MainActor.run {
-                monthlyHistory = response.dates
+                monthlyHistory = response.historyCalendarList
+                historyMap = Dictionary(uniqueKeysWithValues: monthlyHistory.map { ($0.date, $0) })
             }
         } catch {
             print("Error getMonthlyHistory: \(error)")
         }
+    }
+    
+    func historyItem(for date: String) -> HistoryCalendarItem? {
+        historyMap[date]
     }
 }

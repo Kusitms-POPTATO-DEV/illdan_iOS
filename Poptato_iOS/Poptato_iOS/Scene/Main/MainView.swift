@@ -65,8 +65,7 @@ struct MainView: View {
                             }
                         )
                         .tabItem {
-                            Label("오늘", image: selectedTab == 0 ? "ic_today_selected" : "ic_today_unselected")
-                                .font(PoptatoTypo.xsMedium)
+                            Label("", image: selectedTab == 0 ? "ic_today_selected" : "ic_today_unselected")
                         }
                         .environmentObject(todayViewModel)
                         .tag(0)
@@ -84,15 +83,14 @@ struct MainView: View {
                             isCreateCategoryViewPresented: $isCreateCategoryViewPresented
                         )
                         .tabItem {
-                            Label("할 일", image: selectedTab == 1 ? "ic_backlog_selected" : "ic_backlog_unselected")
-                                .font(PoptatoTypo.xsMedium)
+                            Label("", image: selectedTab == 1 ? "ic_backlog_selected" : "ic_backlog_unselected")
                         }
                         .environmentObject(backlogViewModel)
                         .tag(1)
                         
                         HistoryView()
                             .tabItem {
-                                Label("기록", image: selectedTab == 2 ? "ic_clock_selected" : "ic_clock_unselected")
+                                Label("", image: selectedTab == 2 ? "ic_calendar_nav_selected" : "ic_calendar_nav_unselected")
                             }
                             .tag(2)
                         
@@ -101,8 +99,7 @@ struct MainView: View {
                             isPolicyViewPresented: $isPolicyViewPresented
                         )
                         .tabItem {
-                            Label("마이", image: "ic_mypage")
-                                .font(PoptatoTypo.xsMedium)
+                            Label("", image: selectedTab == 3 ? "ic_my_selected" : "ic_mypage")
                         }
                         .tag(3)
                     }

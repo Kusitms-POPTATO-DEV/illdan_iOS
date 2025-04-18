@@ -42,8 +42,33 @@ struct BottomSheetView: View {
                                 }
                         }
                     }
-                    .padding(.horizontal, 24)
-                    .padding(.top, 24)
+                    .padding(.horizontal, 20)
+                    
+                    HStack(spacing: 16) {
+                        EditDeleteButtonView(
+                            image: "ic_pen",
+                            title: "수정하기",
+                            onClickButton: {
+                                AnalyticsManager.shared.logEvent(AnalyticsEvent.edit_task)
+                                isVisible = false
+                                editTodo()
+                            }
+                        )
+                        
+                        EditDeleteButtonView(
+                            image: "ic_trash",
+                            title: "삭제하기",
+                            onClickButton: {
+                                AnalyticsManager.shared.logEvent(AnalyticsEvent.delete_task, parameters: ["task_id" : todoItem?.todoId ?? -1])
+                                isVisible = false
+                                deleteTodo()
+                            }
+                        )
+                    }
+                    .frame(maxWidth: .infinity)
+                    .padding(.horizontal, 20)
+                    
+                    Spacer().frame(height: 20)
                     
                     BottomSheetButton(
                         image: "ic_refresh",
@@ -76,12 +101,12 @@ struct BottomSheetView: View {
                     )
                     
                     BottomSheetButton(
-                        image: "ic_add_emoji",
+                        image: "ic_add_category",
                         buttonText: "카테고리",
                         buttonColor: .gray30,
                         onClickBtn: { showCategoryBottomSheet = true },
                         categoryName: todoItem?.categoryName ?? "",
-                        emojiImageUrl: todoItem?.emojiImageUrl ?? "",
+                        emojiImageUrl: todoItem?.imageUrl ?? "",
                         isRepeat: Binding(
                             get: { todoItem?.isRepeat ?? false },
                             set: { newValue in
@@ -89,47 +114,11 @@ struct BottomSheetView: View {
                             }
                         )
                     )
-                    BottomSheetButton(
-                        image: "ic_pen",
-                        buttonText: "수정하기",
-                        buttonColor: .gray30,
-                        subText: "",
-                        onClickBtn: {
-                            AnalyticsManager.shared.logEvent(AnalyticsEvent.edit_task)
-                            isVisible = false
-                            editTodo()
-                        },
-                        isRepeat: Binding(
-                            get: { todoItem?.isRepeat ?? false },
-                            set: { newValue in
-                                todoItem?.isRepeat = newValue
-                            }
-                        )
-                    )
-                    BottomSheetButton(
-                        image: "ic_trash",
-                        buttonText: "삭제하기",
-                        buttonColor: .danger50,
-                        subText: "",
-                        onClickBtn: {
-                            AnalyticsManager.shared.logEvent(AnalyticsEvent.delete_task, parameters: ["task_id" : todoItem?.todoId ?? -1])
-                            isVisible = false
-                            deleteTodo()
-                        },
-                        isRepeat: Binding(
-                            get: { todoItem?.isRepeat ?? false },
-                            set: { newValue in
-                                todoItem?.isRepeat = newValue
-                            }
-                        )
-                    )
-                    
-                    Spacer()
                 }
                 .frame(maxWidth: .infinity)
-                .frame(height: 350)
+                .padding(.vertical, 20)
                 .background(Color(UIColor.gray100))
-                .clipShape(RoundedCorner(radius: 16, corners: [.topLeft, .topRight]))
+                .clipShape(RoundedCorner(radius: 24))
             }
             
             if showDateBottomSheet {
@@ -151,6 +140,7 @@ struct BottomSheetView: View {
                 )
             }
         }
+        .padding(.horizontal, 16)
     }
 }
 
@@ -176,7 +166,7 @@ struct BottomSheetButton: View {
             Spacer()
             if buttonText == "반복 할 일" {
                 Toggle("", isOn: $isRepeat)
-                    .tint(isRepeat ? Color.primary60 : Color.gray80)
+                    .tint(isRepeat ? Color.primary40 : Color.gray80)
             }
             if !subText.isEmpty {
                 Text(subText)
@@ -196,7 +186,7 @@ struct BottomSheetButton: View {
             }
         }
         .frame(maxWidth: .infinity)
-        .padding(.horizontal, 24)
+        .padding(.horizontal, 20)
         .padding(.vertical, 12)
         .background(Color.clear)
         .contentShape(Rectangle())
@@ -220,7 +210,8 @@ struct DateBottomSheet: View {
             Spacer()
             VStack(spacing: 0) {
                 Spacer().frame(height: 24)
-                DateNavigatorView(
+                
+                BottomSheetDateNavigatorView(
                     year: selectedYear,
                     month: selectedMonth,
                     onClickIncreaseMonth: {
@@ -236,6 +227,7 @@ struct DateBottomSheet: View {
                         generateCalendarDays()
                     }
                 )
+                
                 Spacer().frame(height: 16)
                 
                 BottomSheetCalendarView(
@@ -262,9 +254,10 @@ struct DateBottomSheet: View {
                 )
             }
             .frame(maxWidth: .infinity)
+            .padding(.horizontal, 30)
             .fixedSize(horizontal: false, vertical: true)
             .background(Color(UIColor.gray100))
-            .clipShape(RoundedCorner(radius: 16, corners: [.topLeft, .topRight]))
+            .clipShape(RoundedCorner(radius: 24))
         }
         .onAppear {
             initializeSelectedDate()
@@ -318,7 +311,6 @@ struct BottomSheetCalendarView: View {
                         .foregroundColor(.gray60)
                 }
             }
-            .padding(.horizontal, 24)
             
             LazyVGrid(columns: Array(repeating: GridItem(.flexible()), count: 7), spacing: 10) {
                 ForEach(Array(days.enumerated()), id: \.offset) { index, date in
@@ -326,10 +318,10 @@ struct BottomSheetCalendarView: View {
                         Text("\(date)")
                             .frame(width: 32, height: 32)
                             .font(PoptatoTypo.smMedium)
-                            .foregroundColor(selectedDay == date ? .gray100 : .gray70)
+                            .foregroundColor(selectedDay == date ? .gray100 : .gray10)
                             .background(
                                 Rectangle()
-                                    .fill(selectedDay == date ? Color.primary60 : Color.gray100)
+                                    .fill(selectedDay == date ? Color.primary40 : Color.gray100)
                                     .cornerRadius(8)
                             )
                             .onTapGesture {
@@ -342,7 +334,6 @@ struct BottomSheetCalendarView: View {
                     }
                 }
             }
-            .padding(.horizontal, 24)
             
             Spacer().frame(height: 24)
             
@@ -361,6 +352,46 @@ struct BottomSheetCalendarView: View {
             
             Spacer().frame(height: 16)
         }
+    }
+}
+
+struct BottomSheetDateNavigatorView: View {
+    let year: Int
+    let month: Int
+    
+    var onClickIncreaseMonth: () -> Void
+    var onClickDecreaseMonth: () -> Void
+    
+    var body: some View {
+        HStack(spacing: 0) {
+            
+            Image("ic_arrow_left")
+                .renderingMode(.template)
+                .resizable()
+                .frame(width: 20, height: 20)
+                .foregroundColor(.gray40)
+                .onTapGesture {
+                    onClickDecreaseMonth()
+                }
+            
+            Spacer()
+            
+            Text("\(String(format: "%d", year))년 \(String(format: "%2d", month))월")
+                .font(PoptatoTypo.mdMedium)
+                .foregroundColor(.gray00)
+            
+            Spacer()
+            
+            Image("ic_arrow_right")
+                .renderingMode(.template)
+                .resizable()
+                .frame(width: 20, height: 20)
+                .foregroundColor(.gray40)
+                .onTapGesture {
+                    onClickIncreaseMonth()
+                }
+        }
+        .frame(maxWidth: .infinity)
     }
 }
 
@@ -464,9 +495,9 @@ struct BottomSheetActionButton: View {
                     .font(PoptatoTypo.mdMedium)
                     .frame(maxWidth: .infinity)
                     .frame(height: 48)
-                    .foregroundColor(.gray40)
+                    .foregroundColor(.gray50)
                     .background(Color(.gray95))
-                    .cornerRadius(8)
+                    .cornerRadius(12)
             }
             
             Button(
@@ -478,15 +509,38 @@ struct BottomSheetActionButton: View {
                     .font(PoptatoTypo.mdSemiBold)
                     .frame(maxWidth: .infinity)
                     .frame(height: 48)
-                    .foregroundColor(.gray100)
-                    .background(Color(.primary60))
-                    .cornerRadius(8)
+                    .foregroundColor(.gray90)
+                    .background(Color(.primary40))
+                    .cornerRadius(12)
             }
-            
         }
         .frame(maxWidth: .infinity)
-        .padding(.horizontal, 24)
         .padding(.vertical, 8)
+    }
+}
+
+struct EditDeleteButtonView: View {
+    let image: String
+    let title: String
+    
+    var onClickButton: () -> Void
+    
+    var body: some View {
+        Button(action: onClickButton) {
+            HStack(spacing: 4) {
+                Image(image)
+                    .resizable()
+                    .frame(width: 20, height: 20)
+                
+                Text(title)
+                    .font(PoptatoTypo.mdMedium)
+                    .foregroundStyle(Color.gray30)
+            }
+            .padding(.vertical, 12)
+            .frame(maxWidth: .infinity)
+            .background(Color.gray95)
+            .clipShape(RoundedCorner(radius: 12))
+        }
     }
 }
 

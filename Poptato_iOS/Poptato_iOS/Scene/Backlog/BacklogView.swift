@@ -59,10 +59,10 @@ struct BacklogView: View {
                                     viewModel.showCategorySettingMenu = !viewModel.showCategorySettingMenu
                                 }
                         }
-                        .frame(width: 20, height: 20)
+                        .frame(width: 24, height: 24)
                     }
                 }
-                .padding(.trailing, 14)
+                .padding(.trailing, 20)
                 
                 CreateBacklogTextField(
                     isFocused: $isTextFieldFocused,
@@ -75,14 +75,8 @@ struct BacklogView: View {
                 
                 Spacer().frame(height: 16)
                 
-                if viewModel.backlogList.isEmpty {
-                    Spacer()
-                    
-                    Text("일단, 할 일을\n모두 추가해 보세요.")
-                        .font(PoptatoTypo.lgMedium)
-                        .foregroundColor(.gray80)
-                        .multilineTextAlignment(.center)
-                } else {
+                if viewModel.backlogList.isEmpty { EmptyBacklogView() }
+                else {
                     BacklogListView(
                         backlogList: $viewModel.backlogList,
                         onItemSelected: onItemSelcted,
@@ -132,14 +126,14 @@ struct BacklogView: View {
                     Divider().background(Color.gray90)
                     HStack(spacing: 0) {
                         Spacer().frame(width: 12)
-                        Image("ic_trash")
+                        Image("ic_trash_warning")
                             .resizable()
                             .frame(width: 16, height: 16)
                         Spacer().frame(width: 4)
                         Text("삭제하기")
                             .padding(.vertical, 10)
                             .font(PoptatoTypo.smMedium)
-                            .foregroundColor(.danger50)
+                            .foregroundColor(.warning40)
                         Spacer().frame(width: 16)
                     }
                     .onTapGesture {
@@ -253,6 +247,7 @@ struct CategoryListView: View {
                 }
             }
         }
+        .scrollIndicators(.hidden)
     }
     
     private func imageName(for index: Int) -> String? {
@@ -271,13 +266,6 @@ struct CategoryItemView: View {
     
     var body: some View {
         ZStack(alignment: .center) {
-            Circle()
-                .frame(width: 40, height: 40)
-                .foregroundColor(.gray100)
-                .overlay(
-                    Circle()
-                        .stroke(isSelected ? Color.gray00 : Color.gray95, lineWidth: 1)
-                )
             if image == nil {
                 PDFImageView(imageURL: item.imageUrl, width: 24, height: 24)
             } else {
@@ -289,6 +277,9 @@ struct CategoryItemView: View {
             }
             
         }
+        .frame(width: 40, height: 40)
+        .background(isSelected ? Color.gray90 : Color.gray100)
+        .clipShape(RoundedRectangle(cornerRadius: 12))
     }
 }
 
@@ -307,7 +298,7 @@ struct BacklogListView: View {
     
     var body: some View {
         ScrollView {
-            LazyVStack {
+            LazyVStack(spacing: 16) {
                 ForEach(backlogList.indices, id: \.self) { index in
                     let item = backlogList[index]
                     
@@ -336,7 +327,7 @@ struct BacklogListView: View {
             Spacer().frame(height: 45)
         }
         .frame(maxWidth: .infinity)
-        .padding(.horizontal, 16)
+        .padding(.horizontal, 20)
     }
 }
 
@@ -355,72 +346,7 @@ struct BacklogItemView: View {
     
     var body: some View {
         HStack {
-            VStack {
-                HStack(spacing: 6) {
-                    if (item.isBookmark) {
-                        HStack(spacing: 2) {
-                            Image("ic_star_filled")
-                                .resizable()
-                                .frame(width: 12, height: 12)
-                            Text("중요")
-                                .font(PoptatoTypo.calSemiBold)
-                                .foregroundColor(.primary60)
-                        }
-                        .padding(.horizontal, 4)
-                        .padding(.vertical, 2)
-                        .background(Color.gray90)
-                        .cornerRadius(4)
-                    }
-                    
-                    if item.isRepeat {
-                        HStack(spacing: 2) {
-                            Image("ic_refresh")
-                                .resizable()
-                                .frame(width: 12, height: 12)
-                            Text("반복")
-                                .font(PoptatoTypo.calSemiBold)
-                                .foregroundColor(.gray50)
-                        }
-                        .padding(.horizontal, 4)
-                        .padding(.vertical, 2)
-                        .background(Color.gray90)
-                        .cornerRadius(4)
-                    }
-                    
-                    if let dDay = item.dDay, let deadline = item.deadline {
-                        ZStack {
-                            if deadlineDateMode {
-                                Text(deadline)
-                                    .font(PoptatoTypo.calMedium)
-                                    .foregroundColor(.gray50)
-                                    .frame(height: 12)
-                            } else {
-                                if dDay == 0 {
-                                    Text("D-day")
-                                        .font(PoptatoTypo.calMedium)
-                                        .foregroundColor(.gray50)
-                                        .frame(height: 12)
-                                } else if dDay > 0 {
-                                    Text("D-\(dDay)")
-                                        .font(PoptatoTypo.calMedium)
-                                        .foregroundColor(.gray50)
-                                        .frame(height: 12)
-                                } else {
-                                    Text("D+\(abs(dDay))")
-                                        .font(PoptatoTypo.calMedium)
-                                        .foregroundColor(.gray50)
-                                        .frame(height: 12)
-                                }
-                            }
-                        }
-                        .padding(.horizontal, 4)
-                        .padding(.vertical, 2)
-                        .background(Color.gray90)
-                        .cornerRadius(4)
-                    }
-                    if (item.isBookmark || item.dDay != nil || item.isRepeat) { Spacer() }
-                }
-                
+            VStack(spacing: 0) {
                 if activeItemId == item.todoId {
                     TextField("", text: $content, axis: .vertical)
                         .focused($isActive)
@@ -445,23 +371,46 @@ struct BacklogItemView: View {
                         Spacer()
                     }
                 }
+                
+                if item.isRepeat || item.dDay != nil {
+                    Spacer().frame(height: 8)
+                    BacklogRepeatDeadlineText(deadlineDateMode: deadlineDateMode, item: item)
+                }
+                
+                if item.isBookmark || item.categoryName != nil {
+                    Spacer().frame(height: 8)
+                    BacklogBookmarkCategoryChip(item: item)
+                }
             }
             
             Spacer()
             
-            ZStack(alignment: (item.isBookmark || item.dDay != nil) ? .top : .center) {
+            VStack(spacing: 0) {
                 Image("ic_dot")
                     .resizable()
+                    .renderingMode(.template)
+                    .foregroundStyle(Color.gray80)
                     .frame(width: 20, height: 20)
+                    .padding(.top, !item.isRepeat && !item.isBookmark && item.dDay == nil && item.categoryName == nil ? 2.5 : 0)
                     .onTapGesture {
-                        onItemSelected(item)
+                        onItemSelected(
+                            TodoItemModel(
+                                todoId: item.todoId,
+                                content: item.content,
+                                isBookmark: item.isBookmark,
+                                isRepeat: item.isRepeat,
+                                dDay: item.dDay,
+                                deadline: item.deadline
+                            )
+                        )
                     }
+                Spacer()
             }
         }
         .frame(maxWidth: .infinity)
         .padding(.horizontal, 16)
         .padding(.vertical, 12)
-        .background(RoundedRectangle(cornerRadius: 8))
+        .background(RoundedRectangle(cornerRadius: 12))
         .foregroundColor(.gray95)
         .offset(x: offset)
         .highPriorityGesture(
@@ -513,10 +462,10 @@ struct CreateBacklogTextField: View {
                 if taskInput.isEmpty && !isFocused {
                     HStack {
                         Image(systemName: "plus")
-                            .foregroundColor(.gray)
+                            .foregroundColor(Color.gray80)
 
-                        Text("할 일을 입력하세요")
-                            .foregroundColor(.gray)
+                        Text("할 일 추가하기...")
+                            .foregroundColor(Color.gray80)
                     }
                     .padding(.leading, 16)
                 }
@@ -533,8 +482,8 @@ struct CreateBacklogTextField: View {
                     .padding(.vertical, 16)
                     .padding(.horizontal, 16)
             }
-            .background(RoundedRectangle(cornerRadius: 8).stroke(isFocused ? Color.white : Color.gray, lineWidth: 1))
-            .padding(.horizontal, 16)
+            .background(RoundedRectangle(cornerRadius: 8).stroke(isFocused ? Color.white : Color.gray80, lineWidth: 1))
+            .padding(.horizontal, 20)
             .onTapGesture {
                 isFocused = true
             }
@@ -570,6 +519,116 @@ struct CreateBacklogTextField: View {
                     isFocused = true
                 }
             }
+        }
+    }
+}
+
+struct BacklogRepeatDeadlineText: View {
+    @State var deadlineDateMode: Bool
+    let item: TodoItemModel
+    
+    var body: some View {
+        HStack(alignment: .center, spacing: 3) {
+            if item.isRepeat {
+                Text("반복 할 일")
+                    .font(PoptatoTypo.xsRegular)
+                    .foregroundStyle(Color.gray50)
+            }
+            
+            if item.isRepeat && item.dDay != nil {
+                Text("·")
+                    .font(PoptatoTypo.xsRegular)
+                    .foregroundStyle(Color.gray50)
+            }
+            
+            if let dDay = item.dDay, let deadline = item.deadline {
+                ZStack {
+                    if deadlineDateMode {
+                        Text(deadline)
+                            .font(PoptatoTypo.xsRegular)
+                            .foregroundColor(.gray50)
+                    } else {
+                        if dDay == 0 {
+                            Text("D-day")
+                                .font(PoptatoTypo.xsRegular)
+                                .foregroundColor(.gray50)
+                        } else if dDay > 0 {
+                            Text("D-\(dDay)")
+                                .font(PoptatoTypo.xsRegular)
+                                .foregroundColor(.gray50)
+                        } else {
+                            Text("D+\(abs(dDay))")
+                                .font(PoptatoTypo.xsRegular)
+                                .foregroundColor(.gray50)
+                        }
+                    }
+                    
+                }
+            }
+            
+            if item.isRepeat || item.dDay != nil { Spacer().frame(height: 0) }
+        }
+    }
+}
+
+struct BacklogBookmarkCategoryChip: View {
+    let item: TodoItemModel
+    
+    var body: some View {
+        HStack(alignment: .center, spacing: 6) {
+            if (item.isBookmark) {
+                HStack(spacing: 2) {
+                    Image("ic_star_filled")
+                        .resizable()
+                        .frame(width: 12, height: 12)
+                    Text("중요")
+                        .font(PoptatoTypo.calSemiBold)
+                        .foregroundColor(.primary40)
+                }
+                .padding(.horizontal, 4)
+                .padding(.vertical, 2)
+                .background(Color.gray90)
+                .cornerRadius(4)
+            }
+            
+            if let categoryName = item.categoryName, let imageUrl = item.imageUrl {
+                HStack(spacing: 2) {
+                    PDFImageView(imageURL: imageUrl, width: 12, height: 12)
+                    Text(categoryName)
+                        .font(PoptatoTypo.xsRegular)
+                        .foregroundColor(.gray50)
+                }
+                .padding(.horizontal, 4)
+                .padding(.vertical, 2)
+                .background(Color.gray90)
+                .cornerRadius(6)
+            }
+            
+            if (item.isBookmark || item.categoryName != nil) { Spacer().frame(height: 0) }
+        }
+    }
+}
+
+struct EmptyBacklogView: View {
+    var body: some View {
+        ZStack(alignment: .topLeading) {
+            HStack {
+                Image("ic_arrow_curved")
+                Spacer()
+            }
+            .padding(.horizontal, 37)
+            .padding(.top, 37)
+            
+            VStack(alignment: .center) {
+                Image("ic_fire_today")
+                
+                Text("일단, 할 일을\n모두 추가해 보세요")
+                    .font(PoptatoTypo.mdMedium)
+                    .foregroundColor(.gray70)
+                    .multilineTextAlignment(.center)
+            }
+            .frame(maxHeight: .infinity)
+            .frame(maxWidth: .infinity)
         }
     }
 }

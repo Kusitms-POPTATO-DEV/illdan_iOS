@@ -88,10 +88,9 @@ struct CreateCategoryView: View {
                 
                 CommonDialog(
                     content: "카테고리 이름을 작성해 주세요",
-                    negativeButtonText: "확인",
+                    positiveButtonText: "확인",
                     buttonType: DialogButtonType.single,
-                    onClickBtnPositive: {},
-                    onClickBtnNegative: { viewModel.showEmptyCategoryNameDialog = false },
+                    onClickBtnPositive: { viewModel.showEmptyCategoryNameDialog = false },
                     onDismissRequest: { viewModel.showEmptyCategoryNameDialog = false }
                 )
             }
@@ -102,10 +101,9 @@ struct CreateCategoryView: View {
                 
                 CommonDialog(
                     content: "카테고리 이모티콘을 선택해 주세요",
-                    negativeButtonText: "확인",
+                    positiveButtonText: "확인",
                     buttonType: DialogButtonType.single,
-                    onClickBtnPositive: {},
-                    onClickBtnNegative: { viewModel.showEmptyCategoryEmojiDialog = false },
+                    onClickBtnPositive: { viewModel.showEmptyCategoryEmojiDialog = false },
                     onDismissRequest: { viewModel.showEmptyCategoryEmojiDialog = false }
                 )
             }
@@ -190,7 +188,7 @@ struct CreateCategoryTextField: View {
                 .padding(.bottom, 8)
                 .overlay(
                     Rectangle()
-                        .frame(height: 2)
+                        .frame(height: 1)
                         .foregroundColor(isFocused ? .gray20 : .gray90)
                         .padding(.top, 40),
                     alignment: .bottom
@@ -209,7 +207,7 @@ struct CreateCategoryTextField: View {
             Spacer().frame(width: 16)
             
             if selectedEmoji == nil {
-                Image("ic_add_emoji")
+                Image("ic_add_category")
                     .resizable()
                     .frame(width: 40, height: 40)
                     .onTapGesture {

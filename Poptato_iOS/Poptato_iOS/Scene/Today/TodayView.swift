@@ -24,10 +24,7 @@ struct TodayView: View {
                     .ignoresSafeArea()
                 
                 VStack {
-                    TopBar(
-                        titleText: viewModel.currentDate,
-                        subText: ""
-                    )
+                    TodayTopBar(todayDate: viewModel.currentDate)
                     
                     if isViewActive {
                         if viewModel.todayList.isEmpty {
@@ -114,8 +111,7 @@ struct TodayListView: View {
     
     var body: some View {
         ScrollView {
-            LazyVStack {
-                
+            LazyVStack(spacing: 16) {
                 ForEach(todayList.indices, id: \.self) { index in
                     let item = todayList[index]
                     
@@ -142,7 +138,8 @@ struct TodayListView: View {
             }
         }
         .frame(maxWidth: .infinity)
-        .padding(.horizontal, 16)
+        .padding(.horizontal, 20)
+        .padding(.top, 20)
     }
 }
 
@@ -161,88 +158,22 @@ struct TodayItemView: View {
     @FocusState var isActive: Bool
 
     var body: some View {
-        HStack {
-            VStack {
-                HStack(spacing: 6) {
-                    if (item.isBookmark) {
-                        HStack(spacing: 2) {
-                            Image("ic_star_filled")
-                                .resizable()
-                                .frame(width: 12, height: 12)
-                            Text("중요")
-                                .font(PoptatoTypo.calSemiBold)
-                                .foregroundColor(.primary60)
+        HStack(spacing: 0) {
+            HStack(alignment: .top, spacing: 12) {
+                Image(item.todayStatus == "COMPLETED" ? "ic_checked" : "ic_unchecked")
+                    .resizable()
+                    .frame(width: 20, height: 20)
+                    .onTapGesture {
+                        updateTodoCompletion(item.todoId)
+                        if item.todayStatus == "INCOMPLETE" {
+                            hapticFeedback.impactOccurred()
+                            moveItemToCompleted()
+                        } else {
+                            moveItemToIncomplete()
                         }
-                        .padding(.horizontal, 4)
-                        .padding(.vertical, 2)
-                        .background(Color.gray90)
-                        .cornerRadius(4)
                     }
-                    
-                    if item.isRepeat {
-                        HStack(spacing: 2) {
-                            Image("ic_refresh")
-                                .resizable()
-                                .frame(width: 12, height: 12)
-                            Text("반복")
-                                .font(PoptatoTypo.calSemiBold)
-                                .foregroundColor(.gray50)
-                        }
-                        .padding(.horizontal, 4)
-                        .padding(.vertical, 2)
-                        .background(Color.gray90)
-                        .cornerRadius(4)
-                    }
-                    
-                    if let dDay = item.dDay, let deadline = item.deadline {
-                        ZStack {
-                            if deadlineDateMode {
-                                Text(deadline)
-                                    .font(PoptatoTypo.calMedium)
-                                    .foregroundColor(.gray50)
-                                    .frame(height: 12)
-                            } else {
-                                if dDay == 0 {
-                                    Text("D-day")
-                                        .font(PoptatoTypo.calMedium)
-                                        .foregroundColor(.gray50)
-                                        .frame(height: 12)
-                                } else if dDay > 0 {
-                                    Text("D-\(dDay)")
-                                        .font(PoptatoTypo.calMedium)
-                                        .foregroundColor(.gray50)
-                                        .frame(height: 12)
-                                } else {
-                                    Text("D+\(abs(dDay))")
-                                        .font(PoptatoTypo.calMedium)
-                                        .foregroundColor(.gray50)
-                                        .frame(height: 12)
-                                }
-                            }
-                            
-                        }
-                        .padding(.horizontal, 4)
-                        .padding(.vertical, 2)
-                        .background(Color.gray90)
-                        .cornerRadius(4)
-                    }
-                    if (item.isBookmark || item.dDay != nil || item.isRepeat) { Spacer() }
-                }
                 
-                HStack {
-                    Image(item.todayStatus == "COMPLETED" ? "ic_checked" : "ic_unchecked")
-                        .resizable()
-                        .frame(width: 20, height: 20)
-                        .onTapGesture {
-                            updateTodoCompletion(item.todoId)
-                            if item.todayStatus == "INCOMPLETE" {
-                                hapticFeedback.impactOccurred()
-                                moveItemToCompleted()
-                            } else {
-                                moveItemToIncomplete()
-                            }
-                        }
-
+                VStack(spacing: 8) {
                     if activeItemId == item.todoId {
                         TextField("", text: $content, axis: .vertical)
                             .focused($isActive)
@@ -267,15 +198,22 @@ struct TodayItemView: View {
                             Spacer()
                         }
                     }
+                    
+                    if item.isRepeat || item.deadline != nil { TodayRepeatDeadlineText(deadlineDateMode: deadlineDateMode, item: item) }
+                    
+                    if item.isBookmark || item.categoryName != nil { TodayBookmarkCategoryChip(item: item) }
                 }
             }
             
             Spacer()
             
-            ZStack(alignment: (item.isBookmark || item.dDay != nil) ? .top : .center) {
+            VStack(spacing: 0) {
                 Image("ic_dot")
                     .resizable()
+                    .renderingMode(.template)
+                    .foregroundStyle(Color.gray80)
                     .frame(width: 20, height: 20)
+                    .padding(.top, !item.isRepeat && !item.isBookmark && item.dDay == nil && item.categoryName == nil ? 3 : 0)
                     .onTapGesture {
                         onItemSelected(
                             TodoItemModel(
@@ -288,12 +226,13 @@ struct TodayItemView: View {
                             )
                         )
                     }
+                Spacer()
             }
         }
         .frame(maxWidth: .infinity)
         .padding(.vertical, 12)
         .padding(.horizontal, 16)
-        .background(RoundedRectangle(cornerRadius: 8))
+        .background(RoundedRectangle(cornerRadius: 12))
         .foregroundColor(.gray95)
         .offset(x: offset)
         .highPriorityGesture(
@@ -359,34 +298,132 @@ struct TodayItemView: View {
     }
 }
 
+struct TodayRepeatDeadlineText: View {
+    @State var deadlineDateMode: Bool
+    let item: TodayItemModel
+    
+    var body: some View {
+        HStack(spacing: 3) {
+            if item.isRepeat {
+                Text("반복 할 일")
+                    .font(PoptatoTypo.xsRegular)
+                    .foregroundStyle(Color.gray50)
+            }
+            
+            if item.isRepeat && item.dDay != nil {
+                Text("·")
+                    .font(PoptatoTypo.xsRegular)
+                    .foregroundStyle(Color.gray50)
+            }
+            
+            if let dDay = item.dDay, let deadline = item.deadline {
+                ZStack {
+                    if deadlineDateMode {
+                        Text(deadline)
+                            .font(PoptatoTypo.xsRegular)
+                            .foregroundColor(.gray50)
+                            .frame(height: 12)
+                    } else {
+                        if dDay == 0 {
+                            Text("D-day")
+                                .font(PoptatoTypo.xsRegular)
+                                .foregroundColor(.gray50)
+                                .frame(height: 12)
+                        } else if dDay > 0 {
+                            Text("D-\(dDay)")
+                                .font(PoptatoTypo.xsRegular)
+                                .foregroundColor(.gray50)
+                                .frame(height: 12)
+                        } else {
+                            Text("D+\(abs(dDay))")
+                                .font(PoptatoTypo.xsRegular)
+                                .foregroundColor(.gray50)
+                                .frame(height: 12)
+                        }
+                    }
+                    
+                }
+            }
+            
+            if item.isRepeat || item.dDay != nil { Spacer() }
+        }
+    }
+}
+
+struct TodayBookmarkCategoryChip: View {
+    let item: TodayItemModel
+    
+    var body: some View {
+        HStack(spacing: 6) {
+            if (item.isBookmark) {
+                HStack(spacing: 2) {
+                    Image("ic_star_filled")
+                        .resizable()
+                        .frame(width: 12, height: 12)
+                    Text("중요")
+                        .font(PoptatoTypo.xsRegular)
+                        .foregroundColor(.primary40)
+                }
+                .padding(.horizontal, 4)
+                .padding(.vertical, 2)
+                .background(Color.gray90)
+                .cornerRadius(6)
+            }
+            
+            if let categoryName = item.categoryName, let imageUrl = item.imageUrl {
+                HStack(spacing: 2) {
+                    PDFImageView(imageURL: imageUrl, width: 12, height: 12)
+                    Text(categoryName)
+                        .font(PoptatoTypo.xsRegular)
+                        .foregroundColor(.gray50)
+                }
+                .padding(.horizontal, 4)
+                .padding(.vertical, 2)
+                .background(Color.gray90)
+                .cornerRadius(6)
+            }
+            
+            if (item.isBookmark || item.dDay != nil || item.isRepeat || item.categoryName != nil) { Spacer() }
+        }
+        .onAppear {
+            print("\(item)")
+        }
+    }
+}
+
 struct EmptyTodayView: View {
     var goToBacklog: () -> Void
     
     var body: some View {
         ZStack(alignment: .center) {
-            VStack {
+            VStack(spacing: 0) {
+                Image("ic_fire_today")
+                
+                Spacer().frame(height: 8)
+                
                 Text("오늘 할 일은 무엇인가요?")
-                    .font(PoptatoTypo.lgMedium)
-                    .foregroundColor(.gray40)
+                    .font(PoptatoTypo.mdMedium)
+                    .foregroundColor(.gray70)
+                
+                Spacer().frame(height: 24)
                 
                 Button(
                     action: { goToBacklog() }
                 ) {
                     HStack {
-                        Image("ic_backlog_unselected")
+                        Image("ic_backlog_nav")
                             .resizable()
-                            .frame(width: 16, height: 16)
+                            .frame(width: 20, height: 20)
                             .foregroundColor(.primary100)
                         
                         Text("할 일 가져오기")
-                            .font(PoptatoTypo.smSemiBold)
-                            .foregroundColor(.primary100)
+                            .font(PoptatoTypo.mdSemiBold)
+                            .foregroundColor(.gray95)
                     }
                     .frame(width: 132, height: 37)
-                    .background(Color(.primary60))
-                    .cornerRadius(32)
+                    .background(Color(.primary40))
+                    .cornerRadius(12)
                     .padding(.horizontal, 16)
-                    .padding(.vertical, 8)
                 }
             }
         }
