@@ -383,7 +383,7 @@ struct TodayBookmarkCategoryChip: View {
                 .cornerRadius(6)
             }
             
-            if (item.isBookmark || item.dDay != nil || item.isRepeat) { Spacer() }
+            if (item.isBookmark || item.dDay != nil || item.isRepeat || item.categoryName != nil) { Spacer() }
         }
         .onAppear {
             print("\(item)")

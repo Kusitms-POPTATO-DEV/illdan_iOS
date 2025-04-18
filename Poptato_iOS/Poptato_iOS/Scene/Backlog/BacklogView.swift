@@ -604,7 +604,7 @@ struct BacklogBookmarkCategoryChip: View {
                 .cornerRadius(6)
             }
             
-            if (item.isBookmark) { Spacer().frame(height: 0) }
+            if (item.isBookmark || item.categoryName != nil) { Spacer().frame(height: 0) }
         }
     }
 }
