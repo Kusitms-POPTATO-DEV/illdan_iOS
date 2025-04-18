@@ -8,9 +8,10 @@
 import SwiftUI
 
 struct AccountInfoView: View {
-    @Environment(\.presentationMode) var presentationMode
     var onClickBtnLogout: () -> Void
     var onClickBtnDeleteAccount: () -> Void
+    var onClickBtnBack: () -> Void
+    
     let nickname: String
     let email: String
     let imageUrl: String
@@ -30,7 +31,7 @@ struct AccountInfoView: View {
                     
                     HStack(alignment: .center) {
                         Button(action: {
-                            presentationMode.wrappedValue.dismiss()
+                            onClickBtnBack()
                         }) {
                             Image("ic_arrow_left")
                                 .resizable()
