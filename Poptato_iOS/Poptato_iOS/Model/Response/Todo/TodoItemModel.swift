@@ -17,5 +17,5 @@ struct TodoItemModel: Codable {
     var deadline: String?
     var categoryId: Int?
     var categoryName: String?
-    var emojiImageUrl: String?
+    var imageUrl: String?
 }

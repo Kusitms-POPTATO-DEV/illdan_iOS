@@ -106,7 +106,7 @@ struct BottomSheetView: View {
                         buttonColor: .gray30,
                         onClickBtn: { showCategoryBottomSheet = true },
                         categoryName: todoItem?.categoryName ?? "",
-                        emojiImageUrl: todoItem?.emojiImageUrl ?? "",
+                        emojiImageUrl: todoItem?.imageUrl ?? "",
                         isRepeat: Binding(
                             get: { todoItem?.isRepeat ?? false },
                             set: { newValue in

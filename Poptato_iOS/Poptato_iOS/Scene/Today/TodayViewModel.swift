@@ -210,7 +210,7 @@ final class TodayViewModel: ObservableObject {
             await MainActor.run {
                 selectedTodoItem?.categoryId = resolvedCategory?.id
                 selectedTodoItem?.categoryName = resolvedCategory?.name
-                selectedTodoItem?.emojiImageUrl = resolvedCategory?.imageUrl
+                selectedTodoItem?.imageUrl = resolvedCategory?.imageUrl
             }
             
             try await todoRepository.updateCategory(todoId: todoId, categoryId: CategoryIdModel(categoryId: categoryId))
@@ -249,7 +249,7 @@ final class TodayViewModel: ObservableObject {
                     deadline: item.deadline,
                     categoryId: categoryId,
                     categoryName: response.categoryName,
-                    emojiImageUrl: response.emojiImageUrl
+                    imageUrl: response.emojiImageUrl
                 )
                 updateSelectedItem(item: newItem)
             }

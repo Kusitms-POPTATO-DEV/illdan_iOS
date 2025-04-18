@@ -90,16 +90,7 @@ final class BacklogViewModel: ObservableObject {
             )
             let response = try await backlogRepository.getBacklogList(page: 0, size: 100, categoryId: categoryList[selectedCategoryIndex].id)
             await MainActor.run {
-                backlogList = response.backlogs.map { item in
-                    TodoItemModel(
-                        todoId: item.todoId,
-                        content: item.content,
-                        isBookmark: item.isBookmark,
-                        isRepeat: item.isRepeat,
-                        dDay: item.dDay,
-                        deadline: item.deadline
-                    )
-                }
+                backlogList = response.backlogs
             }
         } catch {
             DispatchQueue.main.async {
@@ -231,7 +222,7 @@ final class BacklogViewModel: ObservableObject {
                     deadline: item.deadline,
                     categoryId: categoryId,
                     categoryName: response.categoryName,
-                    emojiImageUrl: response.emojiImageUrl
+                    imageUrl: response.emojiImageUrl
                 )
                 updateSelectedItem(item: newItem)
             }
@@ -338,7 +329,7 @@ final class BacklogViewModel: ObservableObject {
             await MainActor.run {
                 selectedTodoItem?.categoryId = resolvedCategory?.id
                 selectedTodoItem?.categoryName = resolvedCategory?.name
-                selectedTodoItem?.emojiImageUrl = resolvedCategory?.imageUrl
+                selectedTodoItem?.imageUrl = resolvedCategory?.imageUrl
             }
             
             try await todoRepository.updateCategory(todoId: todoId, categoryId: CategoryIdModel(categoryId: categoryId))

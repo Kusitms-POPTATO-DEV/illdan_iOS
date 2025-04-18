@@ -591,7 +591,7 @@ struct BacklogBookmarkCategoryChip: View {
                 .cornerRadius(4)
             }
             
-            if let categoryName = item.categoryName, let imageUrl = item.emojiImageUrl {
+            if let categoryName = item.categoryName, let imageUrl = item.imageUrl {
                 HStack(spacing: 2) {
                     PDFImageView(imageURL: imageUrl, width: 12, height: 12)
                     Text(categoryName)
