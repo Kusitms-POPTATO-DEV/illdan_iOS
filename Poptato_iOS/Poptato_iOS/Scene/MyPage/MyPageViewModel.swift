@@ -15,6 +15,10 @@ class MyPageViewModel: ObservableObject {
     @Published var imageUrl: String = ""
     @Published var policyContent: String = ""
     @Published var deadlineDateMode: Bool
+    @Published var userInputReason: String = ""
+    @Published var selectedReasons: [Bool] = [false, false, false]
+    
+    private let list = ["NOT_USED_OFTEN", "MISSING_FEATURES", "TOO_COMPLEX"]
     
     init(userRepository: UserRepository = UserRepositoryImpl(), authRepository: AuthRepository = AuthRepositoryImpl()) {
         self.userRepository = userRepository
@@ -64,7 +68,21 @@ class MyPageViewModel: ObservableObject {
     func deleteAccount() async {
         do {
             AnalyticsManager.shared.logEvent(AnalyticsEvent.delete_account)
-            try await authRepository.deleteAccount()
+            
+            var reasons: [String] = []
+            
+            for index in 0..<3 {
+                if selectedReasons[index] {
+                    reasons.append(list[index])
+                }
+            }
+            
+            try await authRepository.deleteAccount(
+                request: DeleteAccountRequest(
+                    reasons: reasons.isEmpty ? nil : reasons,
+                    userInputReason: userInputReason.isEmpty ? nil : userInputReason
+                )
+            )
             
             await MainActor.run {
                 KeychainManager.shared.deleteToken(for: "accessToken")

@@ -11,12 +11,16 @@ struct AccountInfoView: View {
     var onClickBtnLogout: () -> Void
     var onClickBtnDeleteAccount: () -> Void
     var onClickBtnBack: () -> Void
+    var goToKaKaoLogin: () -> Void
     
     let nickname: String
     let email: String
     let imageUrl: String
     @State private var isLogoutDialogPresented = false
-    @State private var showAccountDeletionDialog = false
+    @State private var showAccountWithdrawalReasonView = false
+    @State private var showGoodbyeView = false
+    @Binding var selectedReasons: [Bool]
+    @Binding var userInputReason: String
     
     var body: some View {
         ZStack {
@@ -94,7 +98,7 @@ struct AccountInfoView: View {
                 Spacer().frame(height: 32)
                 
                 Button(action: {
-                    showAccountDeletionDialog = true
+                    showAccountWithdrawalReasonView = true
                 }) {
                     Text("서비스 탈퇴하기")
                         .font(PoptatoTypo.mdMedium)
@@ -122,23 +126,23 @@ struct AccountInfoView: View {
                     onDismissRequest: { isLogoutDialogPresented = false }
                 )
             }
-            
-            if showAccountDeletionDialog {
-                CommonDialog(
-                    title: "정말 탈퇴하시겠어요?",
-                    content: "탈퇴 시 계정에 저장된 모든 데이터가\n삭제되며, 복구되지 않아요.",
-                    positiveButtonText: "탈퇴하기",
-                    negativeButtonText: "취소",
-                    onClickBtnPositive: {
-                        onClickBtnDeleteAccount()
-                        showAccountDeletionDialog = false
-                    },
-                    onClickBtnNegative: { showAccountDeletionDialog = false },
-                    onDismissRequest: { showAccountDeletionDialog = false }
-                )
-            }
         }
         .navigationBarBackButtonHidden(true)
+        .fullScreenCover(isPresented: $showAccountWithdrawalReasonView) {
+            AccountWithdrawalReasonView(
+                selectedReasons: $selectedReasons,
+                userInputReason: $userInputReason,
+                onClickBtnClose: { showAccountWithdrawalReasonView = false },
+                showGoodbyeView: { showGoodbyeView = true }
+            )
+        }
+        .fullScreenCover(isPresented: $showGoodbyeView) {
+            GoodbyeView(
+                nickname: nickname,
+                deleteAccount: onClickBtnDeleteAccount,
+                onDismiss: goToKaKaoLogin
+            )
+        }
     }
 }
 
