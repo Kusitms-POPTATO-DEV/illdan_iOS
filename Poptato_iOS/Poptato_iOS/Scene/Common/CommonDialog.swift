@@ -20,57 +20,59 @@ struct CommonDialog: View {
     
     var body: some View {
         ZStack(alignment: .center) {
-            Color.gray100.opacity(0.5)
+            Color.black.opacity(0.5)
+                .ignoresSafeArea()
+                .onTapGesture {
+                    onDismissRequest()
+                }
             
             ZStack(alignment: .center) {
-                Color.gray100.ignoresSafeArea()
-                
-                VStack {
-                    Spacer()
+                VStack(spacing: 0) {
+                    Spacer().frame(height: 48)
                     if !title.isEmpty {
                         Text(title)
                             .font(PoptatoTypo.lgSemiBold)
                             .foregroundColor(.gray00)
-                        Spacer().frame(height: 16)
+                        Spacer().frame(height: 10)
                     }
                     Text(content)
                         .font(PoptatoTypo.mdSemiBold)
                         .foregroundColor(.gray00)
                         .multilineTextAlignment(.center)
-                    Spacer()
-                    HStack(spacing: 0) {
-                        ZStack {
-                            Color.gray95
-                            
-                            Text(negativeButtonText)
-                                .font(PoptatoTypo.mdSemiBold)
-                                .foregroundColor(.gray05)
-                        }
-                        .frame(height: 56)
-                        .onTapGesture { onClickBtnNegative() }
+                    Spacer().frame(height: 48)
+                    
+                    if buttonType == .double {
+                        Rectangle().fill(Color.gray90).frame(maxWidth: .infinity).frame(height: 1)
+                    }
+                    
+                    ZStack(alignment: .center) {
+                        if buttonType == .single { Color.gray95 }
                         
-                        if buttonType == DialogButtonType.double {
-                            ZStack {
-                                Color.danger50
-                                
-                                Text(positiveButtonText)
-                                    .font(PoptatoTypo.mdSemiBold)
-                                    .foregroundColor(.gray100)
-                            }
-                            .frame(height: 56)
-                            .onTapGesture { onClickBtnPositive() }
-                        }
+                        Text(positiveButtonText)
+                            .font(PoptatoTypo.lgSemiBold)
+                            .foregroundStyle(buttonType == .double ? Color.warning40 : Color.gray10)
                     }
                     .frame(maxWidth: .infinity)
                     .frame(height: 56)
+                    .contentShape(Rectangle())
+                    .onTapGesture { onClickBtnPositive() }
+                    
+                    if buttonType == .double {
+                        Rectangle().fill(Color.gray90).frame(maxWidth: .infinity).frame(height: 1)
+                        
+                        Text(negativeButtonText)
+                            .font(PoptatoTypo.lgSemiBold)
+                            .foregroundStyle(Color.gray40)
+                            .frame(maxWidth: .infinity)
+                            .frame(height: 56)
+                            .contentShape(Rectangle())
+                            .onTapGesture { onClickBtnNegative() }
+                    }
                 }
             }
-            .cornerRadius(16)
-            .frame(maxWidth: 328, maxHeight: 160)
-        }
-        .frame(maxWidth: .infinity, maxHeight: .infinity)
-        .onTapGesture {
-            onDismissRequest()
+            .frame(maxWidth: 328)
+            .background(Color.gray100)
+            .clipShape(RoundedRectangle(cornerRadius: 24))
         }
     }
 }
