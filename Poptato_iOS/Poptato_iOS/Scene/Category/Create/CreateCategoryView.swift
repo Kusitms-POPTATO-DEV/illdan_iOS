@@ -88,10 +88,9 @@ struct CreateCategoryView: View {
                 
                 CommonDialog(
                     content: "카테고리 이름을 작성해 주세요",
-                    negativeButtonText: "확인",
+                    positiveButtonText: "확인",
                     buttonType: DialogButtonType.single,
-                    onClickBtnPositive: {},
-                    onClickBtnNegative: { viewModel.showEmptyCategoryNameDialog = false },
+                    onClickBtnPositive: { viewModel.showEmptyCategoryNameDialog = false },
                     onDismissRequest: { viewModel.showEmptyCategoryNameDialog = false }
                 )
             }
@@ -102,10 +101,9 @@ struct CreateCategoryView: View {
                 
                 CommonDialog(
                     content: "카테고리 이모티콘을 선택해 주세요",
-                    negativeButtonText: "확인",
+                    positiveButtonText: "확인",
                     buttonType: DialogButtonType.single,
-                    onClickBtnPositive: {},
-                    onClickBtnNegative: { viewModel.showEmptyCategoryEmojiDialog = false },
+                    onClickBtnPositive: { viewModel.showEmptyCategoryEmojiDialog = false },
                     onDismissRequest: { viewModel.showEmptyCategoryEmojiDialog = false }
                 )
             }

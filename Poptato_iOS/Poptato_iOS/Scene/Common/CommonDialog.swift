@@ -14,9 +14,9 @@ struct CommonDialog: View {
     var negativeButtonText: String = ""
     var buttonType: DialogButtonType = DialogButtonType.double
     
-    var onClickBtnPositive: () -> Void
-    var onClickBtnNegative: () -> Void
-    var onDismissRequest: () -> Void
+    var onClickBtnPositive: () -> Void = {}
+    var onClickBtnNegative: () -> Void = {}
+    var onDismissRequest: () -> Void = {}
     
     var body: some View {
         ZStack(alignment: .center) {
