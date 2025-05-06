@@ -14,6 +14,7 @@ final class LoginViewModel: ObservableObject {
     private let repository: AuthRepository
     @Published var isLoginSuccess: Bool = false
     @Published var loginError: Error?
+    @Published var isNewUser: Bool = false
     
     init(repository: AuthRepository = AuthRepositoryImpl()) {
         self.repository = repository
@@ -29,6 +30,7 @@ final class LoginViewModel: ObservableObject {
             let response = try await repository.kakaoLogin(request: LoginRequest(socialType: "KAKAO", accessToken: token, mobileType: "IOS", clientId: fcmToken, name: nil, email: nil))
             await MainActor.run {
                 isLoginSuccess = true
+                isNewUser = response.isNewUser
                 print("Login successful: \(response)")
                 
                 KeychainManager.shared.saveToken(response.accessToken, for: "accessToken")
@@ -69,6 +71,7 @@ final class LoginViewModel: ObservableObject {
 
         await MainActor.run {
             isLoginSuccess = true
+            isNewUser = response.isNewUser
             print("Apple Login successful: \(response)")
 
             KeychainManager.shared.saveToken(response.accessToken, for: "accessToken")

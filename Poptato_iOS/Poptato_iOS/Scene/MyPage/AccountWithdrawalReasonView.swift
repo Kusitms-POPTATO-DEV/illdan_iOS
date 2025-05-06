@@ -78,14 +78,18 @@ struct AccountWithdrawalReasonView: View {
                     .padding(.horizontal, 20)
                 }
                 
-                Button(action: { showAccountDeletionDialog = true }) {
+                Button(action: {
+                    if selectedReasons.contains(true) || !userInputReason.isEmpty {
+                        showAccountDeletionDialog = true
+                    }
+                }) {
                     Text("탈퇴하기")
                         .frame(maxWidth: .infinity)
                         .padding(.vertical, 14.5)
-                        .background(Color.gray95)
+                        .background(selectedReasons.contains(true) || !userInputReason.isEmpty ? Color.warning40 : Color.gray95)
                         .clipShape(RoundedCorner(radius: 16))
                         .font(PoptatoTypo.lgSemiBold)
-                        .foregroundStyle(Color.gray70)
+                        .foregroundStyle(selectedReasons.contains(true) || !userInputReason.isEmpty ? Color.gray100 : Color.gray70)
                 }
                 .padding(.horizontal, 20)
                 .scrollDismissesKeyboard(.never)

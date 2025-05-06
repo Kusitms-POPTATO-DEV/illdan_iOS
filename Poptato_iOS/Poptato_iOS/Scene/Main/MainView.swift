@@ -95,7 +95,10 @@ struct MainView: View {
                             .tag(2)
                         
                         MyPageView(
-                            goToKaKaoLogin: { isLogined = false },
+                            goToKaKaoLogin: {
+                                isLogined = false
+                                selectedTab = 0
+                            },
                             isPolicyViewPresented: $isPolicyViewPresented
                         )
                         .tabItem {
@@ -138,7 +141,10 @@ struct MainView: View {
                     }
                 } else {
                     LoginView(
-                        onSuccessLogin: { isLogined = true }
+                        onSuccessLogin: { isNew in
+                            backlogViewModel.isNewUser = isNew
+                            isLogined = true
+                        }
                     )
                 }
                 
