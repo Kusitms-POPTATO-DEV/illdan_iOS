@@ -13,7 +13,7 @@ import AuthenticationServices
 
 struct LoginView: View {
     @StateObject private var viewModel = LoginViewModel()
-    var onSuccessLogin: () -> Void
+    var onSuccessLogin: (Bool) -> Void
     
     var body: some View {
         ZStack(alignment: .center) {
@@ -36,7 +36,7 @@ struct LoginView: View {
                             Task {
                                 do {
                                     try await viewModel.handleAppleLogin(result: authResults)
-                                    onSuccessLogin()
+                                    onSuccessLogin(viewModel.isNewUser)
                                 } catch {
                                     print("Apple Login Error: \(error)")
                                 }
@@ -61,7 +61,7 @@ struct LoginView: View {
                         if let oauthToken = oauthToken{
                             Task {
                                 await viewModel.kakaoLogin(token: oauthToken.accessToken)
-                                onSuccessLogin()
+                                onSuccessLogin(viewModel.isNewUser)
                             }
                         }
                     }

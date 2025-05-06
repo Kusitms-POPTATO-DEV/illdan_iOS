@@ -75,31 +75,49 @@ struct BacklogView: View {
                 
                 Spacer().frame(height: 16)
                 
-                if viewModel.backlogList.isEmpty { EmptyBacklogView() }
-                else {
-                    BacklogListView(
-                        backlogList: $viewModel.backlogList,
-                        onItemSelected: onItemSelcted,
-                        editBacklog: { id, content in
-                            Task {
-                                await viewModel.editBacklog(todoId: id, content: content)
+                ZStack(alignment: .top) {
+                    if viewModel.backlogList.isEmpty { EmptyBacklogView() }
+                    else {
+                        BacklogListView(
+                            backlogList: $viewModel.backlogList,
+                            onItemSelected: onItemSelcted,
+                            editBacklog: { id, content in
+                                Task {
+                                    await viewModel.editBacklog(todoId: id, content: content)
+                                }
+                            },
+                            swipeBacklog: { id in
+                                Task {
+                                    await viewModel.swipeBacklog(todoId: id)
+                                }
+                            },
+                            onDragEnd: {
+                                Task {
+                                    await viewModel.dragAndDrop()
+                                }
+                            },
+                            activeItemId: $viewModel.activeItemId,
+                            content: $viewModel.editingContent,
+                            isActive: $isEditingActive,
+                            deadlineDateMode: viewModel.deadlineDateMode
+                        )
+                    }
+                    
+                    if viewModel.showFirstGuideBubble {
+                        Image("ic_guide_bubble_1")
+                            .offset(x: 80, y: -20)
+                    }
+                    
+                    if viewModel.showSecondGuideBubble {
+                        VStack {
+                            Spacer()
+                            HStack {
+                                Image("ic_guide_bubble_2")
+                                    .padding(.leading, 20)
+                                Spacer()
                             }
-                        },
-                        swipeBacklog: { id in
-                            Task {
-                                await viewModel.swipeBacklog(todoId: id)
-                            }
-                        },
-                        onDragEnd: {
-                            Task {
-                                await viewModel.dragAndDrop()
-                            }
-                        },
-                        activeItemId: $viewModel.activeItemId,
-                        content: $viewModel.editingContent,
-                        isActive: $isEditingActive,
-                        deadlineDateMode: viewModel.deadlineDateMode
-                    )
+                        }
+                    }
                 }
                 
                 Spacer()
@@ -162,6 +180,7 @@ struct BacklogView: View {
                 )
             }
         }
+        .ignoresSafeArea(.keyboard, edges: .bottom)
         .simultaneousGesture(
             TapGesture().onEnded {
                 isTextFieldFocused = false
@@ -181,6 +200,10 @@ struct BacklogView: View {
             }
         }
         .onDisappear {
+            if viewModel.showSecondGuideBubble {
+                viewModel.showSecondGuideBubble = false
+                viewModel.isNewUser = false
+            }
             isViewActive = false
         }
         .onChange(of: isCreateCategoryViewPresented) { newValue in

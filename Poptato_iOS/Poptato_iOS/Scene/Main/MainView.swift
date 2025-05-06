@@ -138,7 +138,10 @@ struct MainView: View {
                     }
                 } else {
                     LoginView(
-                        onSuccessLogin: { isLogined = true }
+                        onSuccessLogin: { isNew in
+                            backlogViewModel.isNewUser = isNew
+                            isLogined = true
+                        }
                     )
                 }
                 

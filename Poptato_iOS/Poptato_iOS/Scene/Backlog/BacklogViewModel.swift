@@ -25,6 +25,9 @@ final class BacklogViewModel: ObservableObject {
     @Published var showDeleteCategoryDialog: Bool = false
     @Published var isCategoryEditMode: Bool = false
     @Published var deadlineDateMode: Bool
+    @Published var isNewUser: Bool = false
+    @Published var showFirstGuideBubble: Bool = false
+    @Published var showSecondGuideBubble: Bool = false
     
     init(
         backlogRepository: BacklogRepository = BacklogRepositoryImpl(),
@@ -62,6 +65,8 @@ final class BacklogViewModel: ObservableObject {
                 if let index = backlogList.firstIndex(where: { $0.todoId == temporaryId }) {
                     backlogList[index].todoId = response.todoId
                 }
+                
+                if isNewUser { showFirstGuideBubble = true }
             }
             AnalyticsManager.shared.logEvent(
                 AnalyticsEvent.make_task,
@@ -137,6 +142,13 @@ final class BacklogViewModel: ObservableObject {
     func swipeBacklog(todoId: Int) async {
         do {
             try await todoRepository.swipeTodo(request: TodoIdModel(todoId: todoId))
+            
+            if isNewUser {
+                await MainActor.run {
+                    showFirstGuideBubble = false
+                    showSecondGuideBubble = true
+                }
+            }
             
             AnalyticsManager.shared.logEvent(
                 AnalyticsEvent.add_today,
