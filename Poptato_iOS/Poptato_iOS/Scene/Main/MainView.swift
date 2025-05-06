@@ -95,7 +95,10 @@ struct MainView: View {
                             .tag(2)
                         
                         MyPageView(
-                            goToKaKaoLogin: { isLogined = false },
+                            goToKaKaoLogin: {
+                                isLogined = false
+                                selectedTab = 0
+                            },
                             isPolicyViewPresented: $isPolicyViewPresented
                         )
                         .tabItem {

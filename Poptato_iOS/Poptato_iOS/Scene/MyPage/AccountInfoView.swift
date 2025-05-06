@@ -24,6 +24,7 @@ struct AccountInfoView: View {
     
     var body: some View {
         ZStack {
+            Color.black.ignoresSafeArea()
             Color(.gray100)
                 .ignoresSafeArea()
             
