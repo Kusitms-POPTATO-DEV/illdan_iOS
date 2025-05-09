@@ -145,6 +145,7 @@ final class BacklogViewModel: ObservableObject {
             
             if isNewUser {
                 await MainActor.run {
+                    isNewUser = false
                     showFirstGuideBubble = false
                     showSecondGuideBubble = true
                 }

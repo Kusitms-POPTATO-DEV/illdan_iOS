@@ -101,11 +101,11 @@ struct BacklogView: View {
                             isActive: $isEditingActive,
                             deadlineDateMode: viewModel.deadlineDateMode
                         )
-                    }
-                    
-                    if viewModel.showFirstGuideBubble {
-                        Image("ic_guide_bubble_1")
-                            .offset(x: 80, y: -20)
+                        
+                        if viewModel.showFirstGuideBubble {
+                            Image("ic_guide_bubble_1")
+                                .offset(x: 80, y: -20)
+                        }
                     }
                     
                     if viewModel.showSecondGuideBubble {
@@ -200,10 +200,6 @@ struct BacklogView: View {
             }
         }
         .onDisappear {
-            if viewModel.showSecondGuideBubble {
-                viewModel.showSecondGuideBubble = false
-                viewModel.isNewUser = false
-            }
             isViewActive = false
         }
         .onChange(of: isCreateCategoryViewPresented) { newValue in

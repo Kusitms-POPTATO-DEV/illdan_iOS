@@ -48,7 +48,11 @@ struct MainView: View {
                 if isLogined {
                     TabView(selection: Binding(
                         get: { selectedTab },
-                        set: { newValue in self.selectedTab = newValue }
+                        set: { newValue in
+                            self.selectedTab = newValue
+                            
+                            if newValue == 0 && backlogViewModel.showSecondGuideBubble { backlogViewModel.showSecondGuideBubble = false }
+                        }
                     )) {
                         TodayView(
                             goToBacklog: { self.selectedTab = 1 },
