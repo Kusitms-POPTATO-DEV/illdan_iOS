@@ -46,22 +46,24 @@ struct BottomSheetView: View {
                     
                     HStack(spacing: 16) {
                         EditDeleteButtonView(
-                            image: "ic_pen",
-                            title: "수정하기",
-                            onClickButton: {
-                                AnalyticsManager.shared.logEvent(AnalyticsEvent.edit_task)
-                                isVisible = false
-                                editTodo()
-                            }
-                        )
-                        
-                        EditDeleteButtonView(
                             image: "ic_trash",
                             title: "삭제하기",
+                            foregroundColor: .warning40,
                             onClickButton: {
                                 AnalyticsManager.shared.logEvent(AnalyticsEvent.delete_task, parameters: ["task_id" : todoItem?.todoId ?? -1])
                                 isVisible = false
                                 deleteTodo()
+                            }
+                        )
+                        
+                        EditDeleteButtonView(
+                            image: "ic_pen",
+                            title: "수정하기",
+                            foregroundColor: .gray30,
+                            onClickButton: {
+                                AnalyticsManager.shared.logEvent(AnalyticsEvent.edit_task)
+                                isVisible = false
+                                editTodo()
                             }
                         )
                     }
@@ -522,6 +524,7 @@ struct BottomSheetActionButton: View {
 struct EditDeleteButtonView: View {
     let image: String
     let title: String
+    let foregroundColor: Color
     
     var onClickButton: () -> Void
     
@@ -530,11 +533,13 @@ struct EditDeleteButtonView: View {
             HStack(spacing: 4) {
                 Image(image)
                     .resizable()
+                    .renderingMode(.template)
+                    .foregroundStyle(foregroundColor)
                     .frame(width: 20, height: 20)
                 
                 Text(title)
                     .font(PoptatoTypo.mdMedium)
-                    .foregroundStyle(Color.gray30)
+                    .foregroundStyle(foregroundColor)
             }
             .padding(.vertical, 12)
             .frame(maxWidth: .infinity)
