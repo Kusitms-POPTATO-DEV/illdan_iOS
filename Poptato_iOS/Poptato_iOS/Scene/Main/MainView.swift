@@ -6,6 +6,7 @@
 //
 
 import SwiftUI
+import KakaoSDKAuth
 
 struct MainView: View {
     @Binding var isLogined: Bool
@@ -109,6 +110,18 @@ struct MainView: View {
                             Label("", image: selectedTab == 3 ? "ic_my_selected" : "ic_mypage")
                         }
                         .tag(3)
+                    }
+                    
+                    if backlogViewModel.showSecondGuideBubble {
+                        VStack {
+                            Spacer()
+                            HStack {
+                                Image("ic_guide_bubble_2")
+                                    .padding(.leading, 20)
+                                    .padding(.bottom, 50)
+                                Spacer()
+                            }
+                        }
                     }
                     
                     if isPolicyViewPresented {
@@ -276,6 +289,12 @@ struct MainView: View {
                 } else {
                     isLoading = false
                 }
+            }
+        }
+        .onOpenURL { url in
+            print("Received URL: \(url)")
+            if AuthApi.isKakaoTalkLoginUrl(url) {
+                _ = AuthController.handleOpenUrl(url: url, options: [:])
             }
         }
     }

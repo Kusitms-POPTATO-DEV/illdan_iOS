@@ -107,17 +107,6 @@ struct BacklogView: View {
                                 .offset(x: 80, y: -20)
                         }
                     }
-                    
-                    if viewModel.showSecondGuideBubble {
-                        VStack {
-                            Spacer()
-                            HStack {
-                                Image("ic_guide_bubble_2")
-                                    .padding(.leading, 20)
-                                Spacer()
-                            }
-                        }
-                    }
                 }
                 
                 Spacer()
