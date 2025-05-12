@@ -6,6 +6,7 @@
 //
 
 import SwiftUI
+import KakaoSDKAuth
 
 struct MainView: View {
     @Binding var isLogined: Bool
@@ -288,6 +289,12 @@ struct MainView: View {
                 } else {
                     isLoading = false
                 }
+            }
+        }
+        .onOpenURL { url in
+            print("Received URL: \(url)")
+            if AuthApi.isKakaoTalkLoginUrl(url) {
+                _ = AuthController.handleOpenUrl(url: url, options: [:])
             }
         }
     }

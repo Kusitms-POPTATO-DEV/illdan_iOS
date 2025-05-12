@@ -54,16 +54,22 @@ struct LoginView: View {
                 Spacer().frame(height: 12)
 
                 Button(action: {
-                    UserApi.shared.loginWithKakaoAccount {(oauthToken, error) in
-                        if let error = error {
-                            print(error)
-                        }
-                        if let oauthToken = oauthToken{
-                            Task {
-                                await viewModel.kakaoLogin(token: oauthToken.accessToken)
-                                onSuccessLogin(viewModel.isNewUser)
-                            }
-                        }
+//                    UserApi.shared.loginWithKakaoAccount {(oauthToken, error) in
+//                        if let error = error {
+//                            print(error)
+//                        }
+//                        if let oauthToken = oauthToken{
+//                            Task {
+//                                await viewModel.kakaoLogin(token: oauthToken.accessToken)
+//                                onSuccessLogin(viewModel.isNewUser)
+//                            }
+//                        }
+//                    }
+                    if UserApi.isKakaoTalkLoginAvailable() {
+                        loginWithKaKaoApp()
+                    } else {
+                        // 앱 미설치 시 계정 로그인
+                        loginWithKakaoAccount()
                     }
                 }) {
                     HStack {
@@ -80,6 +86,38 @@ struct LoginView: View {
                 .padding(.horizontal, 16)
 
                 Spacer().frame(height: 24)
+            }
+        }
+    }
+    
+    private func loginWithKaKaoApp() {
+        UserApi.shared.loginWithKakaoTalk { (oauthToken, error) in
+            if let error = error {
+                print(error)
+                loginWithKakaoAccount()
+            } else {
+                if let token = oauthToken {
+                    Task {
+                        await viewModel.kakaoLogin(token: token.accessToken)
+                        onSuccessLogin(viewModel.isNewUser)
+                    }
+                }
+            }
+        }
+    }
+    
+    private func loginWithKakaoAccount() {
+        UserApi.shared.loginWithKakaoAccount { (oauthToken, error) in
+            if let error = error {
+                print(error)
+            } else {
+                print("loginWithKakaoAccount() success")
+                if let token = oauthToken {
+                    Task {
+                        await viewModel.kakaoLogin(token: token.accessToken)
+                        onSuccessLogin(viewModel.isNewUser)
+                    }
+                }
             }
         }
     }
