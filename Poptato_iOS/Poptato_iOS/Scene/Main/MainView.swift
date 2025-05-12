@@ -111,6 +111,18 @@ struct MainView: View {
                         .tag(3)
                     }
                     
+                    if backlogViewModel.showSecondGuideBubble {
+                        VStack {
+                            Spacer()
+                            HStack {
+                                Image("ic_guide_bubble_2")
+                                    .padding(.leading, 20)
+                                    .padding(.bottom, 50)
+                                Spacer()
+                            }
+                        }
+                    }
+                    
                     if isPolicyViewPresented {
                         PolicyView(isPolicyViewPresented: $isPolicyViewPresented)
                     }
