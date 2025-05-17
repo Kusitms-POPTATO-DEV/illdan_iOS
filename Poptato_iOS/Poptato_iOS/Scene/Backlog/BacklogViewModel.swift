@@ -51,21 +51,10 @@ final class BacklogViewModel: ObservableObject {
     }
     
     func createBacklog(_ item: String) async {
-        let temporaryId = tempIdCounter
-        tempIdCounter -= 1
-        
-        let newItem = TodoItemModel(todoId: temporaryId, content: item, isBookmark: selectedCategoryIndex == 1, isRepeat: false, dDay: nil, deadline: nil)
-        await MainActor.run {
-            backlogList.insert(newItem, at: 0)
-        }
-        
         do {
             let response = try await backlogRepository.createBacklog(request: CreateBacklogRequest(categoryId: categoryList[selectedCategoryIndex].id, content: item))
+            await fetchBacklogList()
             await MainActor.run {
-                if let index = backlogList.firstIndex(where: { $0.todoId == temporaryId }) {
-                    backlogList[index].todoId = response.todoId
-                }
-                
                 if isNewUser { showFirstGuideBubble = true }
             }
             AnalyticsManager.shared.logEvent(
@@ -77,9 +66,6 @@ final class BacklogViewModel: ObservableObject {
                 ]
             )
         } catch {
-            await MainActor.run {
-                backlogList.removeAll { $0.todoId == temporaryId }
-            }
             print("Login error: \(error)")
         }
     }
