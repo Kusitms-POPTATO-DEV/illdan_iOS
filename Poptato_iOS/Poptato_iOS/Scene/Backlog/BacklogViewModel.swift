@@ -28,6 +28,9 @@ final class BacklogViewModel: ObservableObject {
     @Published var isNewUser: Bool = false
     @Published var showFirstGuideBubble: Bool = false
     @Published var showSecondGuideBubble: Bool = false
+    @Published var isCategoryCreated: Bool = false
+    @Published var isCategoryEdited: Bool = false
+    @Published var scrollToLast: Bool = false
     
     init(
         backlogRepository: BacklogRepository = BacklogRepositoryImpl(),

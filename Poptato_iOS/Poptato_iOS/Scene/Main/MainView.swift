@@ -147,6 +147,8 @@ struct MainView: View {
                     if isCreateCategoryViewPresented {
                         CreateCategoryView(
                             isPresented: $isCreateCategoryViewPresented,
+                            isCategoryCreated: $backlogViewModel.isCategoryCreated,
+                            isCategoryEdited: $backlogViewModel.isCategoryEdited,
                             initialCategoryId: backlogViewModel.categoryList[backlogViewModel.selectedCategoryIndex].id,
                             initialCategoryName: backlogViewModel.categoryList[backlogViewModel.selectedCategoryIndex].name,
                             initialSelectedEmoji: EmojiModel(

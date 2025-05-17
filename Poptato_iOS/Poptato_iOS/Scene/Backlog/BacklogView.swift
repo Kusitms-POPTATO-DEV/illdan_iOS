@@ -28,6 +28,7 @@ struct BacklogView: View {
                     CategoryListView(
                         categoryList: $viewModel.categoryList,
                         selectedIndex: $viewModel.selectedCategoryIndex,
+                        scrollToLast: $viewModel.scrollToLast,
                         onClickCategory: { Task { await viewModel.fetchBacklogList() } },
                         onDragEnd: { Task { await viewModel.categoryDragAndDrop() } }
                     )
@@ -191,12 +192,24 @@ struct BacklogView: View {
         .onDisappear {
             isViewActive = false
         }
-        .onChange(of: isCreateCategoryViewPresented) { newValue in
-            if !newValue {
+        .onChange(of: viewModel.isCategoryCreated) { newValue in
+            if newValue {
                 Task {
                     await viewModel.getCategoryList(page: 0, size: 100)
-                    viewModel.selectedCategoryIndex = viewModel.categoryList.count - 1
+                    await MainActor.run {
+                        viewModel.selectedCategoryIndex = viewModel.categoryList.count - 1
+                        viewModel.isCategoryCreated = false
+                        viewModel.scrollToLast = true
+                    }
                     await viewModel.fetchBacklogList()
+                }
+            }
+        }
+        .onChange(of: viewModel.isCategoryEdited) { newValue in
+            if newValue {
+                Task {
+                    await viewModel.getCategoryList(page: 0, size: 100)
+                    await MainActor.run { viewModel.isCategoryEdited = false }
                 }
             }
         }
@@ -222,40 +235,80 @@ struct BacklogView: View {
 struct CategoryListView: View {
     @Binding var categoryList: [CategoryModel]
     @Binding var selectedIndex: Int
+    @Binding var scrollToLast: Bool
     @State private var draggedCategory: CategoryModel?
     @State private var isDragging: Bool = false
     var onClickCategory: () -> Void
     var onDragEnd: () -> Void
     
     var body: some View {
-        ScrollView(.horizontal) {
-            LazyHStack(spacing: 12) {
-                ForEach(Array(categoryList.enumerated()), id: \.element.id) { index, item in
-                    let image = imageName(for: index)
-                    CategoryItemView(item: item, image: image, isSelected: index == selectedIndex)
-                        .onTapGesture {
-                            selectedIndex = index
-                            onClickCategory()
-                        }
-                        .if(item.id != -1 && item.id != 0) { view in
-                            view.onDrag {
-                                draggedCategory = item
-                                isDragging = true
-                                return NSItemProvider(object: "\(item.id)" as NSString)
+        ScrollViewReader { proxy in
+            ScrollView(.horizontal) {
+                LazyHStack(spacing: 12) {
+                    ForEach(Array(categoryList.enumerated()), id: \.element.id) { index, item in
+                        let image = imageName(for: index)
+                        CategoryItemView(item: item, image: image, isSelected: index == selectedIndex)
+                            .onTapGesture {
+                                selectedIndex = index
+                                onClickCategory()
                             }
-                        }
-                        .onDrop(of: [.text],
-                                delegate: CategoryDragDropDelegate(item: item,
-                                                                   categoryList: $categoryList,
-                                                                   draggedItem: $draggedCategory,
-                                                                   onReorder: {
-                            isDragging = false
-                            onDragEnd()
-                        }))
+                            .if(item.id != -1 && item.id != 0) { view in
+                                view.onDrag {
+                                    draggedCategory = item
+                                    isDragging = true
+                                    return NSItemProvider(object: "\(item.id)" as NSString)
+                                }
+                            }
+                            .onDrop(of: [.text],
+                                    delegate: CategoryDragDropDelegate(item: item,
+                                                                       categoryList: $categoryList,
+                                                                       draggedItem: $draggedCategory,
+                                                                       onReorder: {
+                                isDragging = false
+                                onDragEnd()
+                            }))
+                            .id(index)
+                    }
+                }
+            }
+            .scrollIndicators(.hidden)
+            .onChange(of: scrollToLast) { newValue in
+                if newValue {
+                    DispatchQueue.main.async {
+                        proxy.scrollTo(categoryList.count - 1, anchor: .trailing)
+                        scrollToLast = false
+                    }
                 }
             }
         }
-        .scrollIndicators(.hidden)
+//        ScrollView(.horizontal) {
+//            LazyHStack(spacing: 12) {
+//                ForEach(Array(categoryList.enumerated()), id: \.element.id) { index, item in
+//                    let image = imageName(for: index)
+//                    CategoryItemView(item: item, image: image, isSelected: index == selectedIndex)
+//                        .onTapGesture {
+//                            selectedIndex = index
+//                            onClickCategory()
+//                        }
+//                        .if(item.id != -1 && item.id != 0) { view in
+//                            view.onDrag {
+//                                draggedCategory = item
+//                                isDragging = true
+//                                return NSItemProvider(object: "\(item.id)" as NSString)
+//                            }
+//                        }
+//                        .onDrop(of: [.text],
+//                                delegate: CategoryDragDropDelegate(item: item,
+//                                                                   categoryList: $categoryList,
+//                                                                   draggedItem: $draggedCategory,
+//                                                                   onReorder: {
+//                            isDragging = false
+//                            onDragEnd()
+//                        }))
+//                }
+//            }
+//        }
+//        .scrollIndicators(.hidden)
     }
     
     private func imageName(for index: Int) -> String? {
