@@ -10,6 +10,8 @@ import SwiftUI
 struct CreateCategoryView: View {
     @ObservedObject private var viewModel = CreateCategoryViewModel()
     @Binding var isPresented: Bool
+    @Binding var isCategoryCreated: Bool
+    @Binding var isCategoryEdited: Bool
     @FocusState private var isTextFieldFocused: Bool
     @State private var showBottomSheet: Bool = false
     var initialCategoryId: Int
@@ -30,7 +32,10 @@ struct CreateCategoryView: View {
                         if !viewModel.categoryInput.isEmpty && viewModel.selectedEmoji != nil {
                             Task {
                                 await viewModel.createCategory(name: viewModel.categoryInput, emojiId: viewModel.selectedEmoji!.emojiId)
-                                isPresented = false
+                                await MainActor.run {
+                                    isCategoryCreated = true
+                                    isPresented = false
+                                }
                             }
                         } else if viewModel.categoryInput.isEmpty { viewModel.showEmptyCategoryNameDialog = true }
                         else if viewModel.selectedEmoji == nil { viewModel.showEmptyCategoryEmojiDialog = true }
@@ -39,7 +44,10 @@ struct CreateCategoryView: View {
                         if !viewModel.categoryInput.isEmpty && viewModel.selectedEmoji != nil {
                             Task {
                                 await viewModel.editCategory(name: viewModel.categoryInput, emojiId: viewModel.selectedEmoji!.emojiId)
-                                isPresented = false
+                                await MainActor.run {
+                                    isCategoryEdited = true
+                                    isPresented = false
+                                }
                             }
                         } else if viewModel.categoryInput.isEmpty { viewModel.showEmptyCategoryNameDialog = true }
                         else if viewModel.selectedEmoji == nil { viewModel.showEmptyCategoryEmojiDialog = true }

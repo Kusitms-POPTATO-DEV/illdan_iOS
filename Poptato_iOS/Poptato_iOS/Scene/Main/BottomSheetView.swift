@@ -470,12 +470,14 @@ struct CategoryBottomSheet: View {
                         },
                         onClickBtnNegative: { onDismiss() }
                     )
+                    .padding(.horizontal, 20)
+                    
                     Spacer().frame(height: 16)
                 }
             }
             .frame(maxWidth: .infinity, maxHeight: 392)
             .background(Color(UIColor.gray100))
-            .clipShape(RoundedCorner(radius: 16, corners: [.topLeft, .topRight]))
+            .clipShape(RoundedCorner(radius: 24))
         }
     }
 }

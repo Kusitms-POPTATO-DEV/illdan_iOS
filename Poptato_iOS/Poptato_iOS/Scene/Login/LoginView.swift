@@ -54,17 +54,6 @@ struct LoginView: View {
                 Spacer().frame(height: 12)
 
                 Button(action: {
-//                    UserApi.shared.loginWithKakaoAccount {(oauthToken, error) in
-//                        if let error = error {
-//                            print(error)
-//                        }
-//                        if let oauthToken = oauthToken{
-//                            Task {
-//                                await viewModel.kakaoLogin(token: oauthToken.accessToken)
-//                                onSuccessLogin(viewModel.isNewUser)
-//                            }
-//                        }
-//                    }
                     if UserApi.isKakaoTalkLoginAvailable() {
                         loginWithKaKaoApp()
                     } else {
