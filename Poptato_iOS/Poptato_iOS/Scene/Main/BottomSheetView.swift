@@ -420,40 +420,37 @@ struct CategoryBottomSheet: View {
                     ScrollView {
                         LazyVStack {
                             ForEach(categoryList, id: \.id) { category in
-                                HStack(alignment: .center, spacing: 0) {
-                                    Spacer().frame(width: 24)
-                                    if category.id == -1 {
-                                        Image("ic_category_all")
-                                            .resizable()
-                                            .frame(width: 24, height: 24)
-                                    } else if category.id == 0 {
-                                        Image("ic_category_bookmark")
-                                            .resizable()
-                                            .frame(width: 24, height: 24)
-                                    } else {
+                                let isSelected = category.id == selectedCategoryId
+                                let backgroundView = isSelected
+                                    ? AnyView(RoundedRectangle(cornerRadius: 12).fill(Color.gray90).padding(.horizontal, 12))
+                                    : AnyView(RoundedRectangle(cornerRadius: 12).fill(Color.clear))
+
+                                if category.id != -1 && category.id != 0 {
+                                    HStack(alignment: .center, spacing: 0) {
+                                        Spacer().frame(width: 24)
                                         PDFImageView(imageURL: category.imageUrl, width: 24, height: 24)
+                                        Spacer().frame(width: 8)
+                                        Text(category.name)
+                                            .font(PoptatoTypo.mdMedium)
+                                            .foregroundColor(.gray00)
+                                        Spacer()
+                                        if selectedCategoryId != nil && category.id == selectedCategoryId {
+                                            Image("ic_check")
+                                                .resizable()
+                                                .frame(width: 20, height: 20)
+                                        }
+                                        Spacer().frame(width: 24)
                                     }
-                                   
-                                    Spacer().frame(width: 8)
-                                    Text(category.name)
-                                        .font(PoptatoTypo.mdMedium)
-                                        .foregroundColor(.gray00)
-                                    Spacer()
-                                    if selectedCategoryId != nil && category.id == selectedCategoryId {
-                                        Image("ic_check")
-                                            .resizable()
-                                            .frame(width: 20, height: 20)
-                                    }
-                                    Spacer().frame(width: 24)
-                                }
-                                .frame(maxWidth: .infinity)
-                                .frame(height: 48)
-                                .background(category.id == selectedCategoryId ? Color.gray90 : Color.gray100)
-                                .onTapGesture {
-                                    if selectedCategoryId == category.id {
-                                        selectedCategoryId = nil
-                                    } else {
-                                        selectedCategoryId = category.id
+                                    .frame(maxWidth: .infinity)
+                                    .frame(height: 48)
+                                    .background(backgroundView)
+                                    .contentShape(Rectangle())
+                                    .onTapGesture {
+                                        if selectedCategoryId == category.id {
+                                            selectedCategoryId = nil
+                                        } else {
+                                            selectedCategoryId = category.id
+                                        }
                                     }
                                 }
                             }
