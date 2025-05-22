@@ -15,6 +15,7 @@ struct MainView: View {
     @State private var isBottomSheetVisible = false
     @State private var isDateBottomSheetVisible = false
     @State private var isCategoryBottomSheetVisible = false
+    @State private var isTimePickerBottomSheetVisible = false
     @State private var isPolicyViewPresented = false
     @State private var isYesterdayViewPresented = false
     @State private var isMotivationViewPresented = false
@@ -189,6 +190,7 @@ struct MainView: View {
                         todoItem: $backlogViewModel.selectedTodoItem,
                         showDateBottomSheet: $isDateBottomSheetVisible,
                         showCategoryBottomSheet: $isCategoryBottomSheetVisible,
+                        showTimePickerBottomSheet: $isTimePickerBottomSheetVisible,
                         deleteTodo: {
                             Task {
                                 await backlogViewModel.deleteBacklog(todoId: todoItem.todoId)
@@ -233,6 +235,7 @@ struct MainView: View {
                         todoItem: $todayViewModel.selectedTodoItem,
                         showDateBottomSheet: $isDateBottomSheetVisible,
                         showCategoryBottomSheet: $isCategoryBottomSheetVisible,
+                        showTimePickerBottomSheet: $isTimePickerBottomSheetVisible,
                         deleteTodo: {
                             Task {
                                 await todayViewModel.deleteTodo(todoId: todoItem.todoId)
