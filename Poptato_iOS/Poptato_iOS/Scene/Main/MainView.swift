@@ -286,7 +286,7 @@ struct MainView: View {
             isLoading = false
         }) {
             YesterdayTodoView(
-                isYesterdayTodoViewPresented: $isYesterdayViewPresented,
+                isYesterdayTodoViewPresented: $todoViewModel.isExistYesterdayTodo,
                 isMotivationViewPresented: $isMotivationViewPresented
             )
         }

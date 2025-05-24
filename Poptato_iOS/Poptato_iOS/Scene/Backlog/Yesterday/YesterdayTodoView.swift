@@ -52,8 +52,8 @@ struct YesterdayTodoView: View {
                     isMotivationViewPresented = true
                     Task {
                         await viewModel.completeYesterdayTodo()
+                        await MainActor.run { isYesterdayTodoViewPresented = false }
                     }
-                    isYesterdayTodoViewPresented = false
                 }) {
                     Text("완료")
                         .font(PoptatoTypo.lgSemiBold)
