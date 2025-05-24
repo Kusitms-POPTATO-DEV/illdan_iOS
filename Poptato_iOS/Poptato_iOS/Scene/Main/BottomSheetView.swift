@@ -34,6 +34,7 @@ struct BottomSheetView: View {
                         },
                         onDismissRequest: { showTimePickerBottomSheet = false }
                     )
+                    .transition(.move(edge: .bottom))
                 } else if showRoutineBottomSheet {
                     RoutineBottomSheet(
                         updateActiveWeekdays: { newValue in },
@@ -41,6 +42,24 @@ struct BottomSheetView: View {
                         onClickWeekdayChip: { index in },
                         onDismissRequest: { showRoutineBottomSheet = false }
                     )
+                    .transition(.move(edge: .bottom))
+                } else if showDateBottomSheet {
+                    DateBottomSheet(
+                        item: $todoItem,
+                        onDissmiss: { showDateBottomSheet = false },
+                        updateDeadline: updateDeadline
+                    )
+                    .transition(.move(edge: .bottom))
+                } else if showCategoryBottomSheet {
+                    CategoryBottomSheet(
+                        categoryList: categoryList,
+                        onDismiss: { showCategoryBottomSheet = false },
+                        updateCategory: { id in
+                            updateCategory(id)
+                        },
+                        selectedCategoryId: todoItem?.categoryId
+                    )
+                    .transition(.move(edge: .bottom))
                 } else {
                     VStack {
                         HStack {
@@ -174,25 +193,6 @@ struct BottomSheetView: View {
                     .background(Color(UIColor.gray100))
                     .clipShape(RoundedCorner(radius: 24))
                 }
-            }
-            
-            if showDateBottomSheet {
-                DateBottomSheet(
-                    item: $todoItem,
-                    onDissmiss: { showDateBottomSheet = false },
-                    updateDeadline: updateDeadline
-                )
-            }
-            
-            if showCategoryBottomSheet {
-                CategoryBottomSheet(
-                    categoryList: categoryList,
-                    onDismiss: { showCategoryBottomSheet = false },
-                    updateCategory: { id in
-                        updateCategory(id)
-                    },
-                    selectedCategoryId: todoItem?.categoryId
-                )
             }
         }
         .padding(.horizontal, 16)
