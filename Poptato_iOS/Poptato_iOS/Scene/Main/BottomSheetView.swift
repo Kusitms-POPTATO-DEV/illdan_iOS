@@ -13,6 +13,7 @@ struct BottomSheetView: View {
     @Binding var showDateBottomSheet: Bool
     @Binding var showCategoryBottomSheet: Bool
     @Binding var showTimePickerBottomSheet: Bool
+    @Binding var showRoutineBottomSheet: Bool
     var deleteTodo: () -> Void
     var editTodo: () -> Void
     var updateBookmark: () -> Void
@@ -32,6 +33,13 @@ struct BottomSheetView: View {
                             
                         },
                         onDismissRequest: { showTimePickerBottomSheet = false }
+                    )
+                } else if showRoutineBottomSheet {
+                    RoutineBottomSheet(
+                        updateActiveWeekdays: { newValue in },
+                        onClickToggle: { isOn in },
+                        onClickWeekdayChip: { index in },
+                        onDismissRequest: { showRoutineBottomSheet = false }
                     )
                 } else {
                     VStack {
@@ -99,12 +107,26 @@ struct BottomSheetView: View {
                         )
                         
                         BottomSheetButton(
+                            image: "ic_cal",
+                            buttonText: "날짜",
+                            buttonColor: .gray30,
+                            subText: todoItem?.deadline ?? "설정하기",
+                            onClickBtn: { showDateBottomSheet = true },
+                            isRepeat: Binding(
+                                get: { todoItem?.isRepeat ?? false },
+                                set: { newValue in
+                                    todoItem?.isRepeat = newValue
+                                }
+                            )
+                        )
+                        
+                        BottomSheetButton(
                             image: "ic_refresh",
-                            buttonText: "반복 할 일",
+                            buttonText: "루틴",
                             buttonColor: .gray30,
                             subText: "",
                             onClickBtn: {
-                                AnalyticsManager.shared.logEvent(AnalyticsEvent.set_repeat, parameters: ["task_id" : todoItem?.todoId ?? -1])
+                                showRoutineBottomSheet = true
                             },
                             isRepeat: Binding(
                                 get: { todoItem?.isRepeat ?? false },
@@ -116,15 +138,18 @@ struct BottomSheetView: View {
                         )
                         
                         BottomSheetButton(
-                            image: "ic_cal",
-                            buttonText: "날짜",
+                            image: "ic_refresh",
+                            buttonText: "반복",
                             buttonColor: .gray30,
-                            subText: todoItem?.deadline ?? "설정하기",
-                            onClickBtn: { showDateBottomSheet = true },
+                            subText: "",
+                            onClickBtn: {
+                                AnalyticsManager.shared.logEvent(AnalyticsEvent.set_repeat, parameters: ["task_id" : todoItem?.todoId ?? -1])
+                            },
                             isRepeat: Binding(
                                 get: { todoItem?.isRepeat ?? false },
                                 set: { newValue in
                                     todoItem?.isRepeat = newValue
+                                    updateTodoRepeat()
                                 }
                             )
                         )
@@ -197,7 +222,7 @@ struct BottomSheetButton: View {
                 .font(PoptatoTypo.mdRegular)
                 .foregroundColor(buttonColor)
             Spacer()
-            if buttonText == "반복 할 일" {
+            if buttonText == "반복" {
                 Toggle("", isOn: $isRepeat)
                     .tint(isRepeat ? Color.primary40 : Color.gray80)
             }
