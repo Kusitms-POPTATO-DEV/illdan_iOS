@@ -108,22 +108,22 @@ struct BottomSheetView: View {
                         
                         Spacer().frame(height: 20)
                         
-                        BottomSheetButton(
-                            image: "ic_clock",
-                            buttonText: "시간",
-                            buttonColor: .gray30,
-                            subText: "",
-                            onClickBtn: {
-                                showTimePickerBottomSheet = true
-                            },
-                            isRepeat: Binding(
-                                get: { todoItem?.isRepeat ?? false },
-                                set: { newValue in
-                                    todoItem?.isRepeat = newValue
-                                    updateTodoRepeat()
-                                }
-                            )
-                        )
+//                        BottomSheetButton(
+//                            image: "ic_clock",
+//                            buttonText: "시간",
+//                            buttonColor: .gray30,
+//                            subText: "",
+//                            onClickBtn: {
+//                                showTimePickerBottomSheet = true
+//                            },
+//                            isRepeat: Binding(
+//                                get: { todoItem?.isRepeat ?? false },
+//                                set: { newValue in
+//                                    todoItem?.isRepeat = newValue
+//                                    updateTodoRepeat()
+//                                }
+//                            )
+//                        )
                         
                         BottomSheetButton(
                             image: "ic_cal",
@@ -139,22 +139,22 @@ struct BottomSheetView: View {
                             )
                         )
                         
-                        BottomSheetButton(
-                            image: "ic_refresh",
-                            buttonText: "루틴",
-                            buttonColor: .gray30,
-                            subText: "",
-                            onClickBtn: {
-                                showRoutineBottomSheet = true
-                            },
-                            isRepeat: Binding(
-                                get: { todoItem?.isRepeat ?? false },
-                                set: { newValue in
-                                    todoItem?.isRepeat = newValue
-                                    updateTodoRepeat()
-                                }
-                            )
-                        )
+//                        BottomSheetButton(
+//                            image: "ic_refresh",
+//                            buttonText: "루틴",
+//                            buttonColor: .gray30,
+//                            subText: "",
+//                            onClickBtn: {
+//                                showRoutineBottomSheet = true
+//                            },
+//                            isRepeat: Binding(
+//                                get: { todoItem?.isRepeat ?? false },
+//                                set: { newValue in
+//                                    todoItem?.isRepeat = newValue
+//                                    updateTodoRepeat()
+//                                }
+//                            )
+//                        )
                         
                         BottomSheetButton(
                             image: "ic_refresh",
