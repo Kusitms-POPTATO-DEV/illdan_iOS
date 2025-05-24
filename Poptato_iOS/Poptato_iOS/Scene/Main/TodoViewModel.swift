@@ -475,4 +475,20 @@ final class TodoViewModel: ObservableObject {
             print("Error deleteCategory: \(error)")
         }
     }
+    
+    // MARK: - 어제 한 일 페이지 메서드
+    
+    func getYesterdayList(page: Int, size: Int) async {
+        do {
+            let response = try await todoRepository.getYesterdayList(page: page, size: size)
+            await MainActor.run {
+                if !response.yesterdays.isEmpty { isExistYesterdayTodo = true }
+                else {
+                    isExistYesterdayTodo = false
+                }
+            }
+        } catch {
+            print("Error getYesterdayList: \(error)")
+        }
+    }
 }

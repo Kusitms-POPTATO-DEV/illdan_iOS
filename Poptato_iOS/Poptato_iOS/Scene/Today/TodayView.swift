@@ -78,6 +78,7 @@ struct TodayView: View {
             Task {
                 await viewModel.getCategoryList(page: 0, size: 100)
                 await viewModel.getTodayList()
+                await viewModel.getYesterdayList(page: 0, size: 1)
                 await MainActor.run {
                     isViewActive = true
                 }

@@ -13,7 +13,6 @@ struct BacklogView: View {
     @FocusState private var isTextFieldFocused: Bool
     @FocusState private var isEditingActive: Bool
     var onItemSelcted: (TodoItemModel) -> Void
-    @Binding var isYesterdayTodoViewPresented: Bool
     @Binding var isCreateCategoryViewPresented: Bool
     @State private var settingsMenuPosition: CGPoint = .zero
     @State private var isViewActive = false
@@ -184,6 +183,7 @@ struct BacklogView: View {
             Task {
                 await viewModel.getCategoryList(page: 0, size: 100)
                 await viewModel.getBacklogList()
+                await viewModel.getYesterdayList(page: 0, size: 1)
                 await MainActor.run {
                     isViewActive = true
                 }

@@ -9,6 +9,7 @@ import SwiftUI
 import KakaoSDKAuth
 
 struct MainView: View {
+    @Environment(\.scenePhase) private var scenePhase
     @Binding var isLogined: Bool
     @State private var selectedTab: Int = 0
     @State private var isLoading: Bool = true
@@ -89,7 +90,6 @@ struct MainView: View {
                                     }
                                 }
                             },
-                            isYesterdayTodoViewPresented: $isYesterdayViewPresented,
                             isCreateCategoryViewPresented: $isCreateCategoryViewPresented
                         )
                         .tabItem {
@@ -281,7 +281,7 @@ struct MainView: View {
 //                }
             }
         }
-        .fullScreenCover(isPresented: $isYesterdayViewPresented, onDismiss: {
+        .fullScreenCover(isPresented: $todoViewModel.isExistYesterdayTodo, onDismiss: {
             selectedTab = 0
             isLoading = false
         }) {
@@ -304,6 +304,13 @@ struct MainView: View {
             print("Received URL: \(url)")
             if AuthApi.isKakaoTalkLoginUrl(url) {
                 _ = AuthController.handleOpenUrl(url: url, options: [:])
+            }
+        }
+        .onChange(of: scenePhase) { phase in
+            if phase == .active {
+                Task {
+                    await todoViewModel.getYesterdayList(page: 0, size: 1)
+                }
             }
         }
     }
