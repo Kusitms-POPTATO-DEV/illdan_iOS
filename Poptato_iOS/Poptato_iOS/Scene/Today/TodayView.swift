@@ -9,7 +9,7 @@ import SwiftUI
 import UIKit
 
 struct TodayView: View {
-    @EnvironmentObject var viewModel: TodayViewModel
+    @EnvironmentObject var viewModel: TodoViewModel
     @FocusState private var isTextFieldFocused: Bool
     var goToBacklog: () -> Void
     var onItemSelcted: (TodoItemModel) -> Void
@@ -74,7 +74,7 @@ struct TodayView: View {
             }
         }
         .onAppear {
-            print("deadlineDateMode: \(viewModel.deadlineDateMode)")
+            viewModel.currentDate = TimeFormatter.getCurrentMonthDay()
             Task {
                 await viewModel.getCategoryList(page: 0, size: 100)
                 await viewModel.getTodayList()
@@ -305,7 +305,7 @@ struct TodayRepeatDeadlineText: View {
     var body: some View {
         HStack(spacing: 3) {
             if item.isRepeat {
-                Text("반복 할 일")
+                Text("반복")
                     .font(PoptatoTypo.xsRegular)
                     .foregroundStyle(Color.gray50)
             }
