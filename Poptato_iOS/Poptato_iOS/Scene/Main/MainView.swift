@@ -16,6 +16,7 @@ struct MainView: View {
     @State private var isDateBottomSheetVisible = false
     @State private var isCategoryBottomSheetVisible = false
     @State private var isTimePickerBottomSheetVisible = false
+    @State private var isRoutineBottomSheetVisible = false
     @State private var isPolicyViewPresented = false
     @State private var isYesterdayViewPresented = false
     @State private var isMotivationViewPresented = false
@@ -24,6 +25,7 @@ struct MainView: View {
     @State private var toastMessage = ""
     @StateObject private var backlogViewModel = BacklogViewModel()
     @StateObject private var todayViewModel = TodayViewModel()
+    @StateObject private var todoViewModel = TodoViewModel()
     
     init(isLogined: Binding<Bool>) {
         self._isLogined = isLogined
@@ -61,8 +63,10 @@ struct MainView: View {
                             onItemSelcted: { item in
                                 Task {
                                     await todayViewModel.getTodoDetail(item: item)
-                                    withTransaction(Transaction(animation: .easeInOut)) {
-                                        isBottomSheetVisible = true
+                                    await MainActor.run {
+                                        withTransaction(Transaction(animation: .easeInOut)) {
+                                            isBottomSheetVisible = true
+                                        }
                                     }
                                 }
                             },
@@ -80,8 +84,10 @@ struct MainView: View {
                             onItemSelcted: { item in
                                 Task {
                                     await backlogViewModel.getTodoDetail(item: item)
-                                    withTransaction(Transaction(animation: .easeInOut)) {
-                                        isBottomSheetVisible = true
+                                    await MainActor.run {
+                                        withTransaction(Transaction(animation: .easeInOut)) {
+                                            isBottomSheetVisible = true
+                                        }
                                     }
                                 }
                             },
@@ -191,6 +197,7 @@ struct MainView: View {
                         showDateBottomSheet: $isDateBottomSheetVisible,
                         showCategoryBottomSheet: $isCategoryBottomSheetVisible,
                         showTimePickerBottomSheet: $isTimePickerBottomSheetVisible,
+                        showRoutineBottomSheet: $isRoutineBottomSheetVisible,
                         deleteTodo: {
                             Task {
                                 await backlogViewModel.deleteBacklog(todoId: todoItem.todoId)
@@ -236,6 +243,7 @@ struct MainView: View {
                         showDateBottomSheet: $isDateBottomSheetVisible,
                         showCategoryBottomSheet: $isCategoryBottomSheetVisible,
                         showTimePickerBottomSheet: $isTimePickerBottomSheetVisible,
+                        showRoutineBottomSheet: $isRoutineBottomSheetVisible,
                         deleteTodo: {
                             Task {
                                 await todayViewModel.deleteTodo(todoId: todoItem.todoId)
