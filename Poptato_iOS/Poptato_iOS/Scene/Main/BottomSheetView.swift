@@ -20,6 +20,7 @@ struct BottomSheetView: View {
     var updateDeadline: (String?) -> Void
     var updateTodoRepeat: () -> Void
     var updateCategory: (Int?) -> Void
+    var updateTodoTime: (TimeInfo?) -> Void
     var categoryList: [CategoryModel]
     
     var body: some View {
@@ -29,9 +30,7 @@ struct BottomSheetView: View {
                 
                 if showTimePickerBottomSheet {
                     TimePickerBottomSheet(
-                        updateTodoTime: { newValue in
-                            
-                        },
+                        updateTodoTime: updateTodoTime,
                         onDismissRequest: { showTimePickerBottomSheet = false }
                     )
                     .transition(.move(edge: .bottom))
@@ -108,22 +107,22 @@ struct BottomSheetView: View {
                         
                         Spacer().frame(height: 20)
                         
-//                        BottomSheetButton(
-//                            image: "ic_clock",
-//                            buttonText: "시간",
-//                            buttonColor: .gray30,
-//                            subText: "",
-//                            onClickBtn: {
-//                                showTimePickerBottomSheet = true
-//                            },
-//                            isRepeat: Binding(
-//                                get: { todoItem?.isRepeat ?? false },
-//                                set: { newValue in
-//                                    todoItem?.isRepeat = newValue
-//                                    updateTodoRepeat()
-//                                }
-//                            )
-//                        )
+                        BottomSheetButton(
+                            image: "ic_clock",
+                            buttonText: "시간",
+                            buttonColor: .gray30,
+                            subText: todoItem?.timeString ?? "",
+                            onClickBtn: {
+                                showTimePickerBottomSheet = true
+                            },
+                            isRepeat: Binding(
+                                get: { todoItem?.isRepeat ?? false },
+                                set: { newValue in
+                                    todoItem?.isRepeat = newValue
+                                    updateTodoRepeat()
+                                }
+                            )
+                        )
                         
                         BottomSheetButton(
                             image: "ic_cal",
