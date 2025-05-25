@@ -25,4 +25,42 @@ struct TimeFormatter {
         formatter.dateFormat = "yyyy-MM-dd"
         return formatter.date(from: date)
     }
+    
+    static func convertTimeInfoToString(info: TimeInfo) -> String {
+        var hour24 = info.hour
+        if info.meridiem == "오후" && info.hour != 12 {
+            hour24 += 12
+        } else if info.meridiem == "오전" && info.hour == 12 {
+            hour24 = 0
+        }
+        return String(format: "%02d:%02d", hour24, info.minute)
+    }
+    
+    static func convertStringToTimeInfo(time: String) -> TimeInfo? {
+        let components = time.split(separator: ":")
+        guard components.count >= 2,
+              let hour24 = Int(components[0]),
+              let minute = Int(components[1]) else {
+            return nil
+        }
+
+        let meridiem: String
+        let hour12: Int
+
+        if hour24 == 0 {
+            meridiem = "오전"
+            hour12 = 12
+        } else if hour24 < 12 {
+            meridiem = "오전"
+            hour12 = hour24
+        } else if hour24 == 12 {
+            meridiem = "오후"
+            hour12 = 12
+        } else {
+            meridiem = "오후"
+            hour12 = hour24 - 12
+        }
+
+        return TimeInfo(meridiem: meridiem, hour: hour12, minute: minute)
+    }
 }
