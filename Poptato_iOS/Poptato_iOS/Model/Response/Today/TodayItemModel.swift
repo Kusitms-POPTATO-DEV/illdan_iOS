@@ -15,4 +15,23 @@ struct TodayItemModel: Codable {
     var isRepeat: Bool
     var imageUrl: String?
     var categoryName: String?
+    var time: String?
+}
+
+extension TodayItemModel {
+    var timeInfo: TimeInfo? {
+        if let time {
+            return TimeFormatter.convertStringToTimeInfo(time: time)
+        } else {
+            return nil
+        }
+    }
+    
+    var timeString: String {
+        if let info = timeInfo {
+            return String(format: "%@ %02d:%02d", info.meridiem, info.hour, info.minute)
+        } else {
+            return ""
+        }
+    }
 }
