@@ -8,7 +8,7 @@
 import SwiftUI
 
 struct YesterdayTodoView: View {
-    @ObservedObject private var viewModel = YesterdayTodoViewModel()
+    @StateObject private var viewModel = YesterdayTodoViewModel()
     @Binding var isYesterdayTodoViewPresented: Bool
     @Binding var isMotivationViewPresented: Bool
     
@@ -31,8 +31,11 @@ struct YesterdayTodoView: View {
                             .onTapGesture {
                                 Task {
                                     await viewModel.completeYesterdayTodo()
+                                    await MainActor.run {
+                                        isYesterdayTodoViewPresented = false
+                                        isMotivationViewPresented = true
+                                    }
                                 }
-                                isYesterdayTodoViewPresented = false
                             }
                     }
                 }
@@ -49,11 +52,13 @@ struct YesterdayTodoView: View {
                 Spacer()
                 
                 Button(action: {
-                    isMotivationViewPresented = true
                     Task {
                         await viewModel.completeYesterdayTodo()
+                        await MainActor.run {
+                            isYesterdayTodoViewPresented = false
+                            isMotivationViewPresented = true
+                        }
                     }
-                    isYesterdayTodoViewPresented = false
                 }) {
                     Text("완료")
                         .font(PoptatoTypo.lgSemiBold)
@@ -68,11 +73,6 @@ struct YesterdayTodoView: View {
         }
         .frame(maxWidth: .infinity, maxHeight: .infinity)
         .navigationBarBackButtonHidden()
-        .onAppear {
-            Task {
-                await viewModel.getYesterdayList(page: 0, size: 100)
-            }
-        }
     }
 }
 

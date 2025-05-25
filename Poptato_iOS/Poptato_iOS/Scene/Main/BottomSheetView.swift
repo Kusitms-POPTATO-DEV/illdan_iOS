@@ -12,6 +12,8 @@ struct BottomSheetView: View {
     @Binding var todoItem: TodoItemModel?
     @Binding var showDateBottomSheet: Bool
     @Binding var showCategoryBottomSheet: Bool
+    @Binding var showTimePickerBottomSheet: Bool
+    @Binding var showRoutineBottomSheet: Bool
     var deleteTodo: () -> Void
     var editTodo: () -> Void
     var updateBookmark: () -> Void
@@ -24,125 +26,179 @@ struct BottomSheetView: View {
         ZStack {
             VStack {
                 Spacer()
-
-                VStack {
-                    HStack {
-                        if let todo = todoItem {
-                            Text(todo.content)
-                                .font(PoptatoTypo.xLMedium)
-                                .foregroundColor(.gray00)
-                                .lineLimit(1)
-                            Spacer()
-                            Image(todo.isBookmark ? "ic_star_filled" : "ic_star_empty")
-                                .resizable()
-                                .frame(width: 24, height: 24)
-                                .onTapGesture {
-                                    AnalyticsManager.shared.logEvent(AnalyticsEvent.set_important, parameters: ["task_id" : todoItem?.todoId ?? -1])
-                                    updateBookmark()
-                                }
-                        }
-                    }
-                    .padding(.horizontal, 20)
-                    
-                    HStack(spacing: 16) {
-                        EditDeleteButtonView(
-                            image: "ic_trash",
-                            title: "삭제하기",
-                            foregroundColor: .warning40,
-                            onClickButton: {
-                                AnalyticsManager.shared.logEvent(AnalyticsEvent.delete_task, parameters: ["task_id" : todoItem?.todoId ?? -1])
-                                isVisible = false
-                                deleteTodo()
+                
+                if showTimePickerBottomSheet {
+                    TimePickerBottomSheet(
+                        updateTodoTime: { newValue in
+                            
+                        },
+                        onDismissRequest: { showTimePickerBottomSheet = false }
+                    )
+                    .transition(.move(edge: .bottom))
+                } else if showRoutineBottomSheet {
+                    RoutineBottomSheet(
+                        updateActiveWeekdays: { newValue in },
+                        onClickToggle: { isOn in },
+                        onClickWeekdayChip: { index in },
+                        onDismissRequest: { showRoutineBottomSheet = false }
+                    )
+                    .transition(.move(edge: .bottom))
+                } else if showDateBottomSheet {
+                    DateBottomSheet(
+                        item: $todoItem,
+                        onDissmiss: { showDateBottomSheet = false },
+                        updateDeadline: updateDeadline
+                    )
+                    .transition(.move(edge: .bottom))
+                } else if showCategoryBottomSheet {
+                    CategoryBottomSheet(
+                        categoryList: categoryList,
+                        onDismiss: { showCategoryBottomSheet = false },
+                        updateCategory: { id in
+                            updateCategory(id)
+                        },
+                        selectedCategoryId: todoItem?.categoryId
+                    )
+                    .transition(.move(edge: .bottom))
+                } else {
+                    VStack {
+                        HStack {
+                            if let todo = todoItem {
+                                Text(todo.content)
+                                    .font(PoptatoTypo.xLMedium)
+                                    .foregroundColor(.gray00)
+                                    .lineLimit(1)
+                                Spacer()
+                                Image(todo.isBookmark ? "ic_star_filled" : "ic_star_empty")
+                                    .resizable()
+                                    .frame(width: 24, height: 24)
+                                    .onTapGesture {
+                                        AnalyticsManager.shared.logEvent(AnalyticsEvent.set_important, parameters: ["task_id" : todoItem?.todoId ?? -1])
+                                        updateBookmark()
+                                    }
                             }
+                        }
+                        .padding(.horizontal, 20)
+                        
+                        HStack(spacing: 16) {
+                            EditDeleteButtonView(
+                                image: "ic_trash",
+                                title: "삭제하기",
+                                foregroundColor: .warning40,
+                                onClickButton: {
+                                    AnalyticsManager.shared.logEvent(AnalyticsEvent.delete_task, parameters: ["task_id" : todoItem?.todoId ?? -1])
+                                    isVisible = false
+                                    deleteTodo()
+                                }
+                            )
+                            
+                            EditDeleteButtonView(
+                                image: "ic_pen",
+                                title: "수정하기",
+                                foregroundColor: .gray30,
+                                onClickButton: {
+                                    AnalyticsManager.shared.logEvent(AnalyticsEvent.edit_task)
+                                    isVisible = false
+                                    editTodo()
+                                }
+                            )
+                        }
+                        .frame(maxWidth: .infinity)
+                        .padding(.horizontal, 20)
+                        
+                        Spacer().frame(height: 20)
+                        
+//                        BottomSheetButton(
+//                            image: "ic_clock",
+//                            buttonText: "시간",
+//                            buttonColor: .gray30,
+//                            subText: "",
+//                            onClickBtn: {
+//                                showTimePickerBottomSheet = true
+//                            },
+//                            isRepeat: Binding(
+//                                get: { todoItem?.isRepeat ?? false },
+//                                set: { newValue in
+//                                    todoItem?.isRepeat = newValue
+//                                    updateTodoRepeat()
+//                                }
+//                            )
+//                        )
+                        
+                        BottomSheetButton(
+                            image: "ic_cal",
+                            buttonText: "날짜",
+                            buttonColor: .gray30,
+                            subText: todoItem?.deadline ?? "설정하기",
+                            onClickBtn: { showDateBottomSheet = true },
+                            isRepeat: Binding(
+                                get: { todoItem?.isRepeat ?? false },
+                                set: { newValue in
+                                    todoItem?.isRepeat = newValue
+                                }
+                            )
                         )
                         
-                        EditDeleteButtonView(
-                            image: "ic_pen",
-                            title: "수정하기",
-                            foregroundColor: .gray30,
-                            onClickButton: {
-                                AnalyticsManager.shared.logEvent(AnalyticsEvent.edit_task)
-                                isVisible = false
-                                editTodo()
-                            }
+//                        BottomSheetButton(
+//                            image: "ic_refresh",
+//                            buttonText: "루틴",
+//                            buttonColor: .gray30,
+//                            subText: "",
+//                            onClickBtn: {
+//                                showRoutineBottomSheet = true
+//                            },
+//                            isRepeat: Binding(
+//                                get: { todoItem?.isRepeat ?? false },
+//                                set: { newValue in
+//                                    todoItem?.isRepeat = newValue
+//                                    updateTodoRepeat()
+//                                }
+//                            )
+//                        )
+                        
+                        BottomSheetButton(
+                            image: "ic_refresh",
+                            buttonText: "반복",
+                            buttonColor: .gray30,
+                            subText: "",
+                            onClickBtn: {
+                                AnalyticsManager.shared.logEvent(AnalyticsEvent.set_repeat, parameters: ["task_id" : todoItem?.todoId ?? -1])
+                            },
+                            isRepeat: Binding(
+                                get: { todoItem?.isRepeat ?? false },
+                                set: { newValue in
+                                    todoItem?.isRepeat = newValue
+                                    updateTodoRepeat()
+                                }
+                            )
+                        )
+                        
+                        BottomSheetButton(
+                            image: "ic_add_category",
+                            buttonText: "카테고리",
+                            buttonColor: .gray30,
+                            onClickBtn: { showCategoryBottomSheet = true },
+                            categoryName: todoItem?.categoryName ?? "",
+                            emojiImageUrl: todoItem?.imageUrl ?? "",
+                            isRepeat: Binding(
+                                get: { todoItem?.isRepeat ?? false },
+                                set: { newValue in
+                                    todoItem?.isRepeat = newValue
+                                }
+                            )
                         )
                     }
                     .frame(maxWidth: .infinity)
-                    .padding(.horizontal, 20)
-                    
-                    Spacer().frame(height: 20)
-                    
-                    BottomSheetButton(
-                        image: "ic_refresh",
-                        buttonText: "반복 할 일",
-                        buttonColor: .gray30,
-                        subText: "",
-                        onClickBtn: {
-                            AnalyticsManager.shared.logEvent(AnalyticsEvent.set_repeat, parameters: ["task_id" : todoItem?.todoId ?? -1])
-                        },
-                        isRepeat: Binding(
-                            get: { todoItem?.isRepeat ?? false },
-                            set: { newValue in
-                                todoItem?.isRepeat = newValue
-                                updateTodoRepeat()
-                            }
-                        )
-                    )
-                    BottomSheetButton(
-                        image: "ic_cal",
-                        buttonText: "마감기한",
-                        buttonColor: .gray30,
-                        subText: todoItem?.deadline ?? "설정하기",
-                        onClickBtn: { showDateBottomSheet = true },
-                        isRepeat: Binding(
-                            get: { todoItem?.isRepeat ?? false },
-                            set: { newValue in
-                                todoItem?.isRepeat = newValue
-                            }
-                        )
-                    )
-                    
-                    BottomSheetButton(
-                        image: "ic_add_category",
-                        buttonText: "카테고리",
-                        buttonColor: .gray30,
-                        onClickBtn: { showCategoryBottomSheet = true },
-                        categoryName: todoItem?.categoryName ?? "",
-                        emojiImageUrl: todoItem?.imageUrl ?? "",
-                        isRepeat: Binding(
-                            get: { todoItem?.isRepeat ?? false },
-                            set: { newValue in
-                                todoItem?.isRepeat = newValue
-                            }
-                        )
-                    )
+                    .padding(.vertical, 20)
+                    .background(Color(UIColor.gray100))
+                    .clipShape(RoundedCorner(radius: 24))
                 }
-                .frame(maxWidth: .infinity)
-                .padding(.vertical, 20)
-                .background(Color(UIColor.gray100))
-                .clipShape(RoundedCorner(radius: 24))
-            }
-            
-            if showDateBottomSheet {
-                DateBottomSheet(
-                    item: $todoItem,
-                    onDissmiss: { showDateBottomSheet = false },
-                    updateDeadline: updateDeadline
-                )
-            }
-            
-            if showCategoryBottomSheet {
-                CategoryBottomSheet(
-                    categoryList: categoryList,
-                    onDismiss: { showCategoryBottomSheet = false },
-                    updateCategory: { id in
-                        updateCategory(id)
-                    },
-                    selectedCategoryId: todoItem?.categoryId
-                )
             }
         }
         .padding(.horizontal, 16)
+        .onDisappear {
+            showTimePickerBottomSheet = false
+        }
     }
 }
 
@@ -166,7 +222,7 @@ struct BottomSheetButton: View {
                 .font(PoptatoTypo.mdRegular)
                 .foregroundColor(buttonColor)
             Spacer()
-            if buttonText == "반복 할 일" {
+            if buttonText == "반복" {
                 Toggle("", isOn: $isRepeat)
                     .tint(isRepeat ? Color.primary40 : Color.gray80)
             }
@@ -420,40 +476,37 @@ struct CategoryBottomSheet: View {
                     ScrollView {
                         LazyVStack {
                             ForEach(categoryList, id: \.id) { category in
-                                HStack(alignment: .center, spacing: 0) {
-                                    Spacer().frame(width: 24)
-                                    if category.id == -1 {
-                                        Image("ic_category_all")
-                                            .resizable()
-                                            .frame(width: 24, height: 24)
-                                    } else if category.id == 0 {
-                                        Image("ic_category_bookmark")
-                                            .resizable()
-                                            .frame(width: 24, height: 24)
-                                    } else {
+                                let isSelected = category.id == selectedCategoryId
+                                let backgroundView = isSelected
+                                    ? AnyView(RoundedRectangle(cornerRadius: 12).fill(Color.gray90).padding(.horizontal, 12))
+                                    : AnyView(RoundedRectangle(cornerRadius: 12).fill(Color.clear))
+
+                                if category.id != -1 && category.id != 0 {
+                                    HStack(alignment: .center, spacing: 0) {
+                                        Spacer().frame(width: 24)
                                         PDFImageView(imageURL: category.imageUrl, width: 24, height: 24)
+                                        Spacer().frame(width: 8)
+                                        Text(category.name)
+                                            .font(PoptatoTypo.mdMedium)
+                                            .foregroundColor(.gray00)
+                                        Spacer()
+                                        if selectedCategoryId != nil && category.id == selectedCategoryId {
+                                            Image("ic_check")
+                                                .resizable()
+                                                .frame(width: 20, height: 20)
+                                        }
+                                        Spacer().frame(width: 24)
                                     }
-                                   
-                                    Spacer().frame(width: 8)
-                                    Text(category.name)
-                                        .font(PoptatoTypo.mdMedium)
-                                        .foregroundColor(.gray00)
-                                    Spacer()
-                                    if selectedCategoryId != nil && category.id == selectedCategoryId {
-                                        Image("ic_check")
-                                            .resizable()
-                                            .frame(width: 20, height: 20)
-                                    }
-                                    Spacer().frame(width: 24)
-                                }
-                                .frame(maxWidth: .infinity)
-                                .frame(height: 48)
-                                .background(category.id == selectedCategoryId ? Color.gray90 : Color.gray100)
-                                .onTapGesture {
-                                    if selectedCategoryId == category.id {
-                                        selectedCategoryId = nil
-                                    } else {
-                                        selectedCategoryId = category.id
+                                    .frame(maxWidth: .infinity)
+                                    .frame(height: 48)
+                                    .background(backgroundView)
+                                    .contentShape(Rectangle())
+                                    .onTapGesture {
+                                        if selectedCategoryId == category.id {
+                                            selectedCategoryId = nil
+                                        } else {
+                                            selectedCategoryId = category.id
+                                        }
                                     }
                                 }
                             }

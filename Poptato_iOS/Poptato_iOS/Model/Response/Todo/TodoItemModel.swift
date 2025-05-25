@@ -19,3 +19,14 @@ struct TodoItemModel: Codable {
     var categoryName: String?
     var imageUrl: String?
 }
+
+extension TodoItemModel {
+    static var placeholder: TodoItemModel {
+        return TodoItemModel(
+            todoId: -1,
+            content: "",
+            isBookmark: false,
+            isRepeat: false
+        )
+    }
+}

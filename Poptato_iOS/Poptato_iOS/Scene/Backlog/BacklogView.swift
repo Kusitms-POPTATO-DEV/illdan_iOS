@@ -9,11 +9,10 @@ import SwiftUI
 import Combine
 
 struct BacklogView: View {
-    @EnvironmentObject var viewModel: BacklogViewModel
+    @EnvironmentObject var viewModel: TodoViewModel
     @FocusState private var isTextFieldFocused: Bool
     @FocusState private var isEditingActive: Bool
     var onItemSelcted: (TodoItemModel) -> Void
-    @Binding var isYesterdayTodoViewPresented: Bool
     @Binding var isCreateCategoryViewPresented: Bool
     @State private var settingsMenuPosition: CGPoint = .zero
     @State private var isViewActive = false
@@ -29,7 +28,7 @@ struct BacklogView: View {
                         categoryList: $viewModel.categoryList,
                         selectedIndex: $viewModel.selectedCategoryIndex,
                         scrollToLast: $viewModel.scrollToLast,
-                        onClickCategory: { Task { await viewModel.fetchBacklogList() } },
+                        onClickCategory: { Task { await viewModel.getBacklogList() } },
                         onDragEnd: { Task { await viewModel.categoryDragAndDrop() } }
                     )
                     HStack {
@@ -183,7 +182,8 @@ struct BacklogView: View {
         .onAppear {
             Task {
                 await viewModel.getCategoryList(page: 0, size: 100)
-                await viewModel.fetchBacklogList()
+                await viewModel.getBacklogList()
+                await viewModel.getYesterdayList(page: 0, size: 1)
                 await MainActor.run {
                     isViewActive = true
                 }
@@ -201,7 +201,7 @@ struct BacklogView: View {
                         viewModel.isCategoryCreated = false
                         viewModel.scrollToLast = true
                     }
-                    await viewModel.fetchBacklogList()
+                    await viewModel.getBacklogList()
                 }
             }
         }
@@ -591,7 +591,7 @@ struct BacklogRepeatDeadlineText: View {
     var body: some View {
         HStack(alignment: .center, spacing: 3) {
             if item.isRepeat {
-                Text("반복 할 일")
+                Text("반복")
                     .font(PoptatoTypo.xsRegular)
                     .foregroundStyle(Color.gray50)
             }
