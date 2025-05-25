@@ -30,6 +30,9 @@ struct BottomSheetView: View {
                 
                 if showTimePickerBottomSheet {
                     TimePickerBottomSheet(
+                        selectedMeridiem: todoItem?.timeInfo?.meridiem ?? "",
+                        selectedHour: todoItem?.timeInfo?.hour ?? 1,
+                        selectedMinute: todoItem?.timeInfo?.minute ?? 0,
                         updateTodoTime: updateTodoTime,
                         onDismissRequest: { showTimePickerBottomSheet = false }
                     )

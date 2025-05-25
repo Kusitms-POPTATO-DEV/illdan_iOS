@@ -74,6 +74,9 @@ struct TimePickerBottomSheet: View {
             .background(Color.gray100)
             .clipShape(RoundedCorner(radius: 24))
         }
+        .onAppear {
+            print("\(selectedHour), \(selectedMinute)")
+        }
     }
 }
 
@@ -116,6 +119,14 @@ struct CustomScrollPicker: View {
                 .coordinateSpace(name: "picker")
                 .onAppear {
                     scrollViewHeight = geo.size.height
+                    
+                    if let initialIndex = items.firstIndex(of: selected) {
+                        DispatchQueue.main.async {
+                            withAnimation(.easeOut(duration: 0.25)) {
+                                proxy.scrollTo(initialIndex, anchor: .center)
+                            }
+                        }
+                    }
                 }
                 .onPreferenceChange(ItemOffsetKey.self) { offsets in
                     itemOffsets = offsets
