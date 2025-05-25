@@ -14,6 +14,10 @@ class YesterdayTodoViewModel: ObservableObject {
     
     init(todoRepository: TodoRepository = TodoRepositoryImpl()) {
         self.todoRepository = todoRepository
+        
+        Task {
+            await getYesterdayList(page: 0, size: 100)
+        }
     }
     
     func getYesterdayList(page: Int, size: Int) async {
