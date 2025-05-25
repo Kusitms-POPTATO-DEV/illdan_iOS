@@ -438,9 +438,9 @@ struct BacklogItemView: View {
                     BacklogRepeatDeadlineText(deadlineDateMode: deadlineDateMode, item: item)
                 }
                 
-                if item.isBookmark || item.categoryName != nil {
+                if item.isBookmark || item.time != nil || item.categoryName != nil {
                     Spacer().frame(height: 8)
-                    BacklogBookmarkCategoryChip(item: item)
+                    BacklogBookmarkTimeCategoryChip(item: item)
                 }
             }
             
@@ -632,7 +632,7 @@ struct BacklogRepeatDeadlineText: View {
     }
 }
 
-struct BacklogBookmarkCategoryChip: View {
+struct BacklogBookmarkTimeCategoryChip: View {
     let item: TodoItemModel
     
     var body: some View {
@@ -652,6 +652,21 @@ struct BacklogBookmarkCategoryChip: View {
                 .cornerRadius(4)
             }
             
+            if let _ = item.time {
+                HStack(spacing: 2) {
+                    Image("ic_clock")
+                        .resizable()
+                        .frame(width: 12, height: 12)
+                    Text(item.timeString)
+                        .font(PoptatoTypo.xsRegular)
+                        .foregroundColor(.gray50)
+                }
+                .padding(.horizontal, 4)
+                .padding(.vertical, 2)
+                .background(Color.gray90)
+                .cornerRadius(6)
+            }
+            
             if let categoryName = item.categoryName, let imageUrl = item.imageUrl {
                 HStack(spacing: 2) {
                     PDFImageView(imageURL: imageUrl, width: 12, height: 12)
@@ -665,7 +680,7 @@ struct BacklogBookmarkCategoryChip: View {
                 .cornerRadius(6)
             }
             
-            if (item.isBookmark || item.categoryName != nil) { Spacer().frame(height: 0) }
+            if (item.isBookmark || item.categoryName != nil || item.time != nil) { Spacer().frame(height: 0) }
         }
     }
 }
