@@ -37,6 +37,7 @@ enum Router: URLRequestConvertible {
     case updateTodoRepeat(todoId: Int)
     case getTodoDetail(todoId: Int)
     case updateCategory(todoId: Int, categoryId: CategoryIdModel)
+    case updateTodoTime(todoId: Int, request: TodoTimeRequest)
     
     // mypage
     case getUserInfo
@@ -219,6 +220,12 @@ enum Router: URLRequestConvertible {
             request.httpMethod = "PATCH"
             request.headers = headers
             request.httpBody = try JSONEncoder().encode(categoryId)
+        case .updateTodoTime(let todoId, let timeRequest):
+            let endpoint = url.appendingPathComponent("/todo/\(todoId)/time")
+            request = URLRequest(url: endpoint)
+            request.httpMethod = "PATCH"
+            request.headers = headers
+            request.httpBody = try JSONEncoder().encode(timeRequest)
             
         // mypage
         case .getUserInfo:
