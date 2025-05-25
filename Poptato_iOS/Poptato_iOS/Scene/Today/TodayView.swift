@@ -56,7 +56,7 @@ struct TodayView: View {
                                 },
                                 onDragEnd: {
                                     Task {
-                                        await viewModel.dragAndDrop()
+                                        await viewModel.todayDragAndDrop()
                                     }
                                 },
                                 onItemSelected: { item in

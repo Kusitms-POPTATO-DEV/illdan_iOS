@@ -355,6 +355,16 @@ final class TodoViewModel: ObservableObject {
         return result
     }
     
+    func todayDragAndDrop() async {
+        do {
+            AnalyticsManager.shared.logEvent(AnalyticsEvent.drag_today)
+            let todoIds = todayList.map{ $0.todoId }
+            try await todoRepository.dragAndDrop(type: "TODAY", todoIds: todoIds)
+        } catch {
+            print("Error dragAndDrop: \(error)")
+        }
+    }
+    
     // MARK: - 할 일 페이지 관련 메서드
     
     func createBacklog(_ item: String) async {
