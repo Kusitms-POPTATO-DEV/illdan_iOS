@@ -18,6 +18,7 @@ struct TodoItemModel: Codable {
     var categoryId: Int?
     var categoryName: String?
     var imageUrl: String?
+    var time: String?
 }
 
 extension TodoItemModel {
@@ -28,5 +29,23 @@ extension TodoItemModel {
             isBookmark: false,
             isRepeat: false
         )
+    }
+}
+
+extension TodoItemModel {
+    var timeInfo: TimeInfo? {
+        if let time {
+            return TimeFormatter.convertStringToTimeInfo(time: time)
+        } else {
+            return nil
+        }
+    }
+    
+    var timeString: String {
+        if let info = timeInfo {
+            return String(format: "%@ %02d:%02d", info.meridiem, info.hour, info.minute)
+        } else {
+            return ""
+        }
     }
 }

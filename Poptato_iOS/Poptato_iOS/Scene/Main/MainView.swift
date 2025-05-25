@@ -228,6 +228,11 @@ struct MainView: View {
                                 await todoViewModel.updateCategory(categoryId: id, todoId: todoViewModel.selectedTodoItem!.todoId)
                             }
                         },
+                        updateTodoTime: { info in
+                            Task {
+                                await todoViewModel.updateTodoTime(timeInfo: info)
+                            }
+                        },
                         categoryList: todoViewModel.categoryList
                     )
                     .transition(.move(edge: .bottom))
