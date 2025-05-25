@@ -337,6 +337,8 @@ final class TodoViewModel: ObservableObject {
     }
     
     func getBacklogList() async {
+        if categoryList.isEmpty { return }
+        
         do {
             AnalyticsManager.shared.logEvent(AnalyticsEvent.get_backlog_list)
             AnalyticsManager.shared.logEvent(
