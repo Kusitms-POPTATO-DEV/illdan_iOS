@@ -313,6 +313,16 @@ struct MainView: View {
                 }
             }
         }
+        .onChange(of: todoViewModel.isExistYesterdayTodo) { newValue in
+            if !newValue {
+                todoViewModel.currentDate = TimeFormatter.getCurrentMonthDay()
+                // 어제 한 일 페이지가 종료된 이후에 새로운 리스트 조회
+                Task {
+                    await todoViewModel.getTodayList()
+                    await todoViewModel.getBacklogList()
+                }
+            }
+        }
     }
     
     private func showToast(message: String) {
