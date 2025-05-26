@@ -18,7 +18,7 @@ struct BacklogView: View {
     @State private var isViewActive = false
     
     var body: some View {
-        ZStack(alignment: .bottom) {
+        ZStack(alignment: .top) {
             Color.gray100
                 .ignoresSafeArea()
             
@@ -108,8 +108,6 @@ struct BacklogView: View {
                         }
                     }
                 }
-                
-                Spacer()
             }
             
             if (viewModel.showCategorySettingMenu) {
