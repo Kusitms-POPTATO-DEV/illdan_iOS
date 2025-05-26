@@ -8,7 +8,7 @@
 import SwiftUI
 
 struct HistoryView: View {
-    @ObservedObject private var viewModel = HistoryViewModel()
+    @StateObject private var viewModel = HistoryViewModel()
     
     var body: some View {
         ZStack {
