@@ -36,8 +36,8 @@ struct CommonDialog: View {
                         Spacer().frame(height: 10)
                     }
                     Text(content)
-                        .font(PoptatoTypo.mdSemiBold)
-                        .foregroundColor(.gray00)
+                        .font(PoptatoTypo.mdRegular)
+                        .foregroundColor(.gray40)
                         .multilineTextAlignment(.center)
                     Spacer().frame(height: 48)
                     
