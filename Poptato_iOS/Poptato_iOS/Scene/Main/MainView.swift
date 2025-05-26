@@ -198,7 +198,7 @@ struct MainView: View {
                         showRoutineBottomSheet: $isRoutineBottomSheetVisible,
                         deleteTodo: {
                             Task {
-                                await todoViewModel.deleteBacklog(todoId: todoItem.todoId)
+                                await todoViewModel.deleteTodo(todoId: todoItem.todoId)
                                 showToast(message: "할 일이 삭제되었어요.")
                             }
                         },

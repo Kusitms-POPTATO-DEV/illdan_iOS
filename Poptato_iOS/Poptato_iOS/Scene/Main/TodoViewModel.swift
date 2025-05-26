@@ -286,6 +286,25 @@ final class TodoViewModel: ObservableObject {
         }
     }
     
+    func deleteTodo(todoId: Int) async {
+        do {
+            if isToday {
+                await MainActor.run {
+                    self.todayList.removeAll { $0.todoId == todoId }
+                }
+            } else {
+                await MainActor.run {
+                    self.backlogList.removeAll { $0.todoId == todoId }
+                }
+            }
+            await MainActor.run { selectedTodoItem = nil }
+            
+            try await backlogRepository.deleteBacklog(todoId: todoId)
+        } catch {
+            print("Error delete backlog: \(error)")
+        }
+    }
+    
     // MARK: - 오늘 페이지 관련 메서드
     
     /// 역할: 오늘 할 일 리스트를 조회
@@ -426,21 +445,6 @@ final class TodoViewModel: ObservableObject {
             }
             
             print("Error edit backlog: \(error)")
-        }
-    }
-    
-    func deleteBacklog(todoId: Int) async {
-        do {
-            await MainActor.run {
-                self.backlogList.removeAll { $0.todoId == todoId }
-                selectedTodoItem = nil
-            }
-            
-            try await backlogRepository.deleteBacklog(todoId: todoId)
-        } catch {
-            DispatchQueue.main.async {
-                print("Error delete backlog: \(error)")
-            }
         }
     }
     
