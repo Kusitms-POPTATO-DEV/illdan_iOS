@@ -167,7 +167,7 @@ struct BacklogView: View {
                 )
             }
         }
-        .ignoresSafeArea(.keyboard, edges: .bottom)
+//        .ignoresSafeArea(.keyboard, edges: .bottom)
         .simultaneousGesture(
             TapGesture().onEnded {
                 isTextFieldFocused = false
@@ -279,34 +279,6 @@ struct CategoryListView: View {
                 }
             }
         }
-//        ScrollView(.horizontal) {
-//            LazyHStack(spacing: 12) {
-//                ForEach(Array(categoryList.enumerated()), id: \.element.id) { index, item in
-//                    let image = imageName(for: index)
-//                    CategoryItemView(item: item, image: image, isSelected: index == selectedIndex)
-//                        .onTapGesture {
-//                            selectedIndex = index
-//                            onClickCategory()
-//                        }
-//                        .if(item.id != -1 && item.id != 0) { view in
-//                            view.onDrag {
-//                                draggedCategory = item
-//                                isDragging = true
-//                                return NSItemProvider(object: "\(item.id)" as NSString)
-//                            }
-//                        }
-//                        .onDrop(of: [.text],
-//                                delegate: CategoryDragDropDelegate(item: item,
-//                                                                   categoryList: $categoryList,
-//                                                                   draggedItem: $draggedCategory,
-//                                                                   onReorder: {
-//                            isDragging = false
-//                            onDragEnd()
-//                        }))
-//                }
-//            }
-//        }
-//        .scrollIndicators(.hidden)
     }
     
     private func imageName(for index: Int) -> String? {
