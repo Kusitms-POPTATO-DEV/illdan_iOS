@@ -198,7 +198,7 @@ struct MainView: View {
                         showRoutineBottomSheet: $isRoutineBottomSheetVisible,
                         deleteTodo: {
                             Task {
-                                await todoViewModel.deleteBacklog(todoId: todoItem.todoId)
+                                await todoViewModel.deleteTodo(todoId: todoItem.todoId)
                                 showToast(message: "할 일이 삭제되었어요.")
                             }
                         },
@@ -226,6 +226,11 @@ struct MainView: View {
                         updateCategory: { id in
                             Task {
                                 await todoViewModel.updateCategory(categoryId: id, todoId: todoViewModel.selectedTodoItem!.todoId)
+                            }
+                        },
+                        updateTodoTime: { info in
+                            Task {
+                                await todoViewModel.updateTodoTime(timeInfo: info)
                             }
                         },
                         categoryList: todoViewModel.categoryList

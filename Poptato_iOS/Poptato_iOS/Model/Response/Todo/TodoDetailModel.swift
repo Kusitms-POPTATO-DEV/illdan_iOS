@@ -7,6 +7,7 @@
 
 struct TodoDetailModel: Codable {
     let content: String
+    let time: String?
     let deadline: String?
     let categoryName: String?
     let emojiImageUrl: String?

@@ -18,7 +18,7 @@ struct BacklogView: View {
     @State private var isViewActive = false
     
     var body: some View {
-        ZStack(alignment: .bottom) {
+        ZStack(alignment: .top) {
             Color.gray100
                 .ignoresSafeArea()
             
@@ -108,8 +108,6 @@ struct BacklogView: View {
                         }
                     }
                 }
-                
-                Spacer()
             }
             
             if (viewModel.showCategorySettingMenu) {
@@ -169,7 +167,7 @@ struct BacklogView: View {
                 )
             }
         }
-        .ignoresSafeArea(.keyboard, edges: .bottom)
+//        .ignoresSafeArea(.keyboard, edges: .bottom)
         .simultaneousGesture(
             TapGesture().onEnded {
                 isTextFieldFocused = false
@@ -281,34 +279,6 @@ struct CategoryListView: View {
                 }
             }
         }
-//        ScrollView(.horizontal) {
-//            LazyHStack(spacing: 12) {
-//                ForEach(Array(categoryList.enumerated()), id: \.element.id) { index, item in
-//                    let image = imageName(for: index)
-//                    CategoryItemView(item: item, image: image, isSelected: index == selectedIndex)
-//                        .onTapGesture {
-//                            selectedIndex = index
-//                            onClickCategory()
-//                        }
-//                        .if(item.id != -1 && item.id != 0) { view in
-//                            view.onDrag {
-//                                draggedCategory = item
-//                                isDragging = true
-//                                return NSItemProvider(object: "\(item.id)" as NSString)
-//                            }
-//                        }
-//                        .onDrop(of: [.text],
-//                                delegate: CategoryDragDropDelegate(item: item,
-//                                                                   categoryList: $categoryList,
-//                                                                   draggedItem: $draggedCategory,
-//                                                                   onReorder: {
-//                            isDragging = false
-//                            onDragEnd()
-//                        }))
-//                }
-//            }
-//        }
-//        .scrollIndicators(.hidden)
     }
     
     private func imageName(for index: Int) -> String? {
@@ -438,9 +408,9 @@ struct BacklogItemView: View {
                     BacklogRepeatDeadlineText(deadlineDateMode: deadlineDateMode, item: item)
                 }
                 
-                if item.isBookmark || item.categoryName != nil {
+                if item.isBookmark || item.time != nil || item.categoryName != nil {
                     Spacer().frame(height: 8)
-                    BacklogBookmarkCategoryChip(item: item)
+                    BacklogBookmarkTimeCategoryChip(item: item)
                 }
             }
             
@@ -632,7 +602,7 @@ struct BacklogRepeatDeadlineText: View {
     }
 }
 
-struct BacklogBookmarkCategoryChip: View {
+struct BacklogBookmarkTimeCategoryChip: View {
     let item: TodoItemModel
     
     var body: some View {
@@ -652,6 +622,21 @@ struct BacklogBookmarkCategoryChip: View {
                 .cornerRadius(4)
             }
             
+            if let _ = item.time {
+                HStack(spacing: 2) {
+                    Image("ic_clock")
+                        .resizable()
+                        .frame(width: 12, height: 12)
+                    Text(item.timeString)
+                        .font(PoptatoTypo.xsRegular)
+                        .foregroundColor(.gray50)
+                }
+                .padding(.horizontal, 4)
+                .padding(.vertical, 2)
+                .background(Color.gray90)
+                .cornerRadius(6)
+            }
+            
             if let categoryName = item.categoryName, let imageUrl = item.imageUrl {
                 HStack(spacing: 2) {
                     PDFImageView(imageURL: imageUrl, width: 12, height: 12)
@@ -665,7 +650,7 @@ struct BacklogBookmarkCategoryChip: View {
                 .cornerRadius(6)
             }
             
-            if (item.isBookmark || item.categoryName != nil) { Spacer().frame(height: 0) }
+            if (item.isBookmark || item.categoryName != nil || item.time != nil) { Spacer().frame(height: 0) }
         }
     }
 }

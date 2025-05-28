@@ -20,6 +20,7 @@ struct BottomSheetView: View {
     var updateDeadline: (String?) -> Void
     var updateTodoRepeat: () -> Void
     var updateCategory: (Int?) -> Void
+    var updateTodoTime: (TimeInfo?) -> Void
     var categoryList: [CategoryModel]
     
     var body: some View {
@@ -29,9 +30,10 @@ struct BottomSheetView: View {
                 
                 if showTimePickerBottomSheet {
                     TimePickerBottomSheet(
-                        updateTodoTime: { newValue in
-                            
-                        },
+                        selectedMeridiem: todoItem?.timeInfo?.meridiem ?? "",
+                        selectedHour: todoItem?.timeInfo?.hour ?? 1,
+                        selectedMinute: todoItem?.timeInfo?.minute ?? 0,
+                        updateTodoTime: updateTodoTime,
                         onDismissRequest: { showTimePickerBottomSheet = false }
                     )
                     .transition(.move(edge: .bottom))
@@ -61,9 +63,9 @@ struct BottomSheetView: View {
                     )
                     .transition(.move(edge: .bottom))
                 } else {
-                    VStack {
-                        HStack {
-                            if let todo = todoItem {
+                    if let todo = todoItem {
+                        VStack {
+                            HStack {
                                 Text(todo.content)
                                     .font(PoptatoTypo.xLMedium)
                                     .foregroundColor(.gray00)
@@ -77,121 +79,122 @@ struct BottomSheetView: View {
                                         updateBookmark()
                                     }
                             }
-                        }
-                        .padding(.horizontal, 20)
-                        
-                        HStack(spacing: 16) {
-                            EditDeleteButtonView(
-                                image: "ic_trash",
-                                title: "삭제하기",
-                                foregroundColor: .warning40,
-                                onClickButton: {
-                                    AnalyticsManager.shared.logEvent(AnalyticsEvent.delete_task, parameters: ["task_id" : todoItem?.todoId ?? -1])
-                                    isVisible = false
-                                    deleteTodo()
-                                }
+                            .padding(.horizontal, 20)
+                            
+                            HStack(spacing: 16) {
+                                EditDeleteButtonView(
+                                    image: "ic_trash",
+                                    title: "삭제하기",
+                                    foregroundColor: .warning40,
+                                    onClickButton: {
+                                        AnalyticsManager.shared.logEvent(AnalyticsEvent.delete_task, parameters: ["task_id" : todoItem?.todoId ?? -1])
+                                        isVisible = false
+                                        deleteTodo()
+                                    }
+                                )
+                                
+                                EditDeleteButtonView(
+                                    image: "ic_pen",
+                                    title: "수정하기",
+                                    foregroundColor: .gray30,
+                                    onClickButton: {
+                                        AnalyticsManager.shared.logEvent(AnalyticsEvent.edit_task)
+                                        isVisible = false
+                                        editTodo()
+                                    }
+                                )
+                            }
+                            .frame(maxWidth: .infinity)
+                            .padding(.horizontal, 20)
+                            
+                            Spacer().frame(height: 20)
+                            
+                            BottomSheetButton(
+                                image: "ic_clock",
+                                buttonText: "시간",
+                                buttonColor: .gray30,
+                                subText: todo.timeString.isEmpty ? "설정하기" : todo.timeString,
+                                onClickBtn: {
+                                    showTimePickerBottomSheet = true
+                                },
+                                isRepeat: Binding(
+                                    get: { todoItem?.isRepeat ?? false },
+                                    set: { newValue in
+                                        todoItem?.isRepeat = newValue
+                                        updateTodoRepeat()
+                                    }
+                                )
                             )
                             
-                            EditDeleteButtonView(
-                                image: "ic_pen",
-                                title: "수정하기",
-                                foregroundColor: .gray30,
-                                onClickButton: {
-                                    AnalyticsManager.shared.logEvent(AnalyticsEvent.edit_task)
-                                    isVisible = false
-                                    editTodo()
-                                }
+                            BottomSheetButton(
+                                image: "ic_cal",
+                                buttonText: "날짜",
+                                buttonColor: .gray30,
+                                subText: todoItem?.deadline ?? "설정하기",
+                                onClickBtn: { showDateBottomSheet = true },
+                                isRepeat: Binding(
+                                    get: { todoItem?.isRepeat ?? false },
+                                    set: { newValue in
+                                        todoItem?.isRepeat = newValue
+                                    }
+                                )
+                            )
+                            
+    //                        BottomSheetButton(
+    //                            image: "ic_refresh",
+    //                            buttonText: "루틴",
+    //                            buttonColor: .gray30,
+    //                            subText: "",
+    //                            onClickBtn: {
+    //                                showRoutineBottomSheet = true
+    //                            },
+    //                            isRepeat: Binding(
+    //                                get: { todoItem?.isRepeat ?? false },
+    //                                set: { newValue in
+    //                                    todoItem?.isRepeat = newValue
+    //                                    updateTodoRepeat()
+    //                                }
+    //                            )
+    //                        )
+                            
+                            BottomSheetButton(
+                                image: "ic_refresh",
+                                buttonText: "반복",
+                                buttonColor: .gray30,
+                                subText: "",
+                                onClickBtn: {
+                                    AnalyticsManager.shared.logEvent(AnalyticsEvent.set_repeat, parameters: ["task_id" : todoItem?.todoId ?? -1])
+                                },
+                                isRepeat: Binding(
+                                    get: { todoItem?.isRepeat ?? false },
+                                    set: { newValue in
+                                        todoItem?.isRepeat = newValue
+                                        updateTodoRepeat()
+                                    }
+                                )
+                            )
+                            
+                            BottomSheetButton(
+                                image: "ic_add_category",
+                                buttonText: "카테고리",
+                                buttonColor: .gray30,
+                                onClickBtn: { showCategoryBottomSheet = true },
+                                categoryName: todoItem?.categoryName ?? "",
+                                emojiImageUrl: todoItem?.imageUrl ?? "",
+                                isRepeat: Binding(
+                                    get: { todoItem?.isRepeat ?? false },
+                                    set: { newValue in
+                                        todoItem?.isRepeat = newValue
+                                    }
+                                )
                             )
                         }
                         .frame(maxWidth: .infinity)
-                        .padding(.horizontal, 20)
-                        
-                        Spacer().frame(height: 20)
-                        
-//                        BottomSheetButton(
-//                            image: "ic_clock",
-//                            buttonText: "시간",
-//                            buttonColor: .gray30,
-//                            subText: "",
-//                            onClickBtn: {
-//                                showTimePickerBottomSheet = true
-//                            },
-//                            isRepeat: Binding(
-//                                get: { todoItem?.isRepeat ?? false },
-//                                set: { newValue in
-//                                    todoItem?.isRepeat = newValue
-//                                    updateTodoRepeat()
-//                                }
-//                            )
-//                        )
-                        
-                        BottomSheetButton(
-                            image: "ic_cal",
-                            buttonText: "날짜",
-                            buttonColor: .gray30,
-                            subText: todoItem?.deadline ?? "설정하기",
-                            onClickBtn: { showDateBottomSheet = true },
-                            isRepeat: Binding(
-                                get: { todoItem?.isRepeat ?? false },
-                                set: { newValue in
-                                    todoItem?.isRepeat = newValue
-                                }
-                            )
-                        )
-                        
-//                        BottomSheetButton(
-//                            image: "ic_refresh",
-//                            buttonText: "루틴",
-//                            buttonColor: .gray30,
-//                            subText: "",
-//                            onClickBtn: {
-//                                showRoutineBottomSheet = true
-//                            },
-//                            isRepeat: Binding(
-//                                get: { todoItem?.isRepeat ?? false },
-//                                set: { newValue in
-//                                    todoItem?.isRepeat = newValue
-//                                    updateTodoRepeat()
-//                                }
-//                            )
-//                        )
-                        
-                        BottomSheetButton(
-                            image: "ic_refresh",
-                            buttonText: "반복",
-                            buttonColor: .gray30,
-                            subText: "",
-                            onClickBtn: {
-                                AnalyticsManager.shared.logEvent(AnalyticsEvent.set_repeat, parameters: ["task_id" : todoItem?.todoId ?? -1])
-                            },
-                            isRepeat: Binding(
-                                get: { todoItem?.isRepeat ?? false },
-                                set: { newValue in
-                                    todoItem?.isRepeat = newValue
-                                    updateTodoRepeat()
-                                }
-                            )
-                        )
-                        
-                        BottomSheetButton(
-                            image: "ic_add_category",
-                            buttonText: "카테고리",
-                            buttonColor: .gray30,
-                            onClickBtn: { showCategoryBottomSheet = true },
-                            categoryName: todoItem?.categoryName ?? "",
-                            emojiImageUrl: todoItem?.imageUrl ?? "",
-                            isRepeat: Binding(
-                                get: { todoItem?.isRepeat ?? false },
-                                set: { newValue in
-                                    todoItem?.isRepeat = newValue
-                                }
-                            )
-                        )
+                        .padding(.vertical, 20)
+                        .background(Color(UIColor.gray100))
+                        .clipShape(RoundedCorner(radius: 24))
+                        .transition(.move(edge: .bottom))
                     }
-                    .frame(maxWidth: .infinity)
-                    .padding(.vertical, 20)
-                    .background(Color(UIColor.gray100))
-                    .clipShape(RoundedCorner(radius: 24))
                 }
             }
         }

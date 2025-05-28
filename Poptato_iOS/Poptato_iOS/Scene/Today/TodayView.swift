@@ -56,7 +56,7 @@ struct TodayView: View {
                                 },
                                 onDragEnd: {
                                     Task {
-                                        await viewModel.dragAndDrop()
+                                        await viewModel.todayDragAndDrop()
                                     }
                                 },
                                 onItemSelected: { item in
@@ -202,7 +202,7 @@ struct TodayItemView: View {
                     
                     if item.isRepeat || item.deadline != nil { TodayRepeatDeadlineText(deadlineDateMode: deadlineDateMode, item: item) }
                     
-                    if item.isBookmark || item.categoryName != nil { TodayBookmarkCategoryChip(item: item) }
+                    if item.isBookmark || item.time != nil || item.categoryName != nil { TodayBookmarkTimeCategoryChip(item: item) }
                 }
             }
             
@@ -351,7 +351,7 @@ struct TodayRepeatDeadlineText: View {
     }
 }
 
-struct TodayBookmarkCategoryChip: View {
+struct TodayBookmarkTimeCategoryChip: View {
     let item: TodayItemModel
     
     var body: some View {
@@ -364,6 +364,21 @@ struct TodayBookmarkCategoryChip: View {
                     Text("중요")
                         .font(PoptatoTypo.xsRegular)
                         .foregroundColor(.primary40)
+                }
+                .padding(.horizontal, 4)
+                .padding(.vertical, 2)
+                .background(Color.gray90)
+                .cornerRadius(6)
+            }
+            
+            if let _ = item.time {
+                HStack(spacing: 2) {
+                    Image("ic_clock")
+                        .resizable()
+                        .frame(width: 12, height: 12)
+                    Text(item.timeString)
+                        .font(PoptatoTypo.xsRegular)
+                        .foregroundColor(.gray50)
                 }
                 .padding(.horizontal, 4)
                 .padding(.vertical, 2)
@@ -384,7 +399,7 @@ struct TodayBookmarkCategoryChip: View {
                 .cornerRadius(6)
             }
             
-            if (item.isBookmark || item.dDay != nil || item.isRepeat || item.categoryName != nil) { Spacer() }
+            if (item.isBookmark || item.dDay != nil || item.isRepeat || item.categoryName != nil || item.time != nil) { Spacer() }
         }
         .onAppear {
             print("\(item)")

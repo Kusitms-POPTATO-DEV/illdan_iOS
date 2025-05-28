@@ -12,5 +12,5 @@ struct TimeInfo {
 }
 
 struct TodoTimeRequest: Codable {
-    let time: String
+    let todoTime: String?
 }

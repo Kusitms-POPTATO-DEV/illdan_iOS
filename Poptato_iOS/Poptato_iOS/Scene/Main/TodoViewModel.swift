@@ -104,7 +104,8 @@ final class TodoViewModel: ObservableObject {
                     deadline: item.deadline,
                     categoryId: categoryId,
                     categoryName: response.categoryName,
-                    imageUrl: response.emojiImageUrl
+                    imageUrl: response.emojiImageUrl,
+                    time: response.time
                 )
                 updateSelectedTodo(item: newItem)
             }
@@ -246,6 +247,64 @@ final class TodoViewModel: ObservableObject {
         }
     }
     
+    /// 역할: 특정 할 일의 시간 정보를 변경
+    /// 상황: 시간 바텀시트에서 확인, 삭제를 클릭했을 때 실행
+    func updateTodoTime(timeInfo: TimeInfo?) async {
+        guard let id = selectedTodoItem?.todoId else { return }
+        
+        do {
+            if let info = timeInfo {
+                let time = TimeFormatter.convertTimeInfoToString(info: info)
+                try await todoRepository.updateTodoTime(todoId: id, request: TodoTimeRequest(todoTime: time))
+                
+                await MainActor.run {
+                    selectedTodoItem?.time = time
+                    updateTodoTimeInUI(time: time, id: id)
+                }
+            } else {
+                try await todoRepository.updateTodoTime(todoId: id, request: TodoTimeRequest(todoTime: nil))
+                
+                await MainActor.run {
+                    selectedTodoItem?.time = nil
+                    updateTodoTimeInUI(time: nil, id: id)
+                }
+            }
+        } catch {
+            print("할 일 시간 정보 업데이트 실패: \(error)")
+        }
+    }
+    
+    private func updateTodoTimeInUI(time: String?, id: Int) {
+        if isToday {
+            if let index = todayList.firstIndex(where: { $0.todoId == id }) {
+                todayList[index].time = time
+            }
+        } else {
+            if let index = backlogList.firstIndex(where: { $0.todoId == id }) {
+                backlogList[index].time = time
+            }
+        }
+    }
+    
+    func deleteTodo(todoId: Int) async {
+        do {
+            if isToday {
+                await MainActor.run {
+                    self.todayList.removeAll { $0.todoId == todoId }
+                }
+            } else {
+                await MainActor.run {
+                    self.backlogList.removeAll { $0.todoId == todoId }
+                }
+            }
+            await MainActor.run { selectedTodoItem = nil }
+            
+            try await backlogRepository.deleteBacklog(todoId: todoId)
+        } catch {
+            print("Error delete backlog: \(error)")
+        }
+    }
+    
     // MARK: - 오늘 페이지 관련 메서드
     
     /// 역할: 오늘 할 일 리스트를 조회
@@ -264,7 +323,8 @@ final class TodoViewModel: ObservableObject {
                         deadline: item.deadline,
                         isRepeat: item.isRepeat,
                         imageUrl: item.imageUrl,
-                        categoryName: item.categoryName
+                        categoryName: item.categoryName,
+                        time: item.time
                     )
                 }
             }
@@ -312,6 +372,16 @@ final class TodoViewModel: ObservableObject {
         let result = todayList.allSatisfy { $0.todayStatus == "COMPLETED" }
         if result { AnalyticsManager.shared.logEvent(AnalyticsEvent.complete_all) }
         return result
+    }
+    
+    func todayDragAndDrop() async {
+        do {
+            AnalyticsManager.shared.logEvent(AnalyticsEvent.drag_today)
+            let todoIds = todayList.map{ $0.todoId }
+            try await todoRepository.dragAndDrop(type: "TODAY", todoIds: todoIds)
+        } catch {
+            print("Error dragAndDrop: \(error)")
+        }
     }
     
     // MARK: - 할 일 페이지 관련 메서드
@@ -375,21 +445,6 @@ final class TodoViewModel: ObservableObject {
             }
             
             print("Error edit backlog: \(error)")
-        }
-    }
-    
-    func deleteBacklog(todoId: Int) async {
-        do {
-            await MainActor.run {
-                self.backlogList.removeAll { $0.todoId == todoId }
-                selectedTodoItem = nil
-            }
-            
-            try await backlogRepository.deleteBacklog(todoId: todoId)
-        } catch {
-            DispatchQueue.main.async {
-                print("Error delete backlog: \(error)")
-            }
         }
     }
     
