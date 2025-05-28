@@ -238,52 +238,6 @@ struct MainView: View {
                     .transition(.move(edge: .bottom))
                     .zIndex(1)
                 }
-                
-//                if isBottomSheetVisible, let todoItem = todayViewModel.selectedTodoItem {
-//                    BottomSheetView(
-//                        isVisible: $isBottomSheetVisible,
-//                        todoItem: $todayViewModel.selectedTodoItem,
-//                        showDateBottomSheet: $isDateBottomSheetVisible,
-//                        showCategoryBottomSheet: $isCategoryBottomSheetVisible,
-//                        showTimePickerBottomSheet: $isTimePickerBottomSheetVisible,
-//                        showRoutineBottomSheet: $isRoutineBottomSheetVisible,
-//                        deleteTodo: {
-//                            Task {
-//                                await todayViewModel.deleteTodo(todoId: todoItem.todoId)
-//                                showToast(message: "할 일이 삭제되었어요.")
-//                            }
-//                        },
-//                        editTodo: {
-//                            todayViewModel.activeItemId = todoItem.todoId
-//                        },
-//                        updateBookmark: {
-//                            Task {
-//                                await todayViewModel.updateBookmark(todoId: todoItem.todoId)
-//                            }
-//                        },
-//                        updateDeadline: { deadline in
-//                            Task {
-//                                await todayViewModel.updateDeadline(
-//                                    todoId: todoItem.todoId,
-//                                    deadline: deadline
-//                                )
-//                            }
-//                        },
-//                        updateTodoRepeat: {
-//                            Task {
-//                                await todayViewModel.updateTodoRepeat(todoId: todoItem.todoId)
-//                            }
-//                        },
-//                        updateCategory: { id in
-//                            Task {
-//                                await todayViewModel.updateCategory(categoryId: id, todoId: todayViewModel.selectedTodoItem!.todoId)
-//                            }
-//                        },
-//                        categoryList: backlogViewModel.categoryList
-//                    )
-//                    .transition(.move(edge: .bottom))
-//                    .zIndex(1)
-//                }
             }
         }
         .fullScreenCover(isPresented: $todoViewModel.isExistYesterdayTodo, onDismiss: {
