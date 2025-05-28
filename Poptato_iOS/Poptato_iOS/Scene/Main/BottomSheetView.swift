@@ -110,6 +110,20 @@ struct BottomSheetView: View {
                             Spacer().frame(height: 20)
                             
                             BottomSheetButton(
+                                image: "ic_cal",
+                                buttonText: "날짜",
+                                buttonColor: .gray30,
+                                subText: todoItem?.deadline ?? "설정하기",
+                                onClickBtn: { showDateBottomSheet = true },
+                                isRepeat: Binding(
+                                    get: { todoItem?.isRepeat ?? false },
+                                    set: { newValue in
+                                        todoItem?.isRepeat = newValue
+                                    }
+                                )
+                            )
+                            
+                            BottomSheetButton(
                                 image: "ic_clock",
                                 buttonText: "시간",
                                 buttonColor: .gray30,
@@ -122,20 +136,6 @@ struct BottomSheetView: View {
                                     set: { newValue in
                                         todoItem?.isRepeat = newValue
                                         updateTodoRepeat()
-                                    }
-                                )
-                            )
-                            
-                            BottomSheetButton(
-                                image: "ic_cal",
-                                buttonText: "날짜",
-                                buttonColor: .gray30,
-                                subText: todoItem?.deadline ?? "설정하기",
-                                onClickBtn: { showDateBottomSheet = true },
-                                isRepeat: Binding(
-                                    get: { todoItem?.isRepeat ?? false },
-                                    set: { newValue in
-                                        todoItem?.isRepeat = newValue
                                     }
                                 )
                             )
