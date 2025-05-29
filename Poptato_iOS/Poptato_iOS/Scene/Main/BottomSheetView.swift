@@ -505,11 +505,7 @@ struct CategoryBottomSheet: View {
                                     .background(backgroundView)
                                     .contentShape(Rectangle())
                                     .onTapGesture {
-                                        if selectedCategoryId == category.id {
-                                            selectedCategoryId = nil
-                                        } else {
-                                            selectedCategoryId = category.id
-                                        }
+                                        selectedCategoryId = category.id
                                     }
                                 }
                             }
@@ -518,13 +514,16 @@ struct CategoryBottomSheet: View {
                     Spacer().frame(height: 16)
                     BottomSheetActionButton(
                         positiveText: "완료",
-                        negativeText: "취소",
+                        negativeText: "삭제",
                         onClickBtnPositive: {
                             AnalyticsManager.shared.logEvent(AnalyticsEvent.set_category)
                             updateCategory(selectedCategoryId)
                             onDismiss()
                         },
-                        onClickBtnNegative: { onDismiss() }
+                        onClickBtnNegative: {
+                            updateCategory(nil)
+                            onDismiss()
+                        }
                     )
                     .padding(.horizontal, 20)
                     
