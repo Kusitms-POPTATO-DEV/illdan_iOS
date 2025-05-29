@@ -31,7 +31,8 @@ final class AnalyticsManager {
 }
 
 enum AnalyticsEvent: String {
-    case login = "login"
+    case apple_login = "login_apple"
+    case kakao_login = "login_kakao"
     case make_task = "make_task"
     case add_today = "add_today"
     case make_category = "make_category"
@@ -42,7 +43,9 @@ enum AnalyticsEvent: String {
     case drag_tasks = "drag_tasks"
     case drag_today = "drag_today"
     case back_tasks = "back_tasks"
-    case get_backlog_list = "get_backlog_list"
+    case get_backlog = "get_backlog"
+    case get_today = "get_today"
+    case get_calendar = "get_calendar"
     case today_bottom_sheet = "today_bottom_sheet"
     case check_date = "check_date"
     case check_month = "check_month"
@@ -53,6 +56,7 @@ enum AnalyticsEvent: String {
     case set_category = "set_category"
     case set_important = "set_important"
     case delete_account = "delete_account"
+    case set_time = "set_time"
     case notice = "notice"
     case terms = "terms"
     case faq = "faq"

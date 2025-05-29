@@ -257,6 +257,8 @@ final class TodoViewModel: ObservableObject {
                 let time = TimeFormatter.convertTimeInfoToString(info: info)
                 try await todoRepository.updateTodoTime(todoId: id, request: TodoTimeRequest(todoTime: time))
                 
+                AnalyticsManager.shared.logEvent(AnalyticsEvent.set_time)
+                
                 await MainActor.run {
                     selectedTodoItem?.time = time
                     updateTodoTimeInUI(time: time, id: id)
@@ -312,6 +314,7 @@ final class TodoViewModel: ObservableObject {
     func getTodayList() async {
         do {
             let response = try await todayRepository.getTodayList(page: 0, size: 100)
+            
             await MainActor.run {
                 todayList = response.todays.map { item in
                     TodayItemModel(
@@ -410,7 +413,6 @@ final class TodoViewModel: ObservableObject {
         if categoryList.isEmpty { return }
         
         do {
-            AnalyticsManager.shared.logEvent(AnalyticsEvent.get_backlog_list)
             AnalyticsManager.shared.logEvent(
                 AnalyticsEvent.view_category,
                 parameters: [

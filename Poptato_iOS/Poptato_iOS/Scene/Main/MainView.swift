@@ -272,6 +272,11 @@ struct MainView: View {
                 }
             }
         }
+        .onChange(of: selectedTab) { newValue in
+            if newValue == 0 { AnalyticsManager.shared.logEvent(AnalyticsEvent.get_today) }
+            else if newValue == 1 { AnalyticsManager.shared.logEvent(AnalyticsEvent.get_backlog) }
+            else if newValue == 2 { AnalyticsManager.shared.logEvent(AnalyticsEvent.get_calendar) }
+        }
         .onChange(of: todoViewModel.isExistYesterdayTodo) { newValue in
             if !newValue {
                 todoViewModel.currentDate = TimeFormatter.getCurrentMonthDay()

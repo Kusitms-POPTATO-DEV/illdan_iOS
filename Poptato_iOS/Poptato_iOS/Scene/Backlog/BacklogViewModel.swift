@@ -75,7 +75,7 @@ final class BacklogViewModel: ObservableObject {
     
     func fetchBacklogList() async {
         do {
-            AnalyticsManager.shared.logEvent(AnalyticsEvent.get_backlog_list)
+            AnalyticsManager.shared.logEvent(AnalyticsEvent.get_backlog)
             AnalyticsManager.shared.logEvent(
                 AnalyticsEvent.view_category,
                 parameters: [
