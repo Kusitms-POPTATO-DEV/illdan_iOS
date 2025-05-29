@@ -19,7 +19,10 @@ struct CommonToastView: View {
 }
 
 struct ToastModifier: ViewModifier {
+    @State private var dismissWorkItem: DispatchWorkItem?
+    
     @Binding var isPresented: Bool
+    
     let message: String
     let duration: Double
 
@@ -47,11 +50,16 @@ struct ToastModifier: ViewModifier {
                     .padding(.bottom, 70)
                 }
                 .onAppear {
-                    DispatchQueue.main.asyncAfter(deadline: .now() + duration) {
+                    dismissWorkItem?.cancel()
+                    
+                    let task = DispatchWorkItem {
                         withAnimation {
                             isPresented = false
                         }
                     }
+                    
+                    dismissWorkItem = task
+                    DispatchQueue.main.asyncAfter(deadline: .now() + duration, execute: task)
                 }
             }
         }
