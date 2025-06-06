@@ -43,4 +43,12 @@ final class TodoRepositoryImpl: TodoRepository {
     func updateTodoTime(todoId: Int, request: TodoTimeRequest) async throws {
         try await NetworkManager.shared.request(api: .updateTodoTime(todoId: todoId, request: request))
     }
+    
+    func setTodoRoutine(todoId: Int, request: TodoRoutineRequest) async throws {
+        try await NetworkManager.shared.request(api: .setTodoRoutine(todoId: todoId, request: request))
+    }
+    
+    func deleteTodoRoutine(todoId: Int) async throws {
+        try await NetworkManager.shared.request(api: .deleteTodoRoutine(todoId: todoId))
+    }
 }

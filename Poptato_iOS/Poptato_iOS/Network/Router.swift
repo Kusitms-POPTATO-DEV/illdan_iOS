@@ -38,6 +38,8 @@ enum Router: URLRequestConvertible {
     case getTodoDetail(todoId: Int)
     case updateCategory(todoId: Int, categoryId: CategoryIdModel)
     case updateTodoTime(todoId: Int, request: TodoTimeRequest)
+    case setTodoRoutine(todoId: Int, request: TodoRoutineRequest)
+    case deleteTodoRoutine(todoId: Int)
     
     // mypage
     case getUserInfo
@@ -226,6 +228,17 @@ enum Router: URLRequestConvertible {
             request.httpMethod = "PATCH"
             request.headers = headers
             request.httpBody = try JSONEncoder().encode(timeRequest)
+        case .setTodoRoutine(let todoId, let routineRequest):
+            let endpoint = url.appendingPathComponent("/todo/\(todoId)/routine")
+            request = URLRequest(url: endpoint)
+            request.httpMethod = "PUT"
+            request.headers = headers
+            request.httpBody = try JSONEncoder().encode(routineRequest)
+        case .deleteTodoRoutine(let todoId):
+            let endpoint = url.appendingPathComponent("/todo/\(todoId)/routine")
+            request = URLRequest(url: endpoint)
+            request.httpMethod = "DELETE"
+            request.headers = headers
             
         // mypage
         case .getUserInfo:

@@ -16,4 +16,6 @@ protocol TodoRepository {
     func updateCategory(todoId: Int, categoryId: CategoryIdModel) async throws -> Void
     func updateYesterdayCompletion(todoIdsRequest: TodoIdsRequest) async throws -> Void
     func updateTodoTime(todoId: Int, request: TodoTimeRequest) async throws -> Void
+    func setTodoRoutine(todoId: Int, request: TodoRoutineRequest) async throws -> Void
+    func deleteTodoRoutine(todoId: Int) async throws -> Void
 }
