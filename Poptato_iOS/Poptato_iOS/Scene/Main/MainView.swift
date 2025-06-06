@@ -218,9 +218,10 @@ struct MainView: View {
                                 )
                             }
                         },
-                        updateTodoRepeat: {
+                        updateTodoRepeat: { newValue in
                             Task {
-                                await todoViewModel.updateTodoRepeat(todoId: todoItem.todoId)
+                                if newValue { await todoViewModel.setTodoRepeat(todoId: todoItem.todoId) }
+                                else { await todoViewModel.deleteTodoRepeat(todoId: todoItem.todoId) }
                             }
                         },
                         updateCategory: { id in

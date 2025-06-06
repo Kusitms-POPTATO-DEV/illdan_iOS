@@ -13,4 +13,6 @@ struct TodoDetailModel: Codable {
     let emojiImageUrl: String?
     let isBookmark: Bool
     let isRepeat: Bool
+    let isRoutine: Bool
+    let routineDays: [String]
 }

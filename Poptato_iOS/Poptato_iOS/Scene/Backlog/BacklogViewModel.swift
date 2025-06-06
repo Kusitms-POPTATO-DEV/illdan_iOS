@@ -224,7 +224,9 @@ final class BacklogViewModel: ObservableObject {
                     deadline: item.deadline,
                     categoryId: categoryId,
                     categoryName: response.categoryName,
-                    imageUrl: response.emojiImageUrl
+                    imageUrl: response.emojiImageUrl,
+                    isRoutine: response.isRoutine,
+                    routineDays: response.routineDays
                 )
                 updateSelectedItem(item: newItem)
             }

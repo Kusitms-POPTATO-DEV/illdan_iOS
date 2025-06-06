@@ -19,6 +19,8 @@ struct TodoItemModel: Codable {
     var categoryName: String?
     var imageUrl: String?
     var time: String?
+    var isRoutine: Bool = false
+    var routineDays: [String] = []
 }
 
 extension TodoItemModel {
@@ -27,7 +29,9 @@ extension TodoItemModel {
             todoId: -1,
             content: "",
             isBookmark: false,
-            isRepeat: false
+            isRepeat: false,
+            isRoutine: false,
+            routineDays: []
         )
     }
 }
@@ -47,5 +51,21 @@ extension TodoItemModel {
         } else {
             return ""
         }
+    }
+}
+
+extension TodoItemModel {
+    var routineDayIndexes: Set<Int> {
+        let dayToIndexMap: [String: Int] = [
+            "월": 0,
+            "화": 1,
+            "수": 2,
+            "목": 3,
+            "금": 4,
+            "토": 5,
+            "일": 6
+        ]
+        
+        return Set(routineDays.compactMap { dayToIndexMap[$0] })
     }
 }
