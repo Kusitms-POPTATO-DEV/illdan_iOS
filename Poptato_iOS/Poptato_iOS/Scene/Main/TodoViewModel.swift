@@ -261,15 +261,18 @@ final class TodoViewModel: ObservableObject {
                 if isToday {
                     if let index = todayList.firstIndex(where: { $0.todoId == todoId }) {
                         todayList[index].routineDays = days.toWeekdays
+                        todayList[index].isRoutine = true
                         todayList[index].isRepeat = false
                     }
                 } else {
                     if let index = backlogList.firstIndex(where: { $0.todoId == todoId }) {
                         backlogList[index].routineDays = days.toWeekdays
+                        backlogList[index].isRoutine = true
                         backlogList[index].isRepeat = false
                     }
                 }
                 selectedTodoItem?.routineDays = days.toWeekdays
+                selectedTodoItem?.isRoutine = true
                 selectedTodoItem?.isRepeat = false
             }
         } catch {
@@ -279,19 +282,22 @@ final class TodoViewModel: ObservableObject {
     
     func deleteTodoRoutine(todoId: Int) async {
         do {
-            try await todoRepository.deleteTodoRepeat(todoId: todoId)
+            try await todoRepository.deleteTodoRoutine(todoId: todoId)
             
             await MainActor.run {
                 if isToday {
                     if let index = todayList.firstIndex(where: { $0.todoId == todoId }) {
                         todayList[index].routineDays = []
+                        todayList[index].isRoutine = false
                     }
                 } else {
                     if let index = backlogList.firstIndex(where: { $0.todoId == todoId }) {
                         backlogList[index].routineDays = []
+                        backlogList[index].isRoutine = false
                     }
                 }
                 selectedTodoItem?.routineDays = []
+                selectedTodoItem?.isRoutine = false
             }
         } catch {
             print("Error setTodoRoutine: \(error)")

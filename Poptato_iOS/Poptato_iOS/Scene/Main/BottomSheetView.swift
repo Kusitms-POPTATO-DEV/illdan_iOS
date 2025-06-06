@@ -132,7 +132,7 @@ struct BottomSheetView: View {
                                 image: "ic_refresh",
                                 buttonText: "반복",
                                 buttonColor: .gray30,
-                                subText: todo.isRepeat ? "일반 반복" : todo.routineDays.count == 7 ? "매일" : todo.routineDays.joined(separator: ""),
+                                subText: todo.isRepeat ? "일반 반복" : todo.isRoutine ? todo.routineDays.count == 7 ? "매일" : todo.routineDays.joined(separator: "") : "설정하기",
                                 onClickBtn: {
                                     showRoutineBottomSheet = true
                                 }
