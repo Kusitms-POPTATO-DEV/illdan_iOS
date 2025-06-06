@@ -224,7 +224,9 @@ final class BacklogViewModel: ObservableObject {
                     deadline: item.deadline,
                     categoryId: categoryId,
                     categoryName: response.categoryName,
-                    imageUrl: response.emojiImageUrl
+                    imageUrl: response.emojiImageUrl,
+                    isRoutine: response.isRoutine,
+                    routineDays: response.routineDays
                 )
                 updateSelectedItem(item: newItem)
             }
@@ -285,7 +287,7 @@ final class BacklogViewModel: ObservableObject {
 
     func updateTodoRepeat(todoId: Int) async {
         do {
-            try await todoRepository.updateTodoRepeat(todoId: todoId)
+            try await todoRepository.setTodoRepeat(todoId: todoId)
             
             await MainActor.run {
                 if let index = backlogList.firstIndex(where: { $0.todoId == todoId }) {

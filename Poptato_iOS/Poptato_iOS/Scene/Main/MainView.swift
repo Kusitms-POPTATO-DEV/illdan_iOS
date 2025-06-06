@@ -218,9 +218,10 @@ struct MainView: View {
                                 )
                             }
                         },
-                        updateTodoRepeat: {
+                        updateTodoRepeat: { newValue in
                             Task {
-                                await todoViewModel.updateTodoRepeat(todoId: todoItem.todoId)
+                                if newValue { await todoViewModel.setTodoRepeat(todoId: todoItem.todoId) }
+                                else { await todoViewModel.deleteTodoRepeat(todoId: todoItem.todoId) }
                             }
                         },
                         updateCategory: { id in
@@ -231,6 +232,15 @@ struct MainView: View {
                         updateTodoTime: { info in
                             Task {
                                 await todoViewModel.updateTodoTime(timeInfo: info)
+                            }
+                        },
+                        updateTodoRoutine: { newValue in
+                            Task {
+                                if let days = newValue {
+                                    await todoViewModel.setTodoRoutine(todoId: todoItem.todoId, days: days)
+                                } else {
+                                    await todoViewModel.deleteTodoRoutine(todoId: todoItem.todoId)
+                                }
                             }
                         },
                         categoryList: todoViewModel.categoryList

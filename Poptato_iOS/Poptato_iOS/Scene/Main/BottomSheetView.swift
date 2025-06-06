@@ -18,9 +18,10 @@ struct BottomSheetView: View {
     var editTodo: () -> Void
     var updateBookmark: () -> Void
     var updateDeadline: (String?) -> Void
-    var updateTodoRepeat: () -> Void
+    var updateTodoRepeat: (Bool) -> Void
     var updateCategory: (Int?) -> Void
     var updateTodoTime: (TimeInfo?) -> Void
+    var updateTodoRoutine: (Set<Int>?) -> Void
     var categoryList: [CategoryModel]
     
     var body: some View {
@@ -28,42 +29,42 @@ struct BottomSheetView: View {
             VStack {
                 Spacer()
                 
-                if showTimePickerBottomSheet {
-                    TimePickerBottomSheet(
-                        selectedMeridiem: todoItem?.timeInfo?.meridiem ?? "",
-                        selectedHour: todoItem?.timeInfo?.hour ?? 1,
-                        selectedMinute: todoItem?.timeInfo?.minute ?? 0,
-                        updateTodoTime: updateTodoTime,
-                        onDismissRequest: { showTimePickerBottomSheet = false }
-                    )
-                    .transition(.move(edge: .bottom))
-                } else if showRoutineBottomSheet {
-                    RoutineBottomSheet(
-                        updateActiveWeekdays: { newValue in },
-                        onClickToggle: { isOn in },
-                        onClickWeekdayChip: { index in },
-                        onDismissRequest: { showRoutineBottomSheet = false }
-                    )
-                    .transition(.move(edge: .bottom))
-                } else if showDateBottomSheet {
-                    DateBottomSheet(
-                        item: $todoItem,
-                        onDissmiss: { showDateBottomSheet = false },
-                        updateDeadline: updateDeadline
-                    )
-                    .transition(.move(edge: .bottom))
-                } else if showCategoryBottomSheet {
-                    CategoryBottomSheet(
-                        categoryList: categoryList,
-                        onDismiss: { showCategoryBottomSheet = false },
-                        updateCategory: { id in
-                            updateCategory(id)
-                        },
-                        selectedCategoryId: todoItem?.categoryId
-                    )
-                    .transition(.move(edge: .bottom))
-                } else {
-                    if let todo = todoItem {
+                if let todo = todoItem {
+                    if showTimePickerBottomSheet {
+                        TimePickerBottomSheet(
+                            selectedMeridiem: todoItem?.timeInfo?.meridiem ?? "",
+                            selectedHour: todoItem?.timeInfo?.hour ?? 1,
+                            selectedMinute: todoItem?.timeInfo?.minute ?? 0,
+                            updateTodoTime: updateTodoTime,
+                            onDismissRequest: { showTimePickerBottomSheet = false }
+                        )
+                        .transition(.move(edge: .bottom))
+                    } else if showRoutineBottomSheet {
+                        RoutineBottomSheet(
+                            activeWeekdays: todo.routineDayIndexes,
+                            updateTodoRoutine: updateTodoRoutine,
+                            updateTodoRepeat: updateTodoRepeat,
+                            onDismissRequest: { showRoutineBottomSheet = false }
+                        )
+                        .transition(.move(edge: .bottom))
+                    } else if showDateBottomSheet {
+                        DateBottomSheet(
+                            item: $todoItem,
+                            onDissmiss: { showDateBottomSheet = false },
+                            updateDeadline: updateDeadline
+                        )
+                        .transition(.move(edge: .bottom))
+                    } else if showCategoryBottomSheet {
+                        CategoryBottomSheet(
+                            categoryList: categoryList,
+                            onDismiss: { showCategoryBottomSheet = false },
+                            updateCategory: { id in
+                                updateCategory(id)
+                            },
+                            selectedCategoryId: todoItem?.categoryId
+                        )
+                        .transition(.move(edge: .bottom))
+                    } else {
                         VStack {
                             HStack {
                                 Text(todo.content)
@@ -114,13 +115,7 @@ struct BottomSheetView: View {
                                 buttonText: "날짜",
                                 buttonColor: .gray30,
                                 subText: todoItem?.deadline ?? "설정하기",
-                                onClickBtn: { showDateBottomSheet = true },
-                                isRepeat: Binding(
-                                    get: { todoItem?.isRepeat ?? false },
-                                    set: { newValue in
-                                        todoItem?.isRepeat = newValue
-                                    }
-                                )
+                                onClickBtn: { showDateBottomSheet = true }
                             )
                             
                             BottomSheetButton(
@@ -130,48 +125,17 @@ struct BottomSheetView: View {
                                 subText: todo.timeString.isEmpty ? "설정하기" : todo.timeString,
                                 onClickBtn: {
                                     showTimePickerBottomSheet = true
-                                },
-                                isRepeat: Binding(
-                                    get: { todoItem?.isRepeat ?? false },
-                                    set: { newValue in
-                                        todoItem?.isRepeat = newValue
-                                        updateTodoRepeat()
-                                    }
-                                )
+                                }
                             )
-                            
-    //                        BottomSheetButton(
-    //                            image: "ic_refresh",
-    //                            buttonText: "루틴",
-    //                            buttonColor: .gray30,
-    //                            subText: "",
-    //                            onClickBtn: {
-    //                                showRoutineBottomSheet = true
-    //                            },
-    //                            isRepeat: Binding(
-    //                                get: { todoItem?.isRepeat ?? false },
-    //                                set: { newValue in
-    //                                    todoItem?.isRepeat = newValue
-    //                                    updateTodoRepeat()
-    //                                }
-    //                            )
-    //                        )
                             
                             BottomSheetButton(
                                 image: "ic_refresh",
                                 buttonText: "반복",
                                 buttonColor: .gray30,
-                                subText: "",
+                                subText: todo.isRepeat ? "일반 반복" : todo.isRoutine ? todo.routineDays.count == 7 ? "매일" : todo.routineDays.joined(separator: "") : "설정하기",
                                 onClickBtn: {
-                                    AnalyticsManager.shared.logEvent(AnalyticsEvent.set_repeat, parameters: ["task_id" : todoItem?.todoId ?? -1])
-                                },
-                                isRepeat: Binding(
-                                    get: { todoItem?.isRepeat ?? false },
-                                    set: { newValue in
-                                        todoItem?.isRepeat = newValue
-                                        updateTodoRepeat()
-                                    }
-                                )
+                                    showRoutineBottomSheet = true
+                                }
                             )
                             
                             BottomSheetButton(
@@ -180,13 +144,7 @@ struct BottomSheetView: View {
                                 buttonColor: .gray30,
                                 onClickBtn: { showCategoryBottomSheet = true },
                                 categoryName: todoItem?.categoryName ?? "",
-                                emojiImageUrl: todoItem?.imageUrl ?? "",
-                                isRepeat: Binding(
-                                    get: { todoItem?.isRepeat ?? false },
-                                    set: { newValue in
-                                        todoItem?.isRepeat = newValue
-                                    }
-                                )
+                                emojiImageUrl: todoItem?.imageUrl ?? ""
                             )
                         }
                         .frame(maxWidth: .infinity)
@@ -213,7 +171,6 @@ struct BottomSheetButton: View {
     var onClickBtn: () -> Void
     var categoryName: String = ""
     var emojiImageUrl: String = ""
-    @Binding var isRepeat: Bool
     
     var body: some View {
         HStack(spacing: 0) {
@@ -225,10 +182,6 @@ struct BottomSheetButton: View {
                 .font(PoptatoTypo.mdRegular)
                 .foregroundColor(buttonColor)
             Spacer()
-            if buttonText == "반복" {
-                Toggle("", isOn: $isRepeat)
-                    .tint(isRepeat ? Color.primary40 : Color.gray80)
-            }
             if !subText.isEmpty {
                 Text(subText)
                     .font(PoptatoTypo.mdRegular)

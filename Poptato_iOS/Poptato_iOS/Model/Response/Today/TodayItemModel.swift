@@ -16,6 +16,8 @@ struct TodayItemModel: Codable {
     var imageUrl: String?
     var categoryName: String?
     var time: String?
+    var isRoutine: Bool
+    var routineDays: [String]
 }
 
 extension TodayItemModel {

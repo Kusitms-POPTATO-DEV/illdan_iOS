@@ -105,7 +105,9 @@ final class TodoViewModel: ObservableObject {
                     categoryId: categoryId,
                     categoryName: response.categoryName,
                     imageUrl: response.emojiImageUrl,
-                    time: response.time
+                    time: response.time,
+                    isRoutine: response.isRoutine,
+                    routineDays: response.routineDays
                 )
                 updateSelectedTodo(item: newItem)
             }
@@ -206,23 +208,99 @@ final class TodoViewModel: ObservableObject {
         }
     }
     
-    func updateTodoRepeat(todoId: Int) async {
+    func setTodoRepeat(todoId: Int) async {
         do {
-            try await todoRepository.updateTodoRepeat(todoId: todoId)
+            try await todoRepository.setTodoRepeat(todoId: todoId)
             
             await MainActor.run {
                 if isToday {
                     if let index = todayList.firstIndex(where: { $0.todoId == todoId }) {
-                        todayList[index].isRepeat.toggle()
+                        todayList[index].isRepeat = true
+                        todayList[index].routineDays = []
                     }
                 } else {
                     if let index = backlogList.firstIndex(where: { $0.todoId == todoId }) {
-                        backlogList[index].isRepeat.toggle()
+                        backlogList[index].isRepeat = true
+                        backlogList[index].routineDays = []
                     }
                 }
+                selectedTodoItem?.isRepeat = true
+                selectedTodoItem?.routineDays = []
             }
         } catch {
-            print("Error updateTodoRepeat: \(error)")
+            print("Error setTodoRepeat: \(error)")
+        }
+    }
+    
+    func deleteTodoRepeat(todoId: Int) async {
+        do {
+            try await todoRepository.deleteTodoRepeat(todoId: todoId)
+            
+            await MainActor.run {
+                if isToday {
+                    if let index = todayList.firstIndex(where: { $0.todoId == todoId }) {
+                        todayList[index].isRepeat = false
+                    }
+                } else {
+                    if let index = backlogList.firstIndex(where: { $0.todoId == todoId }) {
+                        backlogList[index].isRepeat = false
+                    }
+                }
+                selectedTodoItem?.isRepeat = false
+            }
+        } catch {
+            print("Error deleteTodoRepeat: \(error)")
+        }
+    }
+    
+    func setTodoRoutine(todoId: Int, days: Set<Int>) async {
+        do {
+            try await todoRepository.setTodoRoutine(todoId: todoId, request: TodoRoutineRequest(routineDays: days.toWeekdays))
+            
+            await MainActor.run {
+                if isToday {
+                    if let index = todayList.firstIndex(where: { $0.todoId == todoId }) {
+                        todayList[index].routineDays = days.toWeekdays
+                        todayList[index].isRoutine = true
+                        todayList[index].isRepeat = false
+                    }
+                } else {
+                    if let index = backlogList.firstIndex(where: { $0.todoId == todoId }) {
+                        backlogList[index].routineDays = days.toWeekdays
+                        backlogList[index].isRoutine = true
+                        backlogList[index].isRepeat = false
+                    }
+                }
+                selectedTodoItem?.routineDays = days.toWeekdays
+                selectedTodoItem?.isRoutine = true
+                selectedTodoItem?.isRepeat = false
+            }
+        } catch {
+            print("Error setTodoRoutine: \(error)")
+        }
+    }
+    
+    func deleteTodoRoutine(todoId: Int) async {
+        do {
+            try await todoRepository.deleteTodoRoutine(todoId: todoId)
+            
+            await MainActor.run {
+                if isToday {
+                    if let index = todayList.firstIndex(where: { $0.todoId == todoId }) {
+                        todayList[index].routineDays = []
+                        todayList[index].isRoutine = false
+                    }
+                } else {
+                    if let index = backlogList.firstIndex(where: { $0.todoId == todoId }) {
+                        backlogList[index].routineDays = []
+                        backlogList[index].isRoutine = false
+                    }
+                }
+                selectedTodoItem?.routineDays = []
+                selectedTodoItem?.isRoutine = false
+            }
+        } catch {
+            print("Error setTodoRoutine: \(error)")
         }
     }
     
@@ -316,20 +394,7 @@ final class TodoViewModel: ObservableObject {
             let response = try await todayRepository.getTodayList(page: 0, size: 100)
             
             await MainActor.run {
-                todayList = response.todays.map { item in
-                    TodayItemModel(
-                        todoId: item.todoId,
-                        content: item.content,
-                        todayStatus: item.todayStatus,
-                        isBookmark: item.isBookmark,
-                        dDay: item.dDay,
-                        deadline: item.deadline,
-                        isRepeat: item.isRepeat,
-                        imageUrl: item.imageUrl,
-                        categoryName: item.categoryName,
-                        time: item.time
-                    )
-                }
+                todayList = response.todays
             }
         } catch {
             print("Error getTodayList \(error)")
@@ -549,5 +614,20 @@ final class TodoViewModel: ObservableObject {
         } catch {
             print("Error getYesterdayList: \(error)")
         }
+    }
+}
+
+extension Set<Int> {
+    var toWeekdays: [String] {
+        let indexToDayMap = [
+            0: "월",
+            1: "화",
+            2: "수",
+            3: "목",
+            4: "금",
+            5: "토",
+            6: "일"
+        ]
+        return self.sorted().compactMap { indexToDayMap[$0] }
     }
 }

@@ -167,7 +167,6 @@ struct BacklogView: View {
                 )
             }
         }
-//        .ignoresSafeArea(.keyboard, edges: .bottom)
         .simultaneousGesture(
             TapGesture().onEnded {
                 isTextFieldFocused = false
@@ -403,7 +402,7 @@ struct BacklogItemView: View {
                     }
                 }
                 
-                if item.isRepeat || item.dDay != nil {
+                if item.isRepeat || item.isRoutine || item.dDay != nil {
                     Spacer().frame(height: 8)
                     BacklogRepeatDeadlineText(deadlineDateMode: deadlineDateMode, item: item)
                 }
@@ -566,7 +565,13 @@ struct BacklogRepeatDeadlineText: View {
                     .foregroundStyle(Color.gray50)
             }
             
-            if item.isRepeat && item.dDay != nil {
+            if item.isRoutine {
+                Text(item.routineDays.count == 7 ? "매일" : item.routineDays.joined(separator: ""))
+                    .font(PoptatoTypo.xsRegular)
+                    .foregroundStyle(Color.gray50)
+            }
+            
+            if (item.isRepeat || item.isRoutine) && item.dDay != nil {
                 Text("·")
                     .font(PoptatoTypo.xsRegular)
                     .foregroundStyle(Color.gray50)
@@ -597,7 +602,7 @@ struct BacklogRepeatDeadlineText: View {
                 }
             }
             
-            if item.isRepeat || item.dDay != nil { Spacer().frame(height: 0) }
+            if item.isRepeat || item.isRoutine || item.dDay != nil { Spacer().frame(height: 0) }
         }
     }
 }

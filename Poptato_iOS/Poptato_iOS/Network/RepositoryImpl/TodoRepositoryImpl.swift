@@ -26,9 +26,14 @@ final class TodoRepositoryImpl: TodoRepository {
         try await NetworkManager.shared.request(type: YesterdayListResponse.self, api: .getYesterdayList(page: page, size: size))
     }
     
-    func updateTodoRepeat(todoId: Int) async throws {
-        try await NetworkManager.shared.request(api: .updateTodoRepeat(todoId: todoId))
+    func setTodoRepeat(todoId: Int) async throws {
+        try await NetworkManager.shared.request(api: .setTodoRepeat(todoId: todoId))
     }
+    
+    func deleteTodoRepeat(todoId: Int) async throws {
+        try await NetworkManager.shared.request(api: .deleteTodoRepeat(todoId: todoId))
+    }
+    
     func getTodoDetail(todoId: Int) async throws -> TodoDetailModel {
         try await NetworkManager.shared.request(type: TodoDetailModel.self, api: .getTodoDetail(todoId: todoId))
     }
@@ -42,5 +47,13 @@ final class TodoRepositoryImpl: TodoRepository {
     
     func updateTodoTime(todoId: Int, request: TodoTimeRequest) async throws {
         try await NetworkManager.shared.request(api: .updateTodoTime(todoId: todoId, request: request))
+    }
+    
+    func setTodoRoutine(todoId: Int, request: TodoRoutineRequest) async throws {
+        try await NetworkManager.shared.request(api: .setTodoRoutine(todoId: todoId, request: request))
+    }
+    
+    func deleteTodoRoutine(todoId: Int) async throws {
+        try await NetworkManager.shared.request(api: .deleteTodoRoutine(todoId: todoId))
     }
 }

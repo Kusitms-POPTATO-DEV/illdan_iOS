@@ -200,7 +200,7 @@ struct TodayItemView: View {
                         }
                     }
                     
-                    if item.isRepeat || item.deadline != nil { TodayRepeatDeadlineText(deadlineDateMode: deadlineDateMode, item: item) }
+                    if item.isRepeat || item.isRoutine || item.deadline != nil { TodayRepeatDeadlineText(deadlineDateMode: deadlineDateMode, item: item) }
                     
                     if item.isBookmark || item.time != nil || item.categoryName != nil { TodayBookmarkTimeCategoryChip(item: item) }
                 }
@@ -306,12 +306,18 @@ struct TodayRepeatDeadlineText: View {
     var body: some View {
         HStack(spacing: 3) {
             if item.isRepeat {
-                Text("반복")
+                Text("일반 반복")
                     .font(PoptatoTypo.xsRegular)
                     .foregroundStyle(Color.gray50)
             }
             
-            if item.isRepeat && item.dDay != nil {
+            if item.isRoutine {
+                Text(item.routineDays.count == 7 ? "매일" : item.routineDays.joined(separator: ""))
+                    .font(PoptatoTypo.xsRegular)
+                    .foregroundStyle(Color.gray50)
+            }
+            
+            if (item.isRepeat || item.isRoutine) && item.dDay != nil {
                 Text("·")
                     .font(PoptatoTypo.xsRegular)
                     .foregroundStyle(Color.gray50)
@@ -346,7 +352,7 @@ struct TodayRepeatDeadlineText: View {
                 }
             }
             
-            if item.isRepeat || item.dDay != nil { Spacer() }
+            if item.isRepeat || item.isRoutine || item.dDay != nil { Spacer() }
         }
     }
 }

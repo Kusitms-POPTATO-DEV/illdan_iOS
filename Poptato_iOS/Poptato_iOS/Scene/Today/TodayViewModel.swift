@@ -47,29 +47,29 @@ final class TodayViewModel: ObservableObject {
     }
     
     func getTodayList() async {
-        do {
-            let response = try await todayRepository.getTodayList(page: 0, size: 50)
-            await MainActor.run {
-                todayList = response.todays.map { item in
-                    TodayItemModel(
-                        todoId: item.todoId,
-                        content: item.content,
-                        todayStatus: item.todayStatus,
-                        isBookmark: item.isBookmark,
-                        dDay: item.dDay,
-                        deadline: item.deadline,
-                        isRepeat: item.isRepeat,
-                        imageUrl: item.imageUrl,
-                        categoryName: item.categoryName
-                    )
-                }
-                self.snapshotList = self.todayList
-            }
-        } catch {
-            DispatchQueue.main.async {
-                print("Error getTodayList \(error)")
-            }
-        }
+//        do {
+//            let response = try await todayRepository.getTodayList(page: 0, size: 50)
+//            await MainActor.run {
+//                todayList = response.todays.map { item in
+//                    TodayItemModel(
+//                        todoId: item.todoId,
+//                        content: item.content,
+//                        todayStatus: item.todayStatus,
+//                        isBookmark: item.isBookmark,
+//                        dDay: item.dDay,
+//                        deadline: item.deadline,
+//                        isRepeat: item.isRepeat,
+//                        imageUrl: item.imageUrl,
+//                        categoryName: item.categoryName
+//                    )
+//                }
+//                self.snapshotList = self.todayList
+//            }
+//        } catch {
+//            DispatchQueue.main.async {
+//                print("Error getTodayList \(error)")
+//            }
+//        }
     }
     
     func swipeToday(todoId: Int) async {
@@ -189,7 +189,7 @@ final class TodayViewModel: ObservableObject {
     
     func updateTodoRepeat(todoId: Int) async {
         do {
-            try await todoRepository.updateTodoRepeat(todoId: todoId)
+            try await todoRepository.setTodoRepeat(todoId: todoId)
             
             await MainActor.run {
                 if let index = todayList.firstIndex(where: { $0.todoId == todoId }) {
@@ -232,30 +232,30 @@ final class TodayViewModel: ObservableObject {
     }
     
     func getTodoDetail(item: TodoItemModel) async {
-        do {
-            AnalyticsManager.shared.logEvent(AnalyticsEvent.today_bottom_sheet)
-            let response = try await todoRepository.getTodoDetail(todoId: item.todoId)
-            let categoryId = categoryList.first { category in
-                category.name == response.categoryName && category.imageUrl == response.emojiImageUrl
-            }?.id
-            
-            await MainActor.run {
-                let newItem = TodoItemModel(
-                    todoId: item.todoId,
-                    content: item.content,
-                    isBookmark: item.isBookmark,
-                    isRepeat: item.isRepeat,
-                    dDay: item.dDay,
-                    deadline: item.deadline,
-                    categoryId: categoryId,
-                    categoryName: response.categoryName,
-                    imageUrl: response.emojiImageUrl
-                )
-                updateSelectedItem(item: newItem)
-            }
-        } catch {
-            print("Error getTodoDetail: \(error)")
-        }
+//        do {
+//            AnalyticsManager.shared.logEvent(AnalyticsEvent.today_bottom_sheet)
+//            let response = try await todoRepository.getTodoDetail(todoId: item.todoId)
+//            let categoryId = categoryList.first { category in
+//                category.name == response.categoryName && category.imageUrl == response.emojiImageUrl
+//            }?.id
+//            
+//            await MainActor.run {
+//                let newItem = TodoItemModel(
+//                    todoId: item.todoId,
+//                    content: item.content,
+//                    isBookmark: item.isBookmark,
+//                    isRepeat: item.isRepeat,
+//                    dDay: item.dDay,
+//                    deadline: item.deadline,
+//                    categoryId: categoryId,
+//                    categoryName: response.categoryName,
+//                    imageUrl: response.emojiImageUrl
+//                )
+//                updateSelectedItem(item: newItem)
+//            }
+//        } catch {
+//            print("Error getTodoDetail: \(error)")
+//        }
     }
     
     func updateSelectedItem(item: TodoItemModel?) {
