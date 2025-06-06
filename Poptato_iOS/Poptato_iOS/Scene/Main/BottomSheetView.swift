@@ -21,6 +21,7 @@ struct BottomSheetView: View {
     var updateTodoRepeat: (Bool) -> Void
     var updateCategory: (Int?) -> Void
     var updateTodoTime: (TimeInfo?) -> Void
+    var updateTodoRoutine: (Set<Int>?) -> Void
     var categoryList: [CategoryModel]
     
     var body: some View {
@@ -41,7 +42,7 @@ struct BottomSheetView: View {
                     } else if showRoutineBottomSheet {
                         RoutineBottomSheet(
                             activeWeekdays: todo.routineDayIndexes,
-                            updateActiveWeekdays: { newValue in },
+                            updateTodoRoutine: updateTodoRoutine,
                             updateTodoRepeat: updateTodoRepeat,
                             onDismissRequest: { showRoutineBottomSheet = false }
                         )

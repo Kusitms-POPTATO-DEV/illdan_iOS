@@ -12,7 +12,7 @@ struct RoutineBottomSheet: View {
     @State private var isOn: Bool = false
     @State var activeWeekdays: Set<Int> = []
     
-    var updateActiveWeekdays: (Set<Int>?) -> Void
+    var updateTodoRoutine: (Set<Int>?) -> Void
     var updateTodoRepeat: (Bool) -> Void
     var onDismissRequest: () -> Void
     
@@ -55,7 +55,7 @@ struct RoutineBottomSheet: View {
                     negativeText: "삭제",
                     onClickBtnPositive: {
                         if routineType == RoutineType.WEEKDAY {
-                            updateActiveWeekdays(activeWeekdays)
+                            updateTodoRoutine(activeWeekdays)
                         } else {
                             updateTodoRepeat(true)
                         }
@@ -64,7 +64,7 @@ struct RoutineBottomSheet: View {
                     },
                     onClickBtnNegative: {
                         if routineType == RoutineType.WEEKDAY {
-                            updateActiveWeekdays(nil)
+                            updateTodoRoutine(nil)
                         } else {
                             updateTodoRepeat(false)
                         }

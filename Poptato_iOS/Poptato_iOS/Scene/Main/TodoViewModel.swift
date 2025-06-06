@@ -216,12 +216,16 @@ final class TodoViewModel: ObservableObject {
                 if isToday {
                     if let index = todayList.firstIndex(where: { $0.todoId == todoId }) {
                         todayList[index].isRepeat = true
+                        todayList[index].routineDays = []
                     }
                 } else {
                     if let index = backlogList.firstIndex(where: { $0.todoId == todoId }) {
                         backlogList[index].isRepeat = true
+                        backlogList[index].routineDays = []
                     }
                 }
+                selectedTodoItem?.isRepeat = true
+                selectedTodoItem?.routineDays = []
             }
         } catch {
             print("Error setTodoRepeat: \(error)")
@@ -242,9 +246,55 @@ final class TodoViewModel: ObservableObject {
                         backlogList[index].isRepeat = false
                     }
                 }
+                selectedTodoItem?.isRepeat = false
             }
         } catch {
             print("Error deleteTodoRepeat: \(error)")
+        }
+    }
+    
+    func setTodoRoutine(todoId: Int, days: Set<Int>) async {
+        do {
+            try await todoRepository.setTodoRoutine(todoId: todoId, request: TodoRoutineRequest(routineDays: days.toWeekdays))
+            
+            await MainActor.run {
+                if isToday {
+                    if let index = todayList.firstIndex(where: { $0.todoId == todoId }) {
+                        todayList[index].routineDays = days.toWeekdays
+                        todayList[index].isRepeat = false
+                    }
+                } else {
+                    if let index = backlogList.firstIndex(where: { $0.todoId == todoId }) {
+                        backlogList[index].routineDays = days.toWeekdays
+                        backlogList[index].isRepeat = false
+                    }
+                }
+                selectedTodoItem?.routineDays = days.toWeekdays
+                selectedTodoItem?.isRepeat = false
+            }
+        } catch {
+            print("Error setTodoRoutine: \(error)")
+        }
+    }
+    
+    func deleteTodoRoutine(todoId: Int) async {
+        do {
+            try await todoRepository.deleteTodoRepeat(todoId: todoId)
+            
+            await MainActor.run {
+                if isToday {
+                    if let index = todayList.firstIndex(where: { $0.todoId == todoId }) {
+                        todayList[index].routineDays = []
+                    }
+                } else {
+                    if let index = backlogList.firstIndex(where: { $0.todoId == todoId }) {
+                        backlogList[index].routineDays = []
+                    }
+                }
+                selectedTodoItem?.routineDays = []
+            }
+        } catch {
+            print("Error setTodoRoutine: \(error)")
         }
     }
     
@@ -558,5 +608,20 @@ final class TodoViewModel: ObservableObject {
         } catch {
             print("Error getYesterdayList: \(error)")
         }
+    }
+}
+
+extension Set<Int> {
+    var toWeekdays: [String] {
+        let indexToDayMap = [
+            0: "월",
+            1: "화",
+            2: "수",
+            3: "목",
+            4: "금",
+            5: "토",
+            6: "일"
+        ]
+        return self.sorted().compactMap { indexToDayMap[$0] }
     }
 }

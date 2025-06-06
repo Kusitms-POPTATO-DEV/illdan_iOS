@@ -234,6 +234,15 @@ struct MainView: View {
                                 await todoViewModel.updateTodoTime(timeInfo: info)
                             }
                         },
+                        updateTodoRoutine: { newValue in
+                            Task {
+                                if let days = newValue {
+                                    await todoViewModel.setTodoRoutine(todoId: todoItem.todoId, days: days)
+                                } else {
+                                    await todoViewModel.deleteTodoRoutine(todoId: todoItem.todoId)
+                                }
+                            }
+                        },
                         categoryList: todoViewModel.categoryList
                     )
                     .transition(.move(edge: .bottom))
