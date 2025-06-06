@@ -602,7 +602,7 @@ struct BacklogRepeatDeadlineText: View {
                 }
             }
             
-            if item.isRepeat || item.dDay != nil { Spacer().frame(height: 0) }
+            if item.isRepeat || item.isRoutine || item.dDay != nil { Spacer().frame(height: 0) }
         }
     }
 }

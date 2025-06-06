@@ -352,7 +352,7 @@ struct TodayRepeatDeadlineText: View {
                 }
             }
             
-            if item.isRepeat || item.dDay != nil { Spacer() }
+            if item.isRepeat || item.isRoutine || item.dDay != nil { Spacer() }
         }
     }
 }
