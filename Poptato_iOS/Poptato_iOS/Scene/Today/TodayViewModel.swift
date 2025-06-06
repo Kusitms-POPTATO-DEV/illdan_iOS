@@ -189,7 +189,7 @@ final class TodayViewModel: ObservableObject {
     
     func updateTodoRepeat(todoId: Int) async {
         do {
-            try await todoRepository.updateTodoRepeat(todoId: todoId)
+            try await todoRepository.setTodoRepeat(todoId: todoId)
             
             await MainActor.run {
                 if let index = todayList.firstIndex(where: { $0.todoId == todoId }) {

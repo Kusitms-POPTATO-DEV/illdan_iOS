@@ -11,7 +11,8 @@ protocol TodoRepository {
     func updateBookmark(todoId: Int) async throws -> Void
     func dragAndDrop(type: String, todoIds: Array<Int>) async throws -> Void
     func getYesterdayList(page: Int, size: Int) async throws -> YesterdayListResponse
-    func updateTodoRepeat(todoId: Int) async throws -> Void
+    func setTodoRepeat(todoId: Int) async throws -> Void
+    func deleteTodoRepeat(todoId: Int) async throws -> Void
     func getTodoDetail(todoId: Int) async throws -> TodoDetailModel
     func updateCategory(todoId: Int, categoryId: CategoryIdModel) async throws -> Void
     func updateYesterdayCompletion(todoIdsRequest: TodoIdsRequest) async throws -> Void

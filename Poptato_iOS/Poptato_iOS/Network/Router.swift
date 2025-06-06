@@ -34,7 +34,8 @@ enum Router: URLRequestConvertible {
     case updateTodoCompletion(todoId: Int)
     case updateBookmark(todoId: Int)
     case dragAndDrop(type: String, todoIds: Array<Int>)
-    case updateTodoRepeat(todoId: Int)
+    case setTodoRepeat(todoId: Int)
+    case deleteTodoRepeat(todoId: Int)
     case getTodoDetail(todoId: Int)
     case updateCategory(todoId: Int, categoryId: CategoryIdModel)
     case updateTodoTime(todoId: Int, request: TodoTimeRequest)
@@ -202,10 +203,15 @@ enum Router: URLRequestConvertible {
             request.httpMethod = "PATCH"
             request.headers = headers
             request.httpBody = try JSONEncoder().encode(DragAndDropRequest(type: type, todoIds: todoIds))
-        case .updateTodoRepeat(let todoId):
+        case .setTodoRepeat(let todoId):
             let endpoint = url.appendingPathComponent("/todo/\(todoId)/repeat")
             request = URLRequest(url: endpoint)
-            request.httpMethod = "PATCH"
+            request.httpMethod = "POST"
+            request.headers = headers
+        case .deleteTodoRepeat(let todoId):
+            let endpoint = url.appendingPathComponent("/todo/\(todoId)/repeat")
+            request = URLRequest(url: endpoint)
+            request.httpMethod = "DELETE"
             request.headers = headers
         case .getTodoDetail(let todoId):
             var components = URLComponents(url: url.appendingPathComponent("/todo/\(todoId)"), resolvingAgainstBaseURL: false)

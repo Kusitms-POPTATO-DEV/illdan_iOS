@@ -208,7 +208,7 @@ final class TodoViewModel: ObservableObject {
     
     func updateTodoRepeat(todoId: Int) async {
         do {
-            try await todoRepository.updateTodoRepeat(todoId: todoId)
+            try await todoRepository.setTodoRepeat(todoId: todoId)
             
             await MainActor.run {
                 if isToday {
