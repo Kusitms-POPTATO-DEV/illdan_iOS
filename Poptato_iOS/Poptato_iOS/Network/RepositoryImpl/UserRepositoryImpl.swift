@@ -13,4 +13,8 @@ class UserRepositoryImpl: UserRepository {
     func getPolicy() async throws -> PolicyResponse {
         try await NetworkManager.shared.request(type: PolicyResponse.self, api: .getPolicy)
     }
+    
+    func sendComment(request: UserCommentRequest) async throws {
+        try await NetworkManager.shared.request(api: .sendComment(commentRequest: request))
+    }
 }
