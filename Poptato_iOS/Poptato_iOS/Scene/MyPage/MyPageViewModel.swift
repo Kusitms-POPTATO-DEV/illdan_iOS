@@ -5,6 +5,7 @@
 //  Created by 현수 노트북 on 11/4/24.
 //
 
+import Combine
 import SwiftUI
 
 class MyPageViewModel: ObservableObject {
@@ -17,6 +18,14 @@ class MyPageViewModel: ObservableObject {
     @Published var deadlineDateMode: Bool
     @Published var userInputReason: String = ""
     @Published var selectedReasons: [Bool] = [false, false, false]
+    
+    // MARK: - UserCommentView State
+    @Published var comment: String = ""
+    @Published var contact: String = ""
+    @Published var showSuccessToast: Bool = false
+    @Published var showFailureToast: Bool = false
+    
+    let eventPublisher = PassthroughSubject<MyPageEvent, Never>()
     
     private let list = ["NOT_USED_OFTEN", "MISSING_FEATURES", "TOO_COMPLEX"]
     
@@ -95,5 +104,22 @@ class MyPageViewModel: ObservableObject {
     
     func updateDealineMode(_ value: Bool) async {
         AppStorageManager.deadlineDateMode = value
+    }
+    
+    // MARK: - UserCommentView Handler
+    
+    func sendComment() async {
+        do {
+            try await userRepository.sendComment(request: UserCommentRequest(content: comment, contactInfo: contact))
+            
+            await MainActor.run {
+                eventPublisher.send(.sendCommentSuccess)
+            }
+        } catch {
+            print("Error sendComment: \(error)")
+            await MainActor.run {
+                eventPublisher.send(.sendCommentFailure)
+            }
+        }
     }
 }
