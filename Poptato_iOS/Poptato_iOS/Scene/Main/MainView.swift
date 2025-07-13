@@ -20,11 +20,13 @@ struct MainView: View {
     @State private var isRoutineBottomSheetVisible = false
     @State private var isPolicyViewPresented = false
     @State private var isYesterdayViewPresented = false
+    @State private var isUserCommentViewPresented = false
     @State private var isMotivationViewPresented = false
     @State private var isCreateCategoryViewPresented = false
     @State private var isToastPresented = false
     @State private var toastMessage = ""
     @StateObject private var todoViewModel = TodoViewModel()
+    @StateObject private var myPageViewModel = MyPageViewModel()
     
     init(isLogined: Binding<Bool>) {
         self._isLogined = isLogined
@@ -109,8 +111,10 @@ struct MainView: View {
                                 isLogined = false
                                 selectedTab = 0
                             },
+                            goToUserCommentView: { isUserCommentViewPresented = true },
                             isPolicyViewPresented: $isPolicyViewPresented
                         )
+                        .environmentObject(myPageViewModel)
                         .tabItem {
                             Label("", image: selectedTab == 3 ? "ic_my_selected" : "ic_mypage")
                         }
@@ -259,7 +263,14 @@ struct MainView: View {
                 isMotivationViewPresented: $isMotivationViewPresented
             )
         }
+        .fullScreenCover(isPresented: $isUserCommentViewPresented) {
+            UserCommentView(
+                onClickBtnBack: { isUserCommentViewPresented = false }
+            )
+            .environmentObject(myPageViewModel)
+        }
         .toast(isPresented: $isToastPresented, message: toastMessage)
+        .toast(isPresented: $myPageViewModel.showSuccessToast, message: "더 나은 서비스로 보답할게요")
         .onAppear {
             Task {
                 if todoViewModel.isExistYesterdayTodo {

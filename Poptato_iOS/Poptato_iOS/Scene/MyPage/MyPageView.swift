@@ -9,7 +9,8 @@ import SwiftUI
 
 struct MyPageView: View {
     var goToKaKaoLogin: () -> Void
-    @StateObject private var viewModel = MyPageViewModel()
+    var goToUserCommentView: () -> Void
+    @EnvironmentObject var viewModel: MyPageViewModel
     @Binding var isPolicyViewPresented: Bool
     @State private var isNoticeViewPresented = false
     @State private var isFaqViewPresented = false
@@ -38,9 +39,8 @@ struct MyPageView: View {
                     
                     SettingMenuListView(
                         deadlineDateMode: $viewModel.deadlineDateMode,
-                        isNoticeViewPresented: $isNoticeViewPresented,
-                        isFaqViewPresented: $isFaqViewPresented,
-                        isPolicyViewPresented: $isPolicyViewPresented
+                        isPolicyViewPresented: $isPolicyViewPresented,
+                        onClickCommentButton: { goToUserCommentView() }
                     )
                     
                     Spacer()
@@ -53,12 +53,6 @@ struct MyPageView: View {
                 Task {
                     await viewModel.getUserInfo()
                 }
-            }
-            .fullScreenCover(isPresented: $isNoticeViewPresented) {
-                WebViewScreen(url: URL(string: "https://www.notion.so/164d60b563cc8091a84cf5fa4b2addad")!)
-            }
-            .fullScreenCover(isPresented: $isFaqViewPresented) {
-                WebViewScreen(url: URL(string: "https://www.notion.so/FAQ-164d60b563cc80beb7e5c388954353b5")!)
             }
             .navigationDestination(for: NavRoutes.Settings.self) { view in
                 switch view {
@@ -132,9 +126,9 @@ struct ProfileInfoView: View {
 
 struct SettingMenuListView: View {
     @Binding var deadlineDateMode: Bool
-    @Binding var isNoticeViewPresented: Bool
-    @Binding var isFaqViewPresented: Bool
     @Binding var isPolicyViewPresented: Bool
+    
+    var onClickCommentButton: () -> Void = {}
     
     var body: some View {
         VStack(alignment: .leading, spacing: 32) {
@@ -153,14 +147,8 @@ struct SettingMenuListView: View {
                     }
             }
             
-            MyPageButton(text: "공지사항", onClickBtn: {
-                AnalyticsManager.shared.logEvent(AnalyticsEvent.notice)
-                isNoticeViewPresented = true
-            })
-            
-            MyPageButton(text: "문의 & FAQ", onClickBtn: {
-                AnalyticsManager.shared.logEvent(AnalyticsEvent.faq)
-                isFaqViewPresented = true
+            MyPageButton(text: "개발자에게 의견 보내기", onClickBtn: {
+                onClickCommentButton()
             })
             
             MyPageButton(text: "개인정보처리 방침", onClickBtn: {
