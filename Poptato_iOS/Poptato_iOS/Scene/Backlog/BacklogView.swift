@@ -560,7 +560,7 @@ struct BacklogRepeatDeadlineText: View {
     var body: some View {
         HStack(alignment: .center, spacing: 3) {
             if item.isRepeat {
-                Text("반복")
+                Text("일반 반복")
                     .font(PoptatoTypo.xsRegular)
                     .foregroundStyle(Color.gray50)
             }
