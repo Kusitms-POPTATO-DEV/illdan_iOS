@@ -261,7 +261,7 @@ enum Router: URLRequestConvertible {
         case .sendComment(let commentRequest):
             let endpoint = url.appendingPathComponent("/user/comments")
             request = URLRequest(url: endpoint)
-            request.httpMethod = "GET"
+            request.httpMethod = "POST"
             request.headers = headers
             request.httpBody = try JSONEncoder().encode(commentRequest)
             
