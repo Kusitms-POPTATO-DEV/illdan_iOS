@@ -45,6 +45,7 @@ enum Router: URLRequestConvertible {
     // mypage
     case getUserInfo
     case getPolicy
+    case sendComment(commentRequest: UserCommentRequest)
     
     // history
     case getHistory(date: String)
@@ -257,6 +258,12 @@ enum Router: URLRequestConvertible {
             request = URLRequest(url: endpoint)
             request.httpMethod = "GET"
             request.headers = headers
+        case .sendComment(let commentRequest):
+            let endpoint = url.appendingPathComponent("/user/comments")
+            request = URLRequest(url: endpoint)
+            request.httpMethod = "POST"
+            request.headers = headers
+            request.httpBody = try JSONEncoder().encode(commentRequest)
             
         // history
         case .getHistory(let date):

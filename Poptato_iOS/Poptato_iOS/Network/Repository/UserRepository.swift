@@ -8,4 +8,5 @@
 protocol UserRepository {
     func getUserInfo() async throws -> UserInfoResponse
     func getPolicy() async throws -> PolicyResponse
+    func sendComment(request: UserCommentRequest) async throws -> Void
 }
