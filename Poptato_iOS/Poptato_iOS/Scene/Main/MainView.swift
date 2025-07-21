@@ -265,7 +265,10 @@ struct MainView: View {
         }
         .fullScreenCover(isPresented: $isUserCommentViewPresented) {
             UserCommentView(
-                onClickBtnBack: { isUserCommentViewPresented = false }
+                onClickBtnBack: {
+                    myPageViewModel.clearUserComment()
+                    isUserCommentViewPresented = false
+                }
             )
             .environmentObject(myPageViewModel)
         }
