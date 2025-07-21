@@ -113,6 +113,8 @@ class MyPageViewModel: ObservableObject {
             try await userRepository.sendComment(request: UserCommentRequest(content: comment, contactInfo: contact))
             
             await MainActor.run {
+                comment = ""
+                contact = ""
                 eventPublisher.send(.sendCommentSuccess)
             }
         } catch {
