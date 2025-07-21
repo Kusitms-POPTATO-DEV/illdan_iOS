@@ -18,7 +18,7 @@ struct TodayView: View {
     @State private var hapticFeedback = UIImpactFeedbackGenerator(style: .medium)
     
     var body: some View {
-        ZStack {
+        ZStack(alignment: .topLeading) {
             if isViewActive {
                 Color(.gray100)
                     .ignoresSafeArea()
@@ -48,6 +48,8 @@ struct TodayView: View {
                                     Task {
                                         await viewModel.updateTodoCompletion(todoId: id)
                                         
+                                        if viewModel.showThirdGuideBubble { viewModel.showThirdGuideBubble = false }
+                                        
                                         if viewModel.checkAllTodoCompleted() {
                                             performDoubleHapticFeedback()
                                             showToast("와우! 수고한 나 자신에게 박수!👏")
@@ -67,6 +69,12 @@ struct TodayView: View {
                             )
                         }
                     }
+                }
+                
+                if (viewModel.showThirdGuideBubble) {
+                    Image("ic_guide_bubble_3")
+                        .padding(.top, 85)
+                        .padding(.leading, 20)
                 }
             } else {
                 Color(.gray100)
