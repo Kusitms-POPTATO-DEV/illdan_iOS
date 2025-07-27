@@ -56,7 +56,10 @@ struct MainView: View {
                         set: { newValue in
                             self.selectedTab = newValue
                             
-                            if newValue == 0 && todoViewModel.showSecondGuideBubble { todoViewModel.showSecondGuideBubble = false }
+                            if newValue == 0 && todoViewModel.showSecondGuideBubble {
+                                todoViewModel.showSecondGuideBubble = false
+                                todoViewModel.showThirdGuideBubble = true
+                            }
                         }
                     )) {
                         TodayView(
@@ -265,7 +268,10 @@ struct MainView: View {
         }
         .fullScreenCover(isPresented: $isUserCommentViewPresented) {
             UserCommentView(
-                onClickBtnBack: { isUserCommentViewPresented = false }
+                onClickBtnBack: {
+                    myPageViewModel.clearUserComment()
+                    isUserCommentViewPresented = false
+                }
             )
             .environmentObject(myPageViewModel)
         }

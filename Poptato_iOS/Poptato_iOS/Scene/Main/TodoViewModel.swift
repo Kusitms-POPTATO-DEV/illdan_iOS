@@ -34,6 +34,7 @@ final class TodoViewModel: ObservableObject {
     /// 가이드 말풍선 상태 변수
     @Published var showFirstGuideBubble: Bool = false
     @Published var showSecondGuideBubble: Bool = false
+    @Published var showThirdGuideBubble: Bool = false
     
     /// 카테고리 관련 상태 변수
     @Published var isCategoryEditMode: Bool = false

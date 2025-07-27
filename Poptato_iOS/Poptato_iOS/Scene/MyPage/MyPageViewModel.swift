@@ -113,8 +113,7 @@ class MyPageViewModel: ObservableObject {
             try await userRepository.sendComment(request: UserCommentRequest(content: comment, contactInfo: contact))
             
             await MainActor.run {
-                comment = ""
-                contact = ""
+                clearUserComment()
                 eventPublisher.send(.sendCommentSuccess)
             }
         } catch {
@@ -123,5 +122,10 @@ class MyPageViewModel: ObservableObject {
                 eventPublisher.send(.sendCommentFailure)
             }
         }
+    }
+    
+    func clearUserComment() {
+        comment = ""
+        contact = ""
     }
 }
