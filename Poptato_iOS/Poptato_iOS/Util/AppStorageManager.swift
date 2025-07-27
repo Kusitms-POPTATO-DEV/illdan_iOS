@@ -10,6 +10,7 @@ import SwiftUI
 
 struct AppStorageManager {
     private static let deadlineDateModeKey = "deadlineDateMode"
+    private static let todoCompletionCountKey = "todoCompletionCount"
     
     static let deadlineDateModePublisher = CurrentValueSubject<Bool, Never>(UserDefaults.standard.bool(forKey: deadlineDateModeKey))
     
@@ -21,5 +22,25 @@ struct AppStorageManager {
             UserDefaults.standard.set(newValue, forKey: deadlineDateModeKey)
             deadlineDateModePublisher.send(newValue)
         }
+    }
+    
+    static let todoCompletionCountPublisher = CurrentValueSubject<Int, Never>(
+        UserDefaults.standard.integer(forKey: todoCompletionCountKey)
+    )
+    
+    static var todoCompletionCount: Int {
+        get { todoCompletionCountPublisher.value }
+        set {
+            UserDefaults.standard.set(newValue, forKey: todoCompletionCountKey)
+            todoCompletionCountPublisher.send(newValue)
+        }
+    }
+    
+    static func incrementTodoCompletionCount() {
+        todoCompletionCount += 1
+    }
+    
+    static func resetTodoCompletionCount() {
+        todoCompletionCount = 0
     }
 }

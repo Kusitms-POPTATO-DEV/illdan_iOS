@@ -15,6 +15,9 @@ final class TodoViewModel: ObservableObject {
     private let backlogRepository: BacklogRepository
     private var cancellables = Set<AnyCancellable>()
     
+    /// 인앱 리뷰 요청 시점을 알리는 퍼블리셔
+    let reviewRequest = PassthroughSubject<Void, Never>()
+    
     @Published var selectedTodoItem: TodoItemModel? = .placeholder
     
     /// 오늘 페이지 상태 변수
@@ -429,6 +432,17 @@ final class TodoViewModel: ObservableObject {
         do {
             AnalyticsManager.shared.logEvent(AnalyticsEvent.complete_task, parameters: ["task_id" : todoId])
             try await todoRepository.updateTodoCompletion(todoId: todoId)
+            
+            AppStorageManager.incrementTodoCompletionCount()
+            
+            let count = AppStorageManager.todoCompletionCount
+            print("count: \(count)")
+            if count == 10 || count == 40 || count == 80 {
+                await MainActor.run {
+                    reviewRequest.send(())
+                }
+            }
+            
         } catch {
             await MainActor.run {
                 print("Error update todocompletion: \(error)")
