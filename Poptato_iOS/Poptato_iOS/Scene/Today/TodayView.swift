@@ -7,6 +7,7 @@
 
 import SwiftUI
 import UIKit
+import StoreKit
 
 struct TodayView: View {
     @EnvironmentObject var viewModel: TodoViewModel
@@ -95,12 +96,25 @@ struct TodayView: View {
         .onDisappear {
             isViewActive = false
         }
+        .onReceive(viewModel.reviewRequest) { _ in
+            requestInAppReview()
+        }
     }
     
     private func performDoubleHapticFeedback() {
         DispatchQueue.main.asyncAfter(deadline: .now() + 0.3) {
             hapticFeedback.impactOccurred()
         }
+    }
+    
+    private func requestInAppReview() {
+        guard let scene = UIApplication.shared
+                  .connectedScenes
+                  .first(where: { $0.activationState == .foregroundActive })
+                  as? UIWindowScene else {
+            return
+        }
+        SKStoreReviewController.requestReview(in: scene)
     }
 }
 
