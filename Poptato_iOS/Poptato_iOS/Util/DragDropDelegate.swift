@@ -13,22 +13,34 @@ struct DragDropDelegate: DropDelegate {
     @Binding var draggedItem: TodoItemModel?
     var onReorder: () -> Void
     
+    func validateDrop(info: DropInfo) -> Bool {
+        true
+    }
+    
     func dropEntered(info: DropInfo) {
-        guard let draggedItem = draggedItem, draggedItem.todoId != item.todoId else {
-            return
-        }
+        guard let dragged = draggedItem, dragged.todoId != item.todoId else { return }
+        guard let from = backlogList.firstIndex(where: { $0.todoId == dragged.todoId }),
+              let to   = backlogList.firstIndex(where: { $0.todoId == item.todoId }) else { return }
+        
+        print("드롭 시작: \(draggedItem)")
 
-        if let fromIndex = backlogList.firstIndex(where: { $0.todoId == draggedItem.todoId }),
-           let toIndex = backlogList.firstIndex(where: { $0.todoId == item.todoId }) {
-            withAnimation {
-                backlogList.move(fromOffsets: IndexSet(integer: fromIndex), toOffset: toIndex > fromIndex ? toIndex + 1 : toIndex)
-            }
+        withAnimation {
+          backlogList.move(
+            fromOffsets: IndexSet(integer: from),
+            toOffset: to > from ? to + 1 : to
+          )
         }
     }
+    
+    func dropUpdated(info: DropInfo) -> DropProposal? { .init(operation: .move) }
 
     func performDrop(info: DropInfo) -> Bool {
         draggedItem = nil
-        onReorder()
+        
+        DispatchQueue.main.async { onReorder() }
+        
+        print("드롭 끝: \(draggedItem)")
+        
         return true
     }
 }
@@ -75,23 +87,34 @@ struct TodayDragDropDelegate: DropDelegate {
     @Binding var draggedItem: TodayItemModel?
     var onReorder: () -> Void
     
+    func validateDrop(info: DropInfo) -> Bool {
+        true
+    }
+    
     func dropEntered(info: DropInfo) {
-        guard let draggedItem = draggedItem, draggedItem.todoId != item.todoId else {
+        guard let dragged = draggedItem, dragged.todoId != item.todoId else { return }
+        guard let from = todayList.firstIndex(where: { $0.todoId == dragged.todoId }),
+              let to   = todayList.firstIndex(where: { $0.todoId == item.todoId }) else { return }
+
+        if todayList[from].todayStatus == "COMPLETED" || todayList[to].todayStatus == "COMPLETED" {
             return
         }
-        
-        if let fromIndex = todayList.firstIndex(where: { $0.todoId == draggedItem.todoId }),
-           let toIndex = todayList.firstIndex(where: { $0.todoId == item.todoId }) {
-            if todayList[fromIndex].todayStatus == "COMPLETED" || todayList[toIndex].todayStatus == "COMPLETED" { return }
-            withAnimation {
-                todayList.move(fromOffsets: IndexSet(integer: fromIndex), toOffset: toIndex > fromIndex ? toIndex + 1 : toIndex)
-            }
+
+        withAnimation {
+            todayList.move(
+                fromOffsets: IndexSet(integer: from),
+                toOffset: to > from ? to + 1 : to
+            )
         }
+    }
+    
+    func dropUpdated(info: DropInfo) -> DropProposal? {
+      return DropProposal(operation: .move)
     }
     
     func performDrop(info: DropInfo) -> Bool {
         draggedItem = nil
-        onReorder()
+        DispatchQueue.main.async { onReorder() }
         return true
     }
 }
