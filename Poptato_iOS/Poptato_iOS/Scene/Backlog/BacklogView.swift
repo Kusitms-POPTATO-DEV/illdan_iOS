@@ -323,41 +323,56 @@ struct BacklogListView: View {
     @Binding var content: String
     @FocusState.Binding var isActive: Bool
     @State private var draggedItem: TodoItemModel?
-    @State private var isDragging: Bool = false
     var deadlineDateMode: Bool
-    
+
     var body: some View {
-        ScrollView {
-            LazyVStack(spacing: 16) {
-                ForEach(backlogList.indices, id: \.self) { index in
-                    let item = backlogList[index]
-                    
-                    BacklogItemView(
-                        item: $backlogList[index],
-                        backlogList: $backlogList,
-                        onItemSelected: onItemSelected,
-                        editBacklog: editBacklog,
-                        swipeBacklog: swipeBacklog,
-                        activeItemId: $activeItemId,
-                        content: $content,
-                        isActive: $isActive,
-                        deadlineDateMode: deadlineDateMode
-                    )
-                    .onDrag {
-                        draggedItem = item
-                        isDragging = true
-                        return NSItemProvider(object: "\(item.todoId)" as NSString)
+        ZStack {
+            ScrollView {
+                LazyVStack(spacing: 16) {
+                    ForEach(backlogList, id: \.todoId) { item in
+                        BacklogItemView(
+                            item: binding(for: item.todoId),
+                            backlogList: $backlogList,
+                            onItemSelected: onItemSelected,
+                            editBacklog: editBacklog,
+                            swipeBacklog: swipeBacklog,
+                            activeItemId: $activeItemId,
+                            content: $content,
+                            isActive: $isActive,
+                            deadlineDateMode: deadlineDateMode
+                        )
+                        .contentShape(Rectangle())
+                        .onDrag {
+                            draggedItem = item
+                            return NSItemProvider(object: "\(item.todoId)" as NSString)
+                        }
+                        .onDrop(
+                            of: [.plainText],
+                            delegate: DragDropDelegate(
+                                item: item,
+                                backlogList: $backlogList,
+                                draggedItem: $draggedItem,
+                                onReorder: { onDragEnd() }
+                            )
+                        )
                     }
-                    .onDrop(of: [.text], delegate: DragDropDelegate(item: item, backlogList: $backlogList, draggedItem: $draggedItem, onReorder: {
-                        isDragging = false
-                        onDragEnd()
-                    }))
                 }
+                Spacer().frame(height: 45)
             }
-            Spacer().frame(height: 45)
+        }
+        .onDrop(of: [.plainText], isTargeted: nil) { _ in
+            guard draggedItem != nil else { return false }
+            draggedItem = nil
+            DispatchQueue.main.async { onDragEnd() }
+            return true
         }
         .frame(maxWidth: .infinity)
         .padding(.horizontal, 20)
+    }
+
+    private func binding(for id: Int) -> Binding<TodoItemModel> {
+        let idx = backlogList.firstIndex { $0.todoId == id }!
+        return $backlogList[idx]
     }
 }
 
@@ -441,6 +456,7 @@ struct BacklogItemView: View {
         .padding(.horizontal, 16)
         .padding(.vertical, 12)
         .background(RoundedRectangle(cornerRadius: 12))
+        .contentShape(Rectangle())
         .foregroundColor(.gray95)
         .offset(x: offset)
         .highPriorityGesture(
