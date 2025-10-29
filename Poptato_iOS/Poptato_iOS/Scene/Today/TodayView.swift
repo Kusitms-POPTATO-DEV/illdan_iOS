@@ -128,41 +128,56 @@ struct TodayListView: View {
     @Binding var activeItemId: Int?
     @State private var draggedItem: TodayItemModel?
     @State private var draggedIndex: Int?
-    @State private var isDragging: Bool = false
     @State private var hapticFeedback = UIImpactFeedbackGenerator(style: .medium)
     @State var deadlineDateMode: Bool
     
     var body: some View {
-        ScrollView {
-            LazyVStack(spacing: 16) {
-                ForEach(todayList.indices, id: \.self) { index in
-                    let item = todayList[index]
-                    
-                    TodayItemView(
-                        item: $todayList[index],
-                        todayList: $todayList,
-                        activeItemId: $activeItemId,
-                        editToday: editToday,
-                        swipeToday: swipeToday,
-                        updateTodoCompletion: updateTodoCompletion,
-                        onItemSelected: onItemSelected,
-                        deadlineDateMode: deadlineDateMode
-                    )
-                    .onDrag {
-                        draggedItem = item
-                        isDragging = true
-                        return NSItemProvider(object: "\(item.todoId)" as NSString)
+        ZStack {
+            ScrollView {
+                LazyVStack(spacing: 16) {
+                    ForEach(todayList, id: \.todoId) { item in
+                        TodayItemView(
+                            item: binding(for: item.todoId),
+                            todayList: $todayList,
+                            activeItemId: $activeItemId,
+                            editToday: editToday,
+                            swipeToday: swipeToday,
+                            updateTodoCompletion: updateTodoCompletion,
+                            onItemSelected: onItemSelected,
+                            deadlineDateMode: deadlineDateMode
+                        )
+                        .contentShape(Rectangle())
+                        .onDrag {
+                            draggedItem = item
+                            return NSItemProvider(object: "\(item.todoId)" as NSString)
+                        }
+                        .onDrop(
+                            of: [.plainText],
+                            delegate: TodayDragDropDelegate(
+                                item: item,
+                                todayList: $todayList,
+                                draggedItem: $draggedItem,
+                                onReorder: { onDragEnd() }
+                            )
+                        )
                     }
-                    .onDrop(of: [.text], delegate: TodayDragDropDelegate(item: item, todayList: $todayList, draggedItem: $draggedItem, onReorder: {
-                        isDragging = false
-                        onDragEnd()
-                    }))
                 }
             }
+        }
+        .onDrop(of: [.plainText], isTargeted: nil) { _ in
+            guard draggedItem != nil else { return false }
+            draggedItem = nil
+            DispatchQueue.main.async { onDragEnd() }
+            return true
         }
         .frame(maxWidth: .infinity)
         .padding(.horizontal, 20)
         .padding(.top, 20)
+    }
+    
+    private func binding(for id: Int) -> Binding<TodayItemModel> {
+        let idx = todayList.firstIndex { $0.todoId == id }!
+        return $todayList[idx]
     }
 }
 
@@ -255,6 +270,7 @@ struct TodayItemView: View {
         .frame(maxWidth: .infinity)
         .padding(.vertical, 12)
         .padding(.horizontal, 16)
+        .contentShape(Rectangle())
         .background(RoundedRectangle(cornerRadius: 12))
         .foregroundColor(.gray95)
         .offset(x: offset)
